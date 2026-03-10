@@ -1,0 +1,218 @@
+/* ── Error Boundary ──────────────────────────────────────────────────── */
+.error-boundary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    padding: 2rem;
+}
+
+.error-boundary-card {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 80, 80, 0.2);
+    border-radius: 16px;
+    padding: 2rem 3rem;
+    backdrop-filter: blur(12px);
+    max-width: 400px;
+}
+
+.error-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.error-boundary-card h3 {
+    color: #ff8080;
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    margin: 0 0 1.2rem;
+    word-break: break-word;
+}
+
+.error-retry-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.error-retry-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Skeleton ────────────────────────────────────────────────────────── */
+.skeleton {
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.04) 25%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+    border-radius: 6px;
+}
+
+.skeleton-rounded {
+    border-radius: 50%;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.card-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.2rem;
+}
+
+/* ── Mobile Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Sidebar collapses to bottom nav */
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        border-right: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        z-index: 100;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 0.5rem;
+    }
+
+    .sidebar .sidebar-header,
+    .sidebar .sidebar-footer {
+        display: none;
+    }
+
+    .sidebar .sidebar-nav {
+        flex-direction: row;
+        gap: 0;
+        flex: 1;
+        justify-content: space-around;
+    }
+
+    .sidebar .nav-item {
+        flex-direction: column;
+        font-size: 0.65rem;
+        gap: 0.15rem;
+        padding: 0.4rem;
+        min-width: 48px;
+    }
+
+    .sidebar .nav-icon {
+        font-size: 1.2rem;
+    }
+
+    .sidebar .nav-label {
+        font-size: 0.6rem;
+        white-space: nowrap;
+    }
+
+    /* Main content adjusts for bottom nav */
+    .main-content {
+        margin-left: 0 !important;
+        padding-bottom: 70px;
+    }
+
+    /* Overview grid becomes single column */
+    .overview-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Settings tabs scroll horizontally */
+    .settings-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.3rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .settings-tab-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    /* Card layouts */
+    .glass-card,
+    .status-card,
+    .financial-card {
+        padding: 1rem;
+    }
+
+    /* Capability grid */
+    .capability-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Page headers */
+    .page-header {
+        padding: 0.5rem 0;
+    }
+
+    .page-title {
+        font-size: 1.3rem;
+    }
+
+    /* Chat interface */
+    .chat-messages {
+        max-height: 60vh;
+    }
+
+    /* Skills panel */
+    .skills-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        height: 54px;
+    }
+
+    .sidebar .nav-label {
+        display: none;
+    }
+
+    .sidebar .nav-item {
+        padding: 0.3rem;
+    }
+
+    .main-content {
+        padding: 0.5rem;
+        padding-bottom: 60px;
+    }
+
+    .god-mode-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+}

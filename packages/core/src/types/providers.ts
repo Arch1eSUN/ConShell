@@ -7,6 +7,7 @@ import type {
     CAIP2NetworkId,
     ComputeMode,
     EthAddress,
+    InferenceAuthType,
     InferenceProvider as InferenceProviderName,
     InferenceTaskType,
     SurvivalTier,
@@ -97,6 +98,7 @@ export interface InferenceUsage {
 
 export interface InferenceProviderAdapter {
     readonly name: InferenceProviderName;
+    readonly authType: InferenceAuthType;
     readonly available: boolean;
     complete(request: InferenceRequest): Promise<InferenceResponse>;
 }

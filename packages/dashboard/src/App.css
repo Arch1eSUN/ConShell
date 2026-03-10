@@ -1,0 +1,61 @@
+/* ── App layout ─────────────────────────────────────────────────── */
+.page-header {
+    margin-bottom: var(--space-xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--space-xs);
+}
+
+.page-subtitle {
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+/* Overview grid */
+.overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    animation: slideUp 400ms ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.overview-chat {
+    animation: slideUp 400ms ease 100ms both;
+}
+
+/* Tab pages */
+.page-chat,
+.page-logs,
+.page-soul {
+    animation: slideUp 300ms ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+}

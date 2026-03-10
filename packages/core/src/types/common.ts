@@ -34,9 +34,26 @@ export type ToolCategory =
     | 'git'
     | 'registry'
     | 'skills'
-    | 'diagnostics';
+    | 'diagnostics'
+    | 'web'
+    | 'browser'
+    | 'shell'
+    | 'filesystem'
+    | 'http';
 
 export type ToolSource = 'agent' | 'mcp' | 'heartbeat';
+
+// ── Capability Permissions ─────────────────────────────────────────────
+
+export type CapabilityId =
+    | 'internet_access'
+    | 'browser_control'
+    | 'shell_exec'
+    | 'file_system'
+    | 'financial_ops'
+    | 'account_creation'
+    | 'self_deploy'
+    | 'self_modify';
 
 // ── Compute ────────────────────────────────────────────────────────────
 
@@ -61,7 +78,12 @@ export type SpendType =
 
 // ── Inference ──────────────────────────────────────────────────────────
 
-export type InferenceProvider = 'anthropic' | 'openai' | 'ollama' | 'gemini';
+export type InferenceProvider = 'ollama' | 'openai' | 'anthropic' | 'gemini' | 'openclaw' | 'nvidia' | 'cliproxyapi';
+
+export type InferenceAuthType = 'local' | 'apiKey' | 'oauth' | 'proxy';
+
+/** Sub-providers within the OpenClaw ecosystem (digital lives). */
+export type OpenClawSubProvider = 'codex' | 'antigravity';
 
 export type InferenceTaskType =
     | 'reasoning'

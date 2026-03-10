@@ -14,6 +14,7 @@ import type {
     InferenceResponse,
     InferenceProviderAdapter,
     SurvivalTier,
+    InferenceTaskType,
     Logger,
     Cents,
     InferenceProvider as InferenceProviderName,
@@ -21,9 +22,10 @@ import type {
 import type {
     ModelRegistryRepository,
     InferenceCostsRepository,
+    RoutingConfigRepository,
     ModelRow,
 } from '@web4-agent/state';
-import { getModelPreferences } from './routing.js';
+import { getModelPreferences, type ModelPreference } from './routing.js';
 
 export interface InferenceRouterOptions {
     /** Daily inference budget in cents */
@@ -31,7 +33,8 @@ export interface InferenceRouterOptions {
 }
 
 export class DefaultInferenceRouter implements InferenceRouter {
-    private readonly providers: Map<InferenceProviderName, InferenceProviderAdapter>;
+    private providers: Map<InferenceProviderName, InferenceProviderAdapter>;
+    private routingConfigRepo?: RoutingConfigRepository;
 
     constructor(
         adapters: readonly InferenceProviderAdapter[],
@@ -46,11 +49,42 @@ export class DefaultInferenceRouter implements InferenceRouter {
         }
     }
 
+    /** Attach optional routing config repo for dynamic routing. */
+    setRoutingConfigRepo(repo: RoutingConfigRepository): void {
+        this.routingConfigRepo = repo;
+    }
+
+    /** Add a single adapter at runtime without replacing existing adapters. */
+    addAdapter(adapter: InferenceProviderAdapter): void {
+        this.providers.set(adapter.name, adapter);
+        this.logger.info('Provider adapter added', {
+            name: adapter.name,
+            providerCount: this.providers.size,
+        });
+    }
+
+    /**
+     * Hot-reload: rebuild providers map and clear caches.
+     * Called after Settings UI saves provider/model/routing changes.
+     */
+    reloadConfig(newAdapters?: readonly InferenceProviderAdapter[]): void {
+        if (newAdapters) {
+            this.providers = new Map();
+            for (const adapter of newAdapters) {
+                this.providers.set(adapter.name, adapter);
+            }
+        }
+        this.logger.info('Router config reloaded', {
+            providerCount: this.providers.size,
+            hasDynamicRouting: !!this.routingConfigRepo,
+        });
+    }
+
     async route(
         request: InferenceRequest,
         tier: SurvivalTier,
     ): Promise<InferenceResponse> {
-        const preferences = getModelPreferences(tier, request.taskType);
+        const preferences = this.getPreferences(tier, request.taskType);
 
         // Find first viable model
         for (const pref of preferences) {
@@ -95,7 +129,7 @@ export class DefaultInferenceRouter implements InferenceRouter {
             try {
                 const response = await provider.complete({
                     ...request,
-                    model: modelRow.name,
+                    model: modelRow.id,
                     maxTokens: pref.maxTokens ?? request.maxTokens,
                 });
 
@@ -140,6 +174,21 @@ export class DefaultInferenceRouter implements InferenceRouter {
         throw new Error(
             `No viable model found for tier=${tier} taskType=${request.taskType}`,
         );
+    }
+
+    /**
+     * Get model preferences: dynamic (from DB) > static (from ROUTING_MATRIX).
+     */
+    private getPreferences(tier: SurvivalTier, taskType: InferenceTaskType): readonly ModelPreference[] {
+        // Try dynamic routing config first
+        if (this.routingConfigRepo?.hasEntries()) {
+            const dbEntries = this.routingConfigRepo.listByTierTask(tier, taskType);
+            if (dbEntries.length > 0) {
+                return dbEntries.map((e: { model_id: string }) => ({ modelId: e.model_id }));
+            }
+        }
+        // Fallback to static routing matrix
+        return getModelPreferences(tier, taskType);
     }
 
     /**

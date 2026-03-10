@@ -5,12 +5,12 @@
 import type { Migration } from './runner.js';
 
 export const migrations: readonly Migration[] = [
-    // ── v1: Core tables ──────────────────────────────────────────────────
-    {
-        version: 1,
-        description: 'Core tables: schema_version, identity, turns, tool_calls, transactions, modifications, installed_tools, kv',
-        apply(db) {
-            db.exec(`
+  // ── v1: Core tables ──────────────────────────────────────────────────
+  {
+    version: 1,
+    description: 'Core tables: schema_version, identity, turns, tool_calls, transactions, modifications, installed_tools, kv',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS schema_version (
           version   INTEGER PRIMARY KEY,
           applied_at TEXT NOT NULL
@@ -88,15 +88,15 @@ export const migrations: readonly Migration[] = [
           updated_at TEXT NOT NULL
         );
       `);
-        },
     },
+  },
 
-    // ── v2: Children + Skills ────────────────────────────────────────────
-    {
-        version: 2,
-        description: 'Children table, skills table',
-        apply(db) {
-            db.exec(`
+  // ── v2: Children + Skills ────────────────────────────────────────────
+  {
+    version: 2,
+    description: 'Children table, skills table',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS children (
           id                TEXT PRIMARY KEY,
           address           TEXT,
@@ -120,15 +120,15 @@ export const migrations: readonly Migration[] = [
           installed_at  TEXT NOT NULL
         );
       `);
-        },
     },
+  },
 
-    // ── v3: Inbox messages (schema preserved for v2 social relay) ───────
-    {
-        version: 3,
-        description: 'Inbox messages table (ADR-006: schema preserved, relay deferred)',
-        apply(db) {
-            db.exec(`
+  // ── v3: Inbox messages (schema preserved for v2 social relay) ───────
+  {
+    version: 3,
+    description: 'Inbox messages table (ADR-006: schema preserved, relay deferred)',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS inbox_messages (
           id           TEXT PRIMARY KEY,
           from_address TEXT NOT NULL,
@@ -141,15 +141,15 @@ export const migrations: readonly Migration[] = [
         );
         CREATE INDEX IF NOT EXISTS idx_inbox_state ON inbox_messages(state);
       `);
-        },
     },
+  },
 
-    // ── v4: Policy, heartbeat, spend tracking ────────────────────────────
-    {
-        version: 4,
-        description: 'Policy decisions, heartbeat schedule/history/dedup, wake events, spend tracking',
-        apply(db) {
-            db.exec(`
+  // ── v4: Policy, heartbeat, spend tracking ────────────────────────────
+  {
+    version: 4,
+    description: 'Policy decisions, heartbeat schedule/history/dedup, wake events, spend tracking',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS policy_decisions (
           id                 INTEGER PRIMARY KEY AUTOINCREMENT,
           tool_name          TEXT NOT NULL,
@@ -213,15 +213,15 @@ export const migrations: readonly Migration[] = [
         CREATE INDEX IF NOT EXISTS idx_spend_hour ON spend_tracking(window_hour);
         CREATE INDEX IF NOT EXISTS idx_spend_day ON spend_tracking(window_day);
       `);
-        },
     },
+  },
 
-    // ── v5: Memory tables + soul history ─────────────────────────────────
-    {
-        version: 5,
-        description: 'Memory subsystem: working, episodic, session_summaries, semantic, procedural, relationship; soul history',
-        apply(db) {
-            db.exec(`
+  // ── v5: Memory tables + soul history ─────────────────────────────────
+  {
+    version: 5,
+    description: 'Memory subsystem: working, episodic, session_summaries, semantic, procedural, relationship; soul history',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS working_memory (
           id         INTEGER PRIMARY KEY AUTOINCREMENT,
           session_id TEXT NOT NULL,
@@ -298,15 +298,15 @@ export const migrations: readonly Migration[] = [
         );
         CREATE INDEX IF NOT EXISTS idx_soul_created ON soul_history(created_at);
       `);
-        },
     },
+  },
 
-    // ── v6: Inference costs + model registry ─────────────────────────────
-    {
-        version: 6,
-        description: 'Inference costs table, model registry table',
-        apply(db) {
-            db.exec(`
+  // ── v6: Inference costs + model registry ─────────────────────────────
+  {
+    version: 6,
+    description: 'Inference costs table, model registry table',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS inference_costs (
           id            INTEGER PRIMARY KEY AUTOINCREMENT,
           model         TEXT    NOT NULL,
@@ -333,15 +333,15 @@ export const migrations: readonly Migration[] = [
           updated_at       TEXT    NOT NULL
         );
       `);
-        },
     },
+  },
 
-    // ── v7: On-chain transactions, child lifecycle events, discovered agents ──
-    {
-        version: 7,
-        description: 'On-chain transactions, child lifecycle events, discovered agents cache',
-        apply(db) {
-            db.exec(`
+  // ── v7: On-chain transactions, child lifecycle events, discovered agents ──
+  {
+    version: 7,
+    description: 'On-chain transactions, child lifecycle events, discovered agents cache',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS onchain_transactions (
           id           INTEGER PRIMARY KEY AUTOINCREMENT,
           tx_hash      TEXT UNIQUE NOT NULL,
@@ -373,15 +373,15 @@ export const migrations: readonly Migration[] = [
           updated_at TEXT NOT NULL
         );
       `);
-        },
     },
+  },
 
-    // ── v8: Metric snapshots ─────────────────────────────────────────────
-    {
-        version: 8,
-        description: 'Metric snapshots table',
-        apply(db) {
-            db.exec(`
+  // ── v8: Metric snapshots ─────────────────────────────────────────────
+  {
+    version: 8,
+    description: 'Metric snapshots table',
+    apply(db) {
+      db.exec(`
         CREATE TABLE IF NOT EXISTS metric_snapshots (
           id           INTEGER PRIMARY KEY AUTOINCREMENT,
           metrics_json TEXT NOT NULL,
@@ -389,6 +389,49 @@ export const migrations: readonly Migration[] = [
           created_at   TEXT NOT NULL
         );
       `);
-        },
     },
+  },
+
+  // ── v9: Settings admin panel — provider config + routing config ──────
+  {
+    version: 9,
+    description: 'Provider config (Settings UI) and routing config (dynamic routing overrides)',
+    apply(db) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS provider_config (
+          name       TEXT PRIMARY KEY,
+          auth_type  TEXT NOT NULL,
+          endpoint   TEXT,
+          api_key    TEXT,
+          enabled    INTEGER NOT NULL DEFAULT 1,
+          priority   INTEGER NOT NULL DEFAULT 100,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS routing_config (
+          id         INTEGER PRIMARY KEY AUTOINCREMENT,
+          tier       TEXT NOT NULL,
+          task_type  TEXT NOT NULL,
+          model_id   TEXT NOT NULL,
+          priority   INTEGER NOT NULL DEFAULT 0,
+          is_custom  INTEGER NOT NULL DEFAULT 0,
+          UNIQUE(tier, task_type, model_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_routing_tier_task ON routing_config(tier, task_type, priority);
+      `);
+    },
+  },
+
+  // ── v10: Conversation memory — store both user and agent messages ────
+  {
+    version: 10,
+    description: 'Add role + content columns to turns table for full conversation memory',
+    apply(db) {
+      db.exec(`
+        ALTER TABLE turns ADD COLUMN role TEXT NOT NULL DEFAULT 'assistant';
+        ALTER TABLE turns ADD COLUMN content TEXT;
+      `);
+    },
+  },
 ];

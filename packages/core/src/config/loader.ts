@@ -58,7 +58,7 @@ export function loadConfig(agentHome?: string): AutomatonConfig {
 
     if (!result.success) {
         const errors = result.error.issues.map(
-            (issue) => `${issue.path.join('.')}: ${issue.message}`,
+            (issue: { path: (string | number)[]; message: string }) => `${issue.path.join('.')}: ${issue.message}`,
         );
         throw new ConfigValidationError(errors);
     }
@@ -76,7 +76,7 @@ export function validateConfig(input: unknown): AutomatonConfig {
 
     if (!result.success) {
         const errors = result.error.issues.map(
-            (issue) => `${issue.path.join('.')}: ${issue.message}`,
+            (issue: { path: (string | number)[]; message: string }) => `${issue.path.join('.')}: ${issue.message}`,
         );
         throw new ConfigValidationError(errors);
     }

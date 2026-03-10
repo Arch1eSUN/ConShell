@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "@web4-agent/core": "workspace:*",
+        "@web4-agent/compute": "workspace:*",
         "@web4-agent/inference": "workspace:*",
         "@web4-agent/policy": "workspace:*",
         "@web4-agent/state": "workspace:*"

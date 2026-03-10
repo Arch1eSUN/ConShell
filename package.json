@@ -9,7 +9,12 @@
         "pnpm": ">=9.0.0"
     },
     "scripts": {
-        "build": "pnpm -r run build",
+        "build": "pnpm -r --filter '!@web4-agent/dashboard' run build",
+        "build:dashboard": "pnpm --filter @web4-agent/dashboard run build",
+        "build:all": "pnpm run build && pnpm run build:dashboard",
+        "dev:dashboard": "pnpm --filter @web4-agent/dashboard run dev",
+        "web4": "node packages/app/dist/index.js",
+        "start": "pnpm run build:all && node packages/app/dist/index.js start",
         "test": "pnpm -r run test",
         "test:watch": "pnpm -r run test:watch",
         "lint": "eslint 'packages/*/src/**/*.ts'",

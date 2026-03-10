@@ -51,6 +51,10 @@ export interface McpGatewayDeps {
     readonly toolRegistry: ToolRegistry;
     readonly logger: Logger;
     readonly readResource?: (uri: string) => Promise<string>;
+    /** Optional tool executor for real tool execution (replaces v1 stub) */
+    readonly toolExecutor?: import('./tool-executor.js').ToolExecutor;
+    /** Tool price map: tool name → price in USDC cents. Tools without prices are free. */
+    readonly toolPrices?: ReadonlyMap<string, number>;
 }
 
 // ── Error codes ─────────────────────────────────────────────────────────
@@ -58,6 +62,7 @@ export interface McpGatewayDeps {
 const INVALID_REQUEST = -32600;
 const METHOD_NOT_FOUND = -32601;
 const INTERNAL_ERROR = -32603;
+const PAYMENT_REQUIRED = -32402; // x402 payment required
 
 /**
  * MCP Gateway — processes JSON-RPC requests for MCP protocol compliance.
@@ -154,9 +159,58 @@ export class McpGateway {
             return this.error(request.id, METHOD_NOT_FOUND, `Tool not found: ${toolName}`);
         }
 
-        // v1: Return a stub response. Actual execution will be wired via tool executor.
-        this.deps.logger.info('MCP tools/call', { tool: toolName });
+        // x402 Payment Gating: Check if this tool has a price configured
+        const toolPrices = this.deps.toolPrices;
+        if (toolPrices) {
+            const priceCents = toolPrices.get(toolName);
+            if (priceCents !== undefined && priceCents > 0) {
+                // Check for payment signature in params (x402 header simulation)
+                const paymentSignature = params['x402-payment-signature'] as string | undefined;
+                if (!paymentSignature) {
+                    this.deps.logger.info('x402 payment required', { tool: toolName, priceCents });
+                    return this.error(request.id, PAYMENT_REQUIRED, JSON.stringify({
+                        type: 'x402-payment-required',
+                        tool: toolName,
+                        priceCents,
+                        currency: 'USDC',
+                        message: `This tool requires payment of $${(priceCents / 100).toFixed(2)} USDC`,
+                    }));
+                }
+                // In production, verify the payment signature here via the x402 facilitator.
+                // For now, log it and proceed.
+                this.deps.logger.info('x402 payment received', { tool: toolName, priceCents });
+            }
+        }
 
+        // Real tool execution via ToolExecutor (replaces v1 stub)
+        if (this.deps.toolExecutor?.hasHandler(toolName)) {
+            try {
+                const result = await this.deps.toolExecutor.execute({
+                    name: toolName,
+                    args: toolArgs,
+                    source: 'mcp',
+                });
+
+                return this.success(request.id, {
+                    content: [
+                        {
+                            type: 'text',
+                            text: result.result,
+                        },
+                    ],
+                    _meta: {
+                        durationMs: result.durationMs,
+                        truncated: result.truncated,
+                    },
+                });
+            } catch (err) {
+                this.deps.logger.error('Tool execution failed', { tool: toolName, error: String(err) });
+                return this.error(request.id, INTERNAL_ERROR, `Tool execution failed: ${toolName}`);
+            }
+        }
+
+        // Fallback stub for tools without handlers
+        this.deps.logger.info('MCP tools/call (stub)', { tool: toolName });
         return this.success(request.id, {
             content: [
                 {

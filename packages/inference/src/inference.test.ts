@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestLogger } from '@web4-agent/core';
-import type { InferenceProviderAdapter, InferenceRequest, InferenceResponse, Cents, InferenceProvider as InferenceProviderName } from '@web4-agent/core';
+import type { InferenceProviderAdapter, InferenceRequest, InferenceResponse, Cents, InferenceProvider as InferenceProviderName, InferenceAuthType } from '@web4-agent/core';
 import { openTestDatabase, ModelRegistryRepository, InferenceCostsRepository } from '@web4-agent/state';
 import type { UpsertModel } from '@web4-agent/state';
 import { DEFAULT_MODEL_SEED } from './seed.js';
@@ -22,9 +22,10 @@ function makeTestResponse(model: string): InferenceResponse {
     };
 }
 
-function makeProvider(name: InferenceProviderName, available = true): InferenceProviderAdapter {
+function makeProvider(name: InferenceProviderName, available = true, authType: InferenceAuthType = 'apiKey'): InferenceProviderAdapter {
     return {
         name,
+        authType,
         available,
         async complete(request: InferenceRequest): Promise<InferenceResponse> {
             return makeTestResponse(request.model ?? name);
@@ -66,27 +67,38 @@ describe('Model Seed', () => {
         expect(all.length).toBe(DEFAULT_MODEL_SEED.length);
     });
 
-    it('Gemini models seeded as unavailable (ADR-003)', () => {
+    it('all models seeded as available', () => {
         modelRepo.upsertMany(DEFAULT_MODEL_SEED);
-        const gemini = modelRepo.listByProvider('gemini');
-        expect(gemini.length).toBeGreaterThan(0);
-        for (const m of gemini) {
-            expect(m.available).toBe(0);
+        const all = modelRepo.listAll();
+        for (const m of all) {
+            expect(m.available).toBe(1);
         }
     });
 
-    it('available models exclude Gemini', () => {
-        modelRepo.upsertMany(DEFAULT_MODEL_SEED);
-        const available = modelRepo.listAvailable();
-        for (const m of available) {
-            expect(m.provider).not.toBe('gemini');
-        }
+    it('all 6 providers are represented in seed', () => {
+        const providers = new Set(DEFAULT_MODEL_SEED.map(m => m.provider));
+        expect(providers.has('ollama')).toBe(true);
+        expect(providers.has('openai')).toBe(true);
+        expect(providers.has('anthropic')).toBe(true);
+        expect(providers.has('gemini')).toBe(true);
+        expect(providers.has('openclaw')).toBe(true);
+        expect(providers.has('nvidia')).toBe(true);
     });
 
     it('pricing is integer microcents', () => {
         for (const m of DEFAULT_MODEL_SEED) {
             expect(Number.isInteger(m.inputCostMicro)).toBe(true);
             expect(Number.isInteger(m.outputCostMicro)).toBe(true);
+        }
+    });
+
+    it('ollama and openclaw models have zero cost', () => {
+        const freeModels = DEFAULT_MODEL_SEED.filter(
+            m => m.provider === 'ollama' || m.provider === 'openclaw',
+        );
+        for (const m of freeModels) {
+            expect(m.inputCostMicro).toBe(0);
+            expect(m.outputCostMicro).toBe(0);
         }
     });
 
@@ -105,23 +117,29 @@ describe('Model Seed', () => {
 // ── Routing Matrix Tests ────────────────────────────────────────────────
 
 describe('Routing Matrix', () => {
-    it('high tier reasoning prefers Sonnet 4 first', () => {
+    it('high tier reasoning prefers cliproxyapi:claude-sonnet-4 first', () => {
         const prefs = getModelPreferences('high', 'reasoning');
-        expect(prefs[0].modelId).toBe('anthropic:claude-sonnet-4-20250514');
+        expect(prefs[0].modelId).toBe('cliproxyapi:claude-sonnet-4');
+    });
+
+    it('high tier coding prefers cliproxyapi:claude-sonnet-4 first', () => {
+        const prefs = getModelPreferences('high', 'coding');
+        expect(prefs[0].modelId).toBe('cliproxyapi:claude-sonnet-4');
     });
 
     it('critical tier routes to Ollama only', () => {
         const taskTypes = ['reasoning', 'coding', 'analysis', 'conversation', 'planning'] as const;
         for (const tt of taskTypes) {
             const prefs = getModelPreferences('critical', tt);
-            expect(prefs.length).toBe(1);
-            expect(prefs[0].modelId).toContain('ollama');
+            for (const p of prefs) {
+                expect(p.modelId).toContain('ollama');
+            }
         }
     });
 
-    it('normal conversation prefers cheap models', () => {
+    it('normal conversation prefers cliproxyapi models', () => {
         const prefs = getModelPreferences('normal', 'conversation');
-        expect(prefs[0].modelId).toBe('openai:gpt-4o-mini');
+        expect(prefs[0].modelId).toBe('cliproxyapi:gemini-2.5-pro');
     });
 
     it('all tasks have at least one model preference', () => {
@@ -134,6 +152,17 @@ describe('Routing Matrix', () => {
             }
         }
     });
+
+    it('high tier includes providers from all ecosystems', () => {
+        const prefs = getModelPreferences('high', 'reasoning');
+        const providers = new Set(prefs.map(p => p.modelId.split(':')[0]));
+        expect(providers.has('openclaw')).toBe(true);
+        expect(providers.has('anthropic')).toBe(true);
+        expect(providers.has('openai')).toBe(true);
+        expect(providers.has('nvidia')).toBe(true);
+        expect(providers.has('gemini')).toBe(true);
+        expect(providers.has('ollama')).toBe(true);
+    });
 });
 
 // ── Inference Router Tests ──────────────────────────────────────────────
@@ -144,7 +173,30 @@ describe('DefaultInferenceRouter', () => {
     it('routes to first viable model', async () => {
         modelRepo.upsertMany(DEFAULT_MODEL_SEED);
         const router = new DefaultInferenceRouter(
-            [makeProvider('anthropic'), makeProvider('openai'), makeProvider('ollama')],
+            [
+                makeProvider('openclaw', true, 'oauth'),
+                makeProvider('anthropic'),
+                makeProvider('openai'),
+                makeProvider('ollama', true, 'local'),
+            ],
+            modelRepo, costRepo,
+            { dailyBudgetCents: 10000 },
+            logger,
+        );
+
+        const result = await router.route(makeRequest('reasoning'), 'high');
+        expect(result.model).toBe('openclaw:antigravity');
+    });
+
+    it('falls back when provider unavailable', async () => {
+        modelRepo.upsertMany(DEFAULT_MODEL_SEED);
+        const router = new DefaultInferenceRouter(
+            [
+                makeProvider('openclaw', false, 'oauth'),
+                makeProvider('anthropic'),
+                makeProvider('openai'),
+                makeProvider('ollama', true, 'local'),
+            ],
             modelRepo, costRepo,
             { dailyBudgetCents: 10000 },
             logger,
@@ -154,29 +206,15 @@ describe('DefaultInferenceRouter', () => {
         expect(result.model).toBe('anthropic:claude-sonnet-4-20250514');
     });
 
-    it('falls back when provider unavailable', async () => {
+    it('critical tier uses Ollama models', async () => {
         modelRepo.upsertMany(DEFAULT_MODEL_SEED);
         const router = new DefaultInferenceRouter(
-            [makeProvider('anthropic', false), makeProvider('openai'), makeProvider('ollama')],
+            [makeProvider('ollama', true, 'local')],
             modelRepo, costRepo,
             { dailyBudgetCents: 10000 },
             logger,
         );
 
-        const result = await router.route(makeRequest('reasoning'), 'high');
-        expect(result.model).toBe('openai:gpt-4o');
-    });
-
-    it('skips unavailable models (Gemini)', async () => {
-        modelRepo.upsertMany(DEFAULT_MODEL_SEED);
-        const router = new DefaultInferenceRouter(
-            [makeProvider('gemini'), makeProvider('ollama')],
-            modelRepo, costRepo,
-            { dailyBudgetCents: 10000 },
-            logger,
-        );
-
-        // Critical tier — even though Gemini provider exists, Gemini models are unavailable
         const result = await router.route(makeRequest('conversation'), 'critical');
         expect(result.model).toContain('ollama');
     });
@@ -191,7 +229,7 @@ describe('DefaultInferenceRouter', () => {
         });
 
         const router = new DefaultInferenceRouter(
-            [makeProvider('anthropic'), makeProvider('openai'), makeProvider('ollama')],
+            [makeProvider('anthropic'), makeProvider('openai'), makeProvider('ollama', true, 'local')],
             modelRepo, costRepo,
             { dailyBudgetCents: 100 }, // budget = 100, already spent 100
             logger,
@@ -204,7 +242,7 @@ describe('DefaultInferenceRouter', () => {
     it('records cost after successful inference', async () => {
         modelRepo.upsertMany(DEFAULT_MODEL_SEED);
         const router = new DefaultInferenceRouter(
-            [makeProvider('ollama')],
+            [makeProvider('ollama', true, 'local')],
             modelRepo, costRepo,
             { dailyBudgetCents: 10000 },
             logger,
@@ -232,8 +270,9 @@ describe('DefaultInferenceRouter', () => {
 
     it('falls back on provider error', async () => {
         modelRepo.upsertMany(DEFAULT_MODEL_SEED);
-        const failingAnthropicProvider: InferenceProviderAdapter = {
-            name: 'anthropic',
+        const failingOpenclawProvider: InferenceProviderAdapter = {
+            name: 'openclaw',
+            authType: 'oauth',
             available: true,
             async complete(): Promise<InferenceResponse> {
                 throw new Error('API down');
@@ -241,15 +280,15 @@ describe('DefaultInferenceRouter', () => {
         };
 
         const router = new DefaultInferenceRouter(
-            [failingAnthropicProvider, makeProvider('openai'), makeProvider('ollama')],
+            [failingOpenclawProvider, makeProvider('anthropic'), makeProvider('openai'), makeProvider('ollama', true, 'local')],
             modelRepo, costRepo,
             { dailyBudgetCents: 10000 },
             logger,
         );
 
         const result = await router.route(makeRequest('reasoning'), 'high');
-        // Should have fallen back to openai
-        expect(result.model).toBe('openai:gpt-4o');
+        // Should have fallen back to anthropic
+        expect(result.model).toBe('anthropic:claude-sonnet-4-20250514');
     });
 });
 

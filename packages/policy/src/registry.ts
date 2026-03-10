@@ -44,6 +44,7 @@ export class ToolRegistry {
             requiredAuthority: tool.requiredAuthority,
             mcpExposed: tool.mcpExposed,
             auditFields: tool.auditFields,
+            requiredCapabilities: tool.requiredCapabilities,
         };
     }
 

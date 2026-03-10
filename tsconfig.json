@@ -33,6 +33,15 @@
         },
         {
             "path": "./packages/selfmod"
+        },
+        {
+            "path": "./packages/cli"
+        },
+        {
+            "path": "./packages/skills"
+        },
+        {
+            "path": "./packages/app"
         }
     ]
 }

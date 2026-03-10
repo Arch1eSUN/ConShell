@@ -1,7 +1,7 @@
 /**
  * Tool system types.
  */
-import type { AuthorityLevel, RiskLevel, ToolCategory, ToolSource } from './common.js';
+import type { AuthorityLevel, CapabilityId, RiskLevel, ToolCategory, ToolSource } from './common.js';
 
 export interface ToolDefinition {
     readonly name: string;
@@ -12,6 +12,8 @@ export interface ToolDefinition {
     readonly requiredAuthority: AuthorityLevel;
     readonly mcpExposed: boolean;
     readonly auditFields: readonly string[];
+    /** Capabilities this tool requires — gated by CapabilityGateRule. */
+    readonly requiredCapabilities?: readonly CapabilityId[];
 }
 
 export interface ToolCallRequest {

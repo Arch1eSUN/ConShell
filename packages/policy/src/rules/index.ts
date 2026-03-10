@@ -1,4 +1,5 @@
 export { authorityRules } from './authority.js';
+export { CapabilityGateRule, DEFAULT_CAPABILITY_CONFIG, type CapabilityConfig } from './capability-gate.js';
 export { commandSafetyStaticRules, createRateLimitSelfMod, type CommandSafetyDeps } from './command-safety.js';
 export { createFinancialRules } from './financial.js';
 export { pathProtectionRules } from './path-protection.js';

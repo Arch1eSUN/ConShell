@@ -1,0 +1,46 @@
+{
+    "name": "@web4-agent/app",
+    "version": "0.1.0",
+    "description": "Conway Automaton application — CLI, HTTP API, and WebSocket server",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "bin": {
+        "web4": "dist/index.js"
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "dev": "tsx src/index.ts start",
+        "start": "node dist/index.js start",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "clean": "rm -rf dist",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@web4-agent/core": "workspace:*",
+        "@web4-agent/state": "workspace:*",
+        "@web4-agent/policy": "workspace:*",
+        "@web4-agent/skills": "workspace:*",
+        "@web4-agent/inference": "workspace:*",
+        "@web4-agent/memory": "workspace:*",
+        "@web4-agent/soul": "workspace:*",
+        "@web4-agent/runtime": "workspace:*",
+        "@web4-agent/wallet": "workspace:*",
+        "@web4-agent/selfmod": "workspace:*",
+        "@web4-agent/cli": "workspace:*",
+        "@web4-agent/x402": "workspace:*",
+        "commander": "^13.0.0",
+        "dotenv": "^16.4.0",
+        "express": "^5.0.0",
+        "ws": "^8.18.0"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "^7.6.0",
+        "@types/express": "^5.0.0",
+        "@types/ws": "^8.5.0",
+        "tsx": "^4.19.0",
+        "typescript": "^5.6.0",
+        "vitest": "^2.1.0"
+    }
+}

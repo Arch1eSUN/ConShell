@@ -1,0 +1,130 @@
+.status-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    transition: border-color var(--transition);
+}
+
+.status-panel:hover {
+    border-color: var(--border-hover);
+}
+
+.status-title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    margin-bottom: var(--space-md);
+    color: var(--ink);
+}
+
+.status-skeleton {
+    height: 120px;
+    background: linear-gradient(90deg, var(--border) 25%, var(--paper) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    border-radius: var(--radius);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.status-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+}
+
+.status-value {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Pulsing status dot */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot.alive {
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.status-dot.dead {
+    background: var(--muted);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+}
+
+/* Tier badge */
+.tier-badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--tier-color, var(--muted)) 12%, transparent);
+    color: var(--tier-color, var(--muted));
+    font-weight: 500;
+}
+
+/* Wallet */
+.status-wallet {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.wallet-address {
+    font-size: 0.8rem;
+    color: var(--blue);
+    cursor: pointer;
+    transition: color var(--transition);
+}
+
+.wallet-address:hover {
+    color: var(--green);
+}
+
+@media (max-width: 768px) {
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+}

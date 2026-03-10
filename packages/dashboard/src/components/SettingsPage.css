@@ -1,0 +1,494 @@
+/* ── Settings Page Styles ─────────────────────────────────────────────── */
+
+.settings-page {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Sub-tabs */
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.5rem;
+}
+
+.settings-tab-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+}
+
+.settings-tab-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-tab-btn.active {
+    color: #7dd3fc;
+    background: rgba(125, 211, 252, 0.1);
+}
+
+/* ── Cards ─────────────────────────────────────────────────────────────── */
+
+.settings-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+    backdrop-filter: blur(12px);
+    margin-bottom: 1rem;
+}
+
+.settings-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.settings-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.settings-card-subtitle {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.25rem;
+}
+
+/* ── Form Elements ────────────────────────────────────────────────────── */
+
+.settings-form-group {
+    margin-bottom: 1rem;
+}
+
+.settings-label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+
+.settings-input,
+.settings-select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.settings-input:focus,
+.settings-select:focus {
+    border-color: #7dd3fc;
+    box-shadow: 0 0 0 2px rgba(125, 211, 252, 0.15);
+}
+
+.settings-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.settings-input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+
+.settings-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.settings-btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #7dd3fc);
+    color: #0c1524;
+}
+
+.settings-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.settings-btn-primary:disabled {
+    opacity: 0.5;
+    transform: none;
+    cursor: not-allowed;
+}
+
+.settings-btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.settings-btn-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.settings-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.settings-btn-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+/* ── Provider List ────────────────────────────────────────────────────── */
+
+.provider-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.provider-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    transition: border-color 0.15s;
+}
+
+.provider-item:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.provider-item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+}
+
+.provider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.provider-dot.enabled { background: #34d399; }
+.provider-dot.disabled { background: #6b7280; }
+
+.provider-item-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.provider-item-type {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: 'MonoLisa', 'JetBrains Mono', monospace;
+}
+
+.provider-item-actions {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.provider-action-btn {
+    padding: 0.3rem 0.45rem;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    transition: all 0.15s;
+}
+
+.provider-action-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Models Grid ──────────────────────────────────────────────────────── */
+
+.models-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.5rem;
+}
+
+.model-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.model-card:hover {
+    border-color: rgba(125, 211, 252, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.model-card.selected {
+    border-color: rgba(125, 211, 252, 0.5);
+    background: rgba(125, 211, 252, 0.08);
+}
+
+.model-checkbox {
+    accent-color: #7dd3fc;
+    width: 15px;
+    height: 15px;
+}
+
+.model-name {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+}
+
+.model-meta {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.15rem;
+}
+
+.model-tier-badge {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.model-tier-badge.flagship {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.model-tier-badge.strong {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+}
+
+.model-tier-badge.fast {
+    background: rgba(34, 211, 153, 0.15);
+    color: #22d3a1;
+}
+
+.model-tier-badge.local {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+}
+
+.model-zero-cost {
+    font-size: 0.6rem;
+    color: #34d399;
+    font-weight: 600;
+}
+
+.model-provider {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Routing Matrix ───────────────────────────────────────────────────── */
+
+.routing-matrix {
+    overflow-x: auto;
+}
+
+.routing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+}
+
+.routing-table th {
+    padding: 0.5rem;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+}
+
+.routing-table td {
+    padding: 0.4rem 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.routing-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.routing-model-chip {
+    display: inline-block;
+    padding: 0.15rem 0.4rem;
+    background: rgba(125, 211, 252, 0.1);
+    color: #7dd3fc;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'MonoLisa', 'JetBrains Mono', monospace;
+    margin: 0.1rem;
+}
+
+.routing-priority {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.65rem;
+    margin-left: 0.25rem;
+}
+
+.routing-custom-badge {
+    font-size: 0.6rem;
+    color: #fbbf24;
+    margin-left: 0.25rem;
+}
+
+/* ── Guide Section ────────────────────────────────────────────────────── */
+
+.guide-section {
+    line-height: 1.7;
+    font-size: 0.85rem;
+}
+
+.guide-section h3 {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    margin: 1.25rem 0 0.5rem;
+}
+
+.guide-section h3:first-child {
+    margin-top: 0;
+}
+
+.guide-section p {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0.5rem 0;
+}
+
+.guide-step {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border-left: 3px solid rgba(125, 211, 252, 0.3);
+}
+
+.guide-step-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #0ea5e9, #7dd3fc);
+    color: #0c1524;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.guide-step-content {
+    flex: 1;
+}
+
+.guide-step-title {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0.2rem;
+}
+
+.guide-step-desc {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.guide-code {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    color: #7dd3fc;
+    font-family: 'MonoLisa', 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+/* ── Status Messages ──────────────────────────────────────────────────── */
+
+.settings-status {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+}
+
+.settings-status.success {
+    background: rgba(34, 211, 153, 0.1);
+    color: #34d399;
+    border: 1px solid rgba(34, 211, 153, 0.15);
+}
+
+.settings-status.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.settings-status.info {
+    background: rgba(125, 211, 252, 0.1);
+    color: #7dd3fc;
+    border: 1px solid rgba(125, 211, 252, 0.15);
+}
+
+.settings-empty {
+    text-align: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+}

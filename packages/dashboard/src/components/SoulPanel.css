@@ -1,0 +1,117 @@
+.soul-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    transition: border-color var(--transition);
+}
+
+.soul-panel:hover {
+    border-color: var(--border-hover);
+}
+
+.soul-title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    margin-bottom: var(--space-md);
+}
+
+.soul-skeleton {
+    height: 200px;
+    background: linear-gradient(90deg, var(--border) 25%, var(--paper) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    border-radius: var(--radius);
+    animation: shimmer 1.5s infinite;
+}
+
+.soul-identity {
+    margin-bottom: var(--space-lg);
+}
+
+.soul-quote {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--ink);
+    border-left: 3px solid var(--green);
+    padding-left: var(--space-md);
+    margin: 0;
+}
+
+.soul-section {
+    margin-bottom: var(--space-md);
+}
+
+.soul-section-title {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: var(--space-sm);
+}
+
+.soul-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.soul-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-weight: 500;
+}
+
+.soul-tag.value {
+    background: var(--green-dim);
+    color: var(--green);
+}
+
+.soul-tag.capability {
+    background: var(--blue-dim);
+    color: var(--blue);
+}
+
+.soul-goals {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.soul-goals li {
+    font-size: 0.875rem;
+    padding-left: var(--space-md);
+    position: relative;
+}
+
+.soul-goals li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--green);
+    font-weight: 700;
+}
+
+.soul-alignment {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.soul-meta {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+}
+
+.soul-version {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+}

@@ -1,0 +1,257 @@
+.cap-settings {
+    padding: 0 0 2rem;
+}
+
+.cap-header h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.4rem;
+}
+
+.cap-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    margin: 0 0 1.5rem;
+}
+
+.cap-loading {
+    color: rgba(255, 255, 255, 0.4);
+    padding: 2rem;
+    text-align: center;
+}
+
+/* God Mode Card */
+.god-mode-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.god-mode-card.god-active {
+    background: linear-gradient(135deg, rgba(255, 60, 60, 0.12), rgba(255, 120, 0, 0.08));
+    border-color: rgba(255, 80, 40, 0.4);
+    box-shadow: 0 0 20px rgba(255, 60, 60, 0.1);
+}
+
+.god-mode-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.god-icon {
+    font-size: 1.8rem;
+}
+
+.god-mode-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.god-mode-info p {
+    margin: 0.2rem 0 0;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.god-toggle {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.god-toggle.active {
+    background: linear-gradient(135deg, #ff3c3c, #ff6a00);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(255, 60, 60, 0.3);
+}
+
+.god-toggle:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+/* God Confirm Modal */
+.god-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.god-confirm-modal {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 80, 40, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 90%;
+}
+
+.god-confirm-modal h3 {
+    margin: 0 0 1rem;
+    color: #ff6a00;
+}
+
+.god-confirm-modal p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.god-confirm-modal ul {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    padding-left: 1.2rem;
+}
+
+.god-confirm-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.god-confirm-cancel {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    cursor: pointer;
+}
+
+.god-confirm-yes {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ff3c3c, #ff6a00);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Capability Grid */
+.cap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.cap-card {
+    position: relative;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.3s ease;
+}
+
+.cap-card.enabled {
+    border-color: rgba(0, 200, 150, 0.25);
+    background: rgba(0, 200, 150, 0.04);
+}
+
+.cap-card.disabled {
+    opacity: 0.7;
+}
+
+.cap-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.cap-icon {
+    font-size: 1.3rem;
+}
+
+.cap-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+}
+
+.cap-desc {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 0 1rem;
+}
+
+.cap-god-badge {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 0.65rem;
+    background: rgba(255, 80, 40, 0.2);
+    color: #ff6a00;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Toggle Switch */
+.cap-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.cap-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cap-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.cap-slider::before {
+    content: '';
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.cap-switch input:checked+.cap-slider {
+    background: #00c896;
+}
+
+.cap-switch input:checked+.cap-slider::before {
+    transform: translateX(20px);
+    background: #fff;
+}
+
+.cap-switch input:disabled+.cap-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

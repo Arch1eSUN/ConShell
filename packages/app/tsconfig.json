@@ -1,0 +1,104 @@
+{
+    "compilerOptions": {
+        "types": [
+            "better-sqlite3",
+            "ws",
+            "node"
+        ],
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "composite": true,
+        "rootDir": "src",
+        "outDir": "dist",
+        "paths": {
+            "@web4-agent/core": [
+                "../core/src/index.ts"
+            ],
+            "@web4-agent/state": [
+                "../state/src/index.ts"
+            ],
+            "@web4-agent/policy": [
+                "../policy/src/index.ts"
+            ],
+            "@web4-agent/inference": [
+                "../inference/src/index.ts"
+            ],
+            "@web4-agent/memory": [
+                "../memory/src/index.ts"
+            ],
+            "@web4-agent/soul": [
+                "../soul/src/index.ts"
+            ],
+            "@web4-agent/runtime": [
+                "../runtime/src/index.ts"
+            ],
+            "@web4-agent/wallet": [
+                "../wallet/src/index.ts"
+            ],
+            "@web4-agent/selfmod": [
+                "../selfmod/src/index.ts"
+            ],
+            "@web4-agent/x402": [
+                "../x402/src/index.ts"
+            ],
+            "@web4-agent/cli": [
+                "../cli/src/index.ts"
+            ],
+            "@web4-agent/skills": [
+                "../skills/src/index.ts"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
+    ],
+    "references": [
+        {
+            "path": "../core"
+        },
+        {
+            "path": "../state"
+        },
+        {
+            "path": "../policy"
+        },
+        {
+            "path": "../inference"
+        },
+        {
+            "path": "../memory"
+        },
+        {
+            "path": "../soul"
+        },
+        {
+            "path": "../runtime"
+        },
+        {
+            "path": "../wallet"
+        },
+        {
+            "path": "../selfmod"
+        },
+        {
+            "path": "../cli"
+        },
+        {
+            "path": "../x402"
+        },
+        {
+            "path": "../skills"
+        }
+    ]
+}

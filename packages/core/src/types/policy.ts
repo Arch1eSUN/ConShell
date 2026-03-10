@@ -2,7 +2,7 @@
  * Policy engine types.
  */
 import type { Cents } from '../money/money.js';
-import type { AgentState, AuthorityLevel, RiskLevel, SurvivalTier } from './common.js';
+import type { AgentState, AuthorityLevel, CapabilityId, RiskLevel, SurvivalTier } from './common.js';
 
 export interface PolicyEvaluationRequest {
     readonly toolName: string;
@@ -43,4 +43,6 @@ export interface ToolMetadata {
     readonly requiredAuthority: AuthorityLevel;
     readonly mcpExposed: boolean;
     readonly auditFields: readonly string[];
+    /** Capabilities required by this tool. */
+    readonly requiredCapabilities?: readonly CapabilityId[];
 }

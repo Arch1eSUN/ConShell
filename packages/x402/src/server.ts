@@ -62,8 +62,12 @@ export class X402Server {
         request: SimpleRequest,
     ): Promise<{ gated: false } | { gated: true; response: SimpleResponse } | { gated: true; verified: true; txHash?: string }> {
         // Find matching route config
-        const url = new URL(request.url, 'http://localhost');
-        const routeConfig = this.routes.get(url.pathname);
+        // Extract pathname from request URL (compatible with both full URLs and path-only)
+        const rawPath = request.url.startsWith('/')
+            ? request.url
+            : request.url.replace(/^https?:\/\/[^/]+/, '');
+        const pathname = rawPath.includes('?') ? rawPath.slice(0, rawPath.indexOf('?')) : rawPath;
+        const routeConfig = this.routes.get(pathname);
         if (!routeConfig) {
             return { gated: false };
         }
@@ -92,7 +96,11 @@ export class X402Server {
 
         // Verify payment
         try {
-            const decoded = atob(paymentPayload);
+            // Decode base64 payload — use globalThis.atob (available in Node 16+)
+            const g = globalThis as Record<string, unknown>;
+            const decoded = typeof g['atob'] === 'function'
+                ? (g['atob'] as (s: string) => string)(paymentPayload)
+                : paymentPayload; // Fallback: treat as plaintext
             const verifyResult = await this.facilitator.verify({
                 paymentPayload: decoded,
                 paymentRequirements: routeConfig.requirements,
@@ -132,7 +140,7 @@ export class X402Server {
             }
 
             this.logger.info('x402 payment settled', {
-                path: url.pathname,
+                path: pathname,
                 txHash: settleResult.txHash,
             });
 

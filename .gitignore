@@ -11,3 +11,9 @@ coverage/
 wallet.json
 api-key
 .DS_Store
+
+# Stale build artifacts
+dist */
+node_modules_locked/
+*.tsbuildinfo.bak
+tsconfig.tsbuildinfo.bak
