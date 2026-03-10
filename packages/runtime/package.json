@@ -1,0 +1,26 @@
+{
+    "name": "@web4-agent/runtime",
+    "version": "0.1.0",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc --build",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "clean": "rm -rf dist",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@web4-agent/core": "workspace:*",
+        "@web4-agent/inference": "workspace:*",
+        "@web4-agent/policy": "workspace:*",
+        "@web4-agent/state": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "^7.6.13",
+        "better-sqlite3": "^11.0.0",
+        "typescript": "^5.6.0",
+        "vitest": "^2.1.0"
+    }
+}

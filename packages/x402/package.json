@@ -1,0 +1,21 @@
+{
+    "name": "@web4-agent/x402",
+    "version": "0.1.0",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc --build",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "clean": "rm -rf dist",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@web4-agent/core": "workspace:*"
+    },
+    "devDependencies": {
+        "vitest": "^2.1.0",
+        "typescript": "^5.6.0"
+    }
+}

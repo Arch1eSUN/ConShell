@@ -1,0 +1,30 @@
+{
+    "name": "@web4-agent/state",
+    "version": "0.1.0",
+    "description": "SQLite durable state: schema, migrations, and typed repositories for web4-agent",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "rm -rf dist *.tsbuildinfo",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@web4-agent/core": "workspace:*",
+        "better-sqlite3": "^11.0.0"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "^7.6.0",
+        "typescript": "^5.6.0",
+        "vitest": "^2.1.0"
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "files": [],
+    "references": [
+        {
+            "path": "./packages/core"
+        },
+        {
+            "path": "./packages/state"
+        },
+        {
+            "path": "./packages/policy"
+        },
+        {
+            "path": "./packages/wallet"
+        },
+        {
+            "path": "./packages/x402"
+        },
+        {
+            "path": "./packages/inference"
+        },
+        {
+            "path": "./packages/runtime"
+        },
+        {
+            "path": "./packages/compute"
+        },
+        {
+            "path": "./packages/memory"
+        },
+        {
+            "path": "./packages/soul"
+        },
+        {
+            "path": "./packages/selfmod"
+        }
+    ]
+}
