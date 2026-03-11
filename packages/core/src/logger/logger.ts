@@ -1,5 +1,5 @@
 /**
- * Structured JSON logger for web4-agent.
+ * Structured JSON logger for conshell.
  *
  * All log output goes to stderr (stdout reserved for MCP stdio transport).
  * Each log line is a single JSON object with: level, message, timestamp, and optional fields.
@@ -98,7 +98,7 @@ export class StructuredLogger implements Logger {
                     message: value.message,
                     stack: value.stack,
                 };
-                // Include any extra enumerable properties (e.g. code from Web4Error)
+                // Include any extra enumerable properties (e.g. code from ConShellError)
                 for (const prop of Object.getOwnPropertyNames(value)) {
                     if (!(prop in errorObj)) {
                         errorObj[prop] = (value as unknown as Record<string, unknown>)[prop];

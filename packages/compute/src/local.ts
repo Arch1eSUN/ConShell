@@ -8,8 +8,8 @@ import { exec as execCb, type ExecException } from 'node:child_process';
 import { readFile as fsReadFile, writeFile as fsWriteFile, mkdir } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import type { Logger } from '@web4-agent/core';
-import { nowISO } from '@web4-agent/core';
+import type { Logger } from '@conshell/core';
+import { nowISO } from '@conshell/core';
 import type { ComputeProvider, ExecResult, SandboxInfo, SandboxConfig, ExecOpts } from './provider.js';
 
 export class LocalComputeProvider implements ComputeProvider {

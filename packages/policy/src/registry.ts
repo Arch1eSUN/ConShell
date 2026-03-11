@@ -4,7 +4,7 @@
  * Provides tool metadata lookup for the policy engine and
  * tool listing for the MCP exposure layer.
  */
-import type { ToolDefinition, ToolMetadata, Logger } from '@web4-agent/core';
+import type { ToolDefinition, ToolMetadata, Logger } from '@conshell/core';
 
 export class ToolRegistry {
     private readonly tools = new Map<string, ToolDefinition>();

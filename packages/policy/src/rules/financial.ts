@@ -4,8 +4,8 @@
  * Enforce treasury policy: per-payment cap, hourly/daily transfer caps,
  * minimum reserve, x402 domain allowlist, inference budget.
  */
-import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@web4-agent/core';
-import type { AutomatonConfig } from '@web4-agent/core';
+import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@conshell/core';
+import type { AutomatonConfig } from '@conshell/core';
 
 function deny(rule: string, reason: string): PolicyDecision {
     return { allowed: false, rule, reason, ruleCategory: 'financial' };

@@ -5,7 +5,7 @@
  * - web_browse: Fetch a URL and extract text content
  * - read_rss: Parse RSS/Atom feeds
  */
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 
 // ── Tool Definitions ────────────────────────────────────────────────────
 
@@ -119,7 +119,7 @@ export async function handleWebSearch(args: Record<string, unknown>): Promise<st
         const url = `https://html.duckduckgo.com/html/?q=${encoded}`;
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'Web4-Agent/0.1 (Autonomous Learning)',
+                'User-Agent': 'ConShell/0.1 (Autonomous Learning)',
             },
         });
 
@@ -170,7 +170,7 @@ export async function handleWebBrowse(args: Record<string, unknown>): Promise<st
 
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'Web4-Agent/0.1 (Autonomous Learning)',
+                'User-Agent': 'ConShell/0.1 (Autonomous Learning)',
                 'Accept': 'text/html,application/xhtml+xml,text/plain',
             },
             signal: controller.signal,
@@ -223,7 +223,7 @@ export async function handleReadRss(args: Record<string, unknown>): Promise<stri
     try {
         const response = await fetch(feedUrl, {
             headers: {
-                'User-Agent': 'Web4-Agent/0.1 (Autonomous Learning)',
+                'User-Agent': 'ConShell/0.1 (Autonomous Learning)',
                 'Accept': 'application/rss+xml,application/atom+xml,application/xml,text/xml',
             },
         });

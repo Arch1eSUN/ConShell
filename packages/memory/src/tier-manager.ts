@@ -6,14 +6,14 @@
  *
  * Ingestion classifies turns and extracts memories into appropriate tiers.
  */
-import type { Logger } from '@web4-agent/core';
+import type { Logger } from '@conshell/core';
 import type {
     WorkingMemoryRepository,
     EpisodicMemoryRepository,
     SemanticMemoryRepository,
     ProceduralMemoryRepository,
     RelationshipMemoryRepository,
-} from '@web4-agent/state';
+} from '@conshell/state';
 
 // ── Types ──────────────────────────────────────────────────────────────
 

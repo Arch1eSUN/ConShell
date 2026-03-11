@@ -2,7 +2,7 @@
  * Heartbeat repository — schedule, history, dedup, wake events.
  */
 import type Database from 'better-sqlite3';
-import { type HeartbeatResult, nowISO } from '@web4-agent/core';
+import { type HeartbeatResult, nowISO } from '@conshell/core';
 
 // ── Schedule ───────────────────────────────────────────────────────────
 

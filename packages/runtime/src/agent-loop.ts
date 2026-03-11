@@ -18,8 +18,8 @@ import type {
     SurvivalTier,
     InferenceTaskType,
     Cents,
-} from '@web4-agent/core';
-import type { TurnsRepository, InsertTurn } from '@web4-agent/state';
+} from '@conshell/core';
+import type { TurnsRepository, InsertTurn } from '@conshell/state';
 import type { ToolExecutor } from './tool-executor.js';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ export class AgentLoop {
         // 1. Identity + values (from Soul)
         try {
             const soulDoc = soul.view();
-            const identity = soulDoc.identity || 'You are a sovereign AI agent operating on the Web4 protocol.';
+            const identity = soulDoc.identity || 'You are a sovereign AI agent operating on the ConShell protocol.';
             sections.push(`<constitution>\n${identity}\n</constitution>`);
 
             if (soulDoc.values && soulDoc.values.length > 0) {

@@ -3,12 +3,12 @@
  *
  * Per-turn tool limits, per-session dangerous op limits, per-hour exec limits.
  */
-import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@web4-agent/core';
+import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@conshell/core';
 import {
     DEFAULT_MAX_TOOL_CALLS_PER_TURN,
     DEFAULT_MAX_DANGEROUS_PER_SESSION,
     DEFAULT_MAX_EXEC_PER_HOUR,
-} from '@web4-agent/core';
+} from '@conshell/core';
 
 function deny(rule: string, reason: string): PolicyDecision {
     return { allowed: false, rule, reason, ruleCategory: 'rate_limit' };

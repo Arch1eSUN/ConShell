@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import './SettingsPage.css';
 import { CapabilitySettings } from './CapabilitySettings';
 import { SkillsPanel } from './SkillsPanel';
+import { SecuritySettings } from './SecuritySettings';
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -33,7 +34,7 @@ interface RoutingEntry {
     is_custom: number;
 }
 
-type SettingsTab = 'providers' | 'models' | 'routing' | 'capabilities' | 'skills' | 'guide';
+type SettingsTab = 'providers' | 'models' | 'routing' | 'capabilities' | 'skills' | 'security' | 'guide';
 
 const API = '/api/settings';
 
@@ -77,7 +78,7 @@ export function SettingsPage() {
             </header>
 
             <div className="settings-tabs">
-                {(['providers', 'models', 'routing', 'capabilities', 'skills', 'guide'] as SettingsTab[]).map(t => (
+                {(['providers', 'models', 'routing', 'capabilities', 'skills', 'security', 'guide'] as SettingsTab[]).map(t => (
                     <button
                         key={t}
                         className={`settings-tab-btn ${tab === t ? 'active' : ''}`}
@@ -87,7 +88,8 @@ export function SettingsPage() {
                             t === 'models' ? '🤖 Models' :
                                 t === 'routing' ? '🧭 Routing' :
                                     t === 'capabilities' ? '🛡️ Permissions' :
-                                        t === 'skills' ? '🧩 Skills' : '📘 Guide'}
+                                        t === 'skills' ? '🧩 Skills' :
+                                            t === 'security' ? '🔒 Security' : '📘 Guide'}
                     </button>
                 ))}
             </div>
@@ -97,6 +99,7 @@ export function SettingsPage() {
             {tab === 'routing' && <RoutingSection />}
             {tab === 'capabilities' && <CapabilitySettings />}
             {tab === 'skills' && <SkillsPanel />}
+            {tab === 'security' && <SecuritySettings />}
             {tab === 'guide' && <GuideSection />}
         </div>
     );

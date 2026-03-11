@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { Web4Error, ConfigNotFoundError, ToolDeniedError, PaymentAmountExceededError } from './base.js';
+import { ConShellError, ConfigNotFoundError, ToolDeniedError, PaymentAmountExceededError } from './base.js';
 
 describe('error hierarchy', () => {
-    it('all errors extend Web4Error', () => {
+    it('all errors extend ConShellError', () => {
         const err = new ConfigNotFoundError('/path/to/config');
-        expect(err).toBeInstanceOf(Web4Error);
+        expect(err).toBeInstanceOf(ConShellError);
         expect(err).toBeInstanceOf(Error);
     });
 
@@ -16,14 +16,14 @@ describe('error hierarchy', () => {
 
     it('carries cause chain', () => {
         const inner = new Error('disk full');
-        const outer = new Web4Error('SOME_CODE', 'operation failed', inner);
+        const outer = new ConShellError('SOME_CODE', 'operation failed', inner);
         expect(outer.cause).toBe(inner);
     });
 
     it('preserves prototype chain for instanceof', () => {
         const err = new ToolDeniedError('exec', 'deny_forbidden', 'authority', 'tool is forbidden');
         expect(err).toBeInstanceOf(ToolDeniedError);
-        expect(err).toBeInstanceOf(Web4Error);
+        expect(err).toBeInstanceOf(ConShellError);
         expect(err.ruleName).toBe('deny_forbidden');
         expect(err.ruleCategory).toBe('authority');
     });

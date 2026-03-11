@@ -5,7 +5,7 @@
  * Overrides static .env-based provider detection when entries exist.
  */
 import type Database from 'better-sqlite3';
-import { nowISO } from '@web4-agent/core';
+import { nowISO } from '@conshell/core';
 
 export interface ProviderConfigRow {
     readonly name: string;

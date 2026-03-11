@@ -8,8 +8,8 @@
  *   3. Paid models sorted by capability/cost ratio
  *   4. Local models (ollama) as fallback at the end
  */
-import type { ModelRow } from '@web4-agent/state';
-import type { InsertRoutingEntry } from '@web4-agent/state';
+import type { ModelRow } from '@conshell/state';
+import type { InsertRoutingEntry } from '@conshell/state';
 
 // ── Model capability tiers ──────────────────────────────────────────────
 

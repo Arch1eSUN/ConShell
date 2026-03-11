@@ -1,19 +1,19 @@
 {
-    "name": "@web4-agent/policy",
+    "name": "@conshell/policy",
     "version": "0.1.0",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "test": "vitest run",
         "test:watch": "vitest",
         "clean": "rm -rf dist",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@web4-agent/core": "workspace:*",
-        "@web4-agent/state": "workspace:*"
+        "@conshell/core": "workspace:*",
+        "@conshell/state": "workspace:*"
     },
     "devDependencies": {
         "better-sqlite3": "^11.0.0",

@@ -1,5 +1,10 @@
 /**
- * AppConfig — loads .env and auto-detects LLM providers.
+ * AppConfig — hybrid loader: ~/.conshell/config.json → .env → defaults.
+ *
+ * Precedence (highest wins):
+ *   1. Environment variables / .env file
+ *   2. ~/.conshell/config.json (created by `conshell init`)
+ *   3. Hard-coded defaults
  *
  * Environment variables:
  *   ANTHROPIC_API_KEY     — Anthropic Claude
@@ -19,7 +24,8 @@
  */
 import { config as loadDotenv } from 'dotenv';
 import { resolve } from 'node:path';
-import type { InferenceAuthType } from '@web4-agent/core';
+import { readFileSync } from 'node:fs';
+import type { InferenceAuthType } from '@conshell/core';
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -51,6 +57,10 @@ export interface AppConfig {
 
     // Budget
     readonly dailyBudgetCents: number;
+
+    // Security
+    readonly authMode: 'none' | 'token' | 'password';
+    readonly authSecret?: string;
 }
 
 // ── Provider detection ──────────────────────────────────────────────────
@@ -120,7 +130,7 @@ function detectProviders(): LlmProviderConfig[] {
     const cliproxyapiEnabled = process.env['CLIPROXYAPI_ENABLED'] !== 'false';
     providers.push({
         name: 'cliproxyapi',
-        authType: 'proxy' as import('@web4-agent/core').InferenceAuthType,
+        authType: 'proxy' as import('@conshell/core').InferenceAuthType,
         available: !!cliproxyapiKey && cliproxyapiEnabled,
         endpoint: cliproxyapiUrl,
         apiKey: cliproxyapiKey,
@@ -129,25 +139,45 @@ function detectProviders(): LlmProviderConfig[] {
     return providers;
 }
 
+// ── Config JSON loader ──────────────────────────────────────────────────
+
+function loadConfigJson(): Record<string, unknown> {
+    const home = process.env['HOME'] || process.env['USERPROFILE'] || '.';
+    const configPath = resolve(home, '.conshell', 'config.json');
+    try {
+        const data = readFileSync(configPath, 'utf-8');
+        return JSON.parse(data);
+    } catch {
+        return {};
+    }
+}
+
 // ── Load config ─────────────────────────────────────────────────────────
 
 export function loadConfig(envPath?: string): AppConfig {
     // Load .env file
     loadDotenv({ path: envPath ?? resolve(process.cwd(), '.env') });
 
-    const agentHome = process.env['AGENT_HOME'] || process.cwd();
+    // Load ~/.conshell/config.json (created by `conshell init`)
+    const json = loadConfigJson();
+
+    const agentHome = process.env['AGENT_HOME'] || (json.agentHome as string | undefined) || process.cwd();
     const providers = detectProviders();
 
+    const authMode = (process.env['CONSHELL_AUTH_MODE'] || (json.authMode as string | undefined) || 'none') as 'none' | 'token' | 'password';
+
     return {
-        agentName: process.env['AGENT_NAME'] || 'conway-automaton',
-        genesisPrompt: process.env['GENESIS_PROMPT'] || 'You are a sovereign AI agent.',
-        port: parseInt(process.env['PORT'] || '4200', 10),
-        dbPath: process.env['DB_PATH'] || resolve(agentHome, 'state.db'),
-        logLevel: process.env['LOG_LEVEL'] || 'info',
+        agentName: process.env['AGENT_NAME'] || (json.agentName as string | undefined) || 'conway-automaton',
+        genesisPrompt: process.env['GENESIS_PROMPT'] || (json.genesisPrompt as string | undefined) || 'You are a sovereign AI agent.',
+        port: parseInt(process.env['PORT'] || String(json.port ?? 4200), 10),
+        dbPath: process.env['DB_PATH'] || (json.dbPath as string | undefined) || resolve(agentHome, 'state.db'),
+        logLevel: process.env['LOG_LEVEL'] || (json.logLevel as string | undefined) || 'info',
         agentHome,
         walletPrivateKey: process.env['WALLET_PRIVATE_KEY'],
         providers,
-        dailyBudgetCents: parseInt(process.env['DAILY_BUDGET_CENTS'] || '5000', 10),
+        dailyBudgetCents: parseInt(process.env['DAILY_BUDGET_CENTS'] || String(json.dailyBudgetCents ?? 5000), 10),
+        authMode,
+        authSecret: process.env['CONSHELL_AUTH_SECRET'] || (json.authSecret as string | undefined),
     };
 }
 

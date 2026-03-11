@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createTestLogger, type Cents } from '@web4-agent/core';
+import { createTestLogger, type Cents } from '@conshell/core';
 import {
     openTestDatabase,
     TurnsRepository,
@@ -7,7 +7,7 @@ import {
     HeartbeatRepository,
     ChildrenRepository,
     SpendRepository,
-} from '@web4-agent/state';
+} from '@conshell/state';
 import { CliAdmin } from './admin.js';
 import type Database from 'better-sqlite3';
 
@@ -151,6 +151,7 @@ describe('logs', () => {
     it('returns inserted turns for a session', () => {
         turnsRepo.insert({
             sessionId: 'sess-1',
+            role: 'assistant',
             thinking: 'thinking about life',
             inputTokens: 100,
             outputTokens: 50,
@@ -159,6 +160,7 @@ describe('logs', () => {
         });
         turnsRepo.insert({
             sessionId: 'sess-1',
+            role: 'assistant',
             thinking: 'more thoughts',
             inputTokens: 200,
             outputTokens: 80,
@@ -175,6 +177,7 @@ describe('logs', () => {
         for (let i = 0; i < 5; i++) {
             turnsRepo.insert({
                 sessionId: 'sess-2',
+                role: 'user',
                 inputTokens: 10,
                 outputTokens: 5,
                 costCents: 1 as Cents,
@@ -188,12 +191,14 @@ describe('logs', () => {
     it('filters by sessionId', () => {
         turnsRepo.insert({
             sessionId: 'sess-a',
+            role: 'user',
             inputTokens: 10,
             outputTokens: 5,
             costCents: 1 as Cents,
         });
         turnsRepo.insert({
             sessionId: 'sess-b',
+            role: 'user',
             inputTokens: 20,
             outputTokens: 10,
             costCents: 2 as Cents,
@@ -206,6 +211,7 @@ describe('logs', () => {
     it('returns empty when no sessionId given', () => {
         turnsRepo.insert({
             sessionId: 'sess-1',
+            role: 'user',
             inputTokens: 10,
             outputTokens: 5,
             costCents: 1 as Cents,
@@ -287,6 +293,7 @@ describe('integration', () => {
     it('full turn flow: insert turn → retrieve via logs', () => {
         const turnId = turnsRepo.insert({
             sessionId: 'integration-sess',
+            role: 'assistant',
             thinking: 'I must survive',
             inputTokens: 500,
             outputTokens: 250,

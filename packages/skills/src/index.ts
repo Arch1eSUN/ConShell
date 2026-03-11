@@ -1,5 +1,5 @@
 /**
- * @web4-agent/skills — Public API
+ * @conshell/skills — Public API
  */
 export { loadAllSkills, parseSkillMd, type SkillLoaderOptions } from './loader.js';
 export { SkillRegistry } from './registry.js';

@@ -4,8 +4,8 @@ import * as path from 'node:path';
 import * as os from 'node:os';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { createTestLogger } from '@web4-agent/core';
-import { openTestDatabase, ModificationsRepository } from '@web4-agent/state';
+import { createTestLogger } from '@conshell/core';
+import { openTestDatabase, ModificationsRepository } from '@conshell/state';
 import { SelfModEngine, sha256 } from './engine.js';
 import type Database from 'better-sqlite3';
 
@@ -27,7 +27,7 @@ const noopLogger = {
 
 async function initGitRepo(dir: string): Promise<void> {
     await execFileAsync('git', ['init'], { cwd: dir });
-    await execFileAsync('git', ['config', 'user.email', 'test@web4.ai'], { cwd: dir });
+    await execFileAsync('git', ['config', 'user.email', 'test@conshell.sh'], { cwd: dir });
     await execFileAsync('git', ['config', 'user.name', 'Test'], { cwd: dir });
     // Initial commit so HEAD exists
     await fs.writeFile(path.join(dir, '.gitkeep'), '');
@@ -38,7 +38,7 @@ async function initGitRepo(dir: string): Promise<void> {
 // ── Setup / teardown ───────────────────────────────────────────────────
 
 beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'web4-selfmod-'));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'conshell-selfmod-'));
     await initGitRepo(tmpDir);
 
     const { logger } = createTestLogger();

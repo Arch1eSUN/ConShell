@@ -1,5 +1,5 @@
 /**
- * @web4-agent/app adapters — barrel export
+ * @conshell/app adapters — barrel export
  */
 export { OllamaAdapter } from './ollama-adapter.js';
 export { OpenAIAdapter } from './openai-adapter.js';

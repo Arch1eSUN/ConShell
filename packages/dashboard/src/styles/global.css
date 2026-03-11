@@ -25,7 +25,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ── Paper grain overlay (like web4.ai) ───────────────────────────── */
+/* ── Paper grain overlay (like conshell) ───────────────────────────── */
 body::before {
     content: '';
     position: fixed;

@@ -2,7 +2,7 @@
  * Modifications repository — append-only audit of all self-modifications.
  */
 import type Database from 'better-sqlite3';
-import { type ModificationType, type SHA256Hash, nowISO } from '@web4-agent/core';
+import { type ModificationType, type SHA256Hash, nowISO } from '@conshell/core';
 
 export interface ModificationRow {
     readonly id: number;

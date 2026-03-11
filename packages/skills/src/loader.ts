@@ -12,7 +12,7 @@ export interface SkillLoaderOptions {
     readonly skillsDir: string;
     /** Additional directories to scan for skills (e.g., shared skill paths). */
     readonly additionalPaths?: readonly string[];
-    /** Logger for diagnostics (matches @web4-agent/core Logger). */
+    /** Logger for diagnostics (matches @conshell/core Logger). */
     readonly logger?: {
         info: (message: string, data?: Record<string, unknown>) => void;
         warn: (message: string, data?: Record<string, unknown>) => void;

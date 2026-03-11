@@ -3,7 +3,7 @@
  * Stores both user messages and agent responses for conversation memory.
  */
 import type Database from 'better-sqlite3';
-import { type Cents, nowISO } from '@web4-agent/core';
+import { type Cents, nowISO } from '@conshell/core';
 
 export interface TurnRow {
     readonly id: number;

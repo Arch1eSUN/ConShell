@@ -4,8 +4,8 @@
  * Ticks every 60s. Evaluates cron expressions. Uses lease-based execution
  * to prevent double-runs. Inserts wake events for the agent loop.
  */
-import type { Logger, SurvivalTier, HeartbeatResult } from '@web4-agent/core';
-import type { HeartbeatRepository } from '@web4-agent/state';
+import type { Logger, SurvivalTier, HeartbeatResult } from '@conshell/core';
+import type { HeartbeatRepository } from '@conshell/state';
 
 export interface HeartbeatTask {
     readonly name: string;

@@ -59,7 +59,7 @@ export function SkillsPanel() {
                 <h2>🧩 Agent Skills</h2>
                 <p className="skills-subtitle">
                     Installed skills extend your agent's capabilities.
-                    Place skill folders in <code>~/.web4/skills/</code>
+                    Place skill folders in <code>~/.conshell/skills/</code>
                 </p>
             </div>
 
@@ -67,7 +67,7 @@ export function SkillsPanel() {
                 <div className="skills-empty">
                     <span className="skills-empty-icon">📦</span>
                     <h3>No Skills Installed</h3>
-                    <p>Create a folder in <code>~/.web4/skills/your-skill/</code> with a <code>SKILL.md</code> file.</p>
+                    <p>Create a folder in <code>~/.conshell/skills/your-skill/</code> with a <code>SKILL.md</code> file.</p>
                     <pre className="skills-example">{`---
 name: my-skill
 description: What this skill does

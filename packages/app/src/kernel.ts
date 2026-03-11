@@ -14,7 +14,7 @@
  * 10. Create CliAdmin
  */
 import type Database from 'better-sqlite3';
-import type { Logger, AgentState, SurvivalTier, PolicyRule } from '@web4-agent/core';
+import type { Logger, AgentState, SurvivalTier, PolicyRule } from '@conshell/core';
 import {
     openDatabase,
     TurnsRepository,
@@ -35,7 +35,7 @@ import {
     ProviderConfigRepository,
     RoutingConfigRepository,
     CapabilityConfigRepository,
-} from '@web4-agent/state';
+} from '@conshell/state';
 import {
     PolicyEngine,
     ToolRegistry,
@@ -43,10 +43,10 @@ import {
     commandSafetyStaticRules,
     pathProtectionRules,
     validationRules,
-} from '@web4-agent/policy';
-import { DefaultInferenceRouter } from '@web4-agent/inference';
-import { MemoryTierManager } from '@web4-agent/memory';
-import { SoulSystem, EMPTY_SOUL } from '@web4-agent/soul';
+} from '@conshell/policy';
+import { DefaultInferenceRouter } from '@conshell/inference';
+import { MemoryTierManager } from '@conshell/memory';
+import { SoulSystem, EMPTY_SOUL } from '@conshell/soul';
 import {
     AgentLoop,
     AgentStateMachine,
@@ -66,14 +66,14 @@ import {
     PAID_TOOL_CONFIGS,
     createPaidToolHandlers,
     createAllHeartbeatTasks,
-} from '@web4-agent/runtime';
-import { CapabilityGateRule, DEFAULT_CAPABILITY_CONFIG, type CapabilityConfig } from '@web4-agent/policy';
-import { loadAllSkills, SkillRegistry, loadSkillHandlers } from '@web4-agent/skills';
-import { CliAdmin } from '@web4-agent/cli';
-import { X402Server, MockFacilitator } from '@web4-agent/x402';
-import { OnchainWalletProvider } from '@web4-agent/wallet';
+} from '@conshell/runtime';
+import { CapabilityGateRule, DEFAULT_CAPABILITY_CONFIG, type CapabilityConfig } from '@conshell/policy';
+import { loadAllSkills, SkillRegistry, loadSkillHandlers } from '@conshell/skills';
+import { CliAdmin } from '@conshell/cli';
+import { X402Server, MockFacilitator } from '@conshell/x402';
+import { OnchainWalletProvider } from '@conshell/wallet';
 import { discoverModels } from './services/model-discovery.js';
-import type { PaymentRequirements, EthAddress, CAIP2NetworkId, Cents } from '@web4-agent/core';
+import type { PaymentRequirements, EthAddress, CAIP2NetworkId, Cents } from '@conshell/core';
 import type { AppConfig } from './config.js';
 
 // ── Logger ──────────────────────────────────────────────────────────────
@@ -250,7 +250,7 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
     logger.info('Policy engine and tool registry created', { ruleCount: allRules.length });
 
     // 4. Inference router — create provider adapters from config
-    const adapters: import('@web4-agent/core').InferenceProviderAdapter[] = [];
+    const adapters: import('@conshell/core').InferenceProviderAdapter[] = [];
     for (const provider of config.providers) {
         if (!provider.available) continue;
 

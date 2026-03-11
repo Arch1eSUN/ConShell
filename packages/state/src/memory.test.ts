@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createTestLogger } from '@web4-agent/core';
-import { openTestDatabase } from '@web4-agent/state';
+import { createTestLogger } from '@conshell/core';
+import { openTestDatabase } from '@conshell/state';
 import {
     WorkingMemoryRepository,
     EpisodicMemoryRepository,
@@ -9,7 +9,7 @@ import {
     RelationshipMemoryRepository,
     SoulHistoryRepository,
     SessionSummariesRepository,
-} from '@web4-agent/state';
+} from '@conshell/state';
 import type Database from 'better-sqlite3';
 
 let db: Database.Database;

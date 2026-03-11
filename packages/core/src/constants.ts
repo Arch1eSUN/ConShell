@@ -1,10 +1,10 @@
 /**
- * Global constants for the web4-agent runtime.
+ * Global constants for the conshell runtime.
  * All financial values are integers. Timeouts in milliseconds.
  */
 
 /** Agent home directory name */
-export const AGENT_HOME_DIR = '.web4-agent';
+export const AGENT_HOME_DIR = '.conshell';
 
 /** Database filename */
 export const DB_FILENAME = 'state.db';

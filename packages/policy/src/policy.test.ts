@@ -4,7 +4,7 @@ import {
     createTestLogger,
     cents,
     nowISO,
-} from '@web4-agent/core';
+} from '@conshell/core';
 import type {
     PolicyEvaluationRequest,
     ToolMetadata,
@@ -12,8 +12,8 @@ import type {
     AutomatonConfig,
     Cents,
     FinancialContext,
-} from '@web4-agent/core';
-import { runMigrations, PolicyDecisionsRepository } from '@web4-agent/state';
+} from '@conshell/core';
+import { runMigrations, PolicyDecisionsRepository } from '@conshell/state';
 import { PolicyEngine } from './engine.js';
 import { ToolRegistry } from './registry.js';
 import { authorityRules } from './rules/authority.js';

@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createTestLogger } from '@web4-agent/core';
-import { openTestDatabase } from '@web4-agent/state';
+import { createTestLogger } from '@conshell/core';
+import { openTestDatabase } from '@conshell/state';
 import {
     WorkingMemoryRepository,
     EpisodicMemoryRepository,
     SemanticMemoryRepository,
     ProceduralMemoryRepository,
     RelationshipMemoryRepository,
-} from '@web4-agent/state';
+} from '@conshell/state';
 import { MemoryTierManager } from './tier-manager.js';
 import type Database from 'better-sqlite3';
 

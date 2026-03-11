@@ -1,5 +1,5 @@
 /**
- * @web4-agent/skills — Unit tests for SkillRegistry + heartbeat triggers.
+ * @conshell/skills — Unit tests for SkillRegistry + heartbeat triggers.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SkillRegistry } from './registry.js';
@@ -20,7 +20,7 @@ function makeManifest(overrides: Partial<SkillManifest> = {}): SkillManifest {
     };
 }
 
-function makeLoadedSkill(overrides: Partial<LoadedSkill> & { manifest?: Partial<SkillManifest> } = {}): LoadedSkill {
+function makeLoadedSkill(overrides: Omit<Partial<LoadedSkill>, 'manifest'> & { manifest?: Partial<SkillManifest> } = {}): LoadedSkill {
     const { manifest: manifestOverrides, ...rest } = overrides;
     return {
         manifest: makeManifest(manifestOverrides),
@@ -111,12 +111,12 @@ describe('SkillRegistry', () => {
     it('updateLoadedSkill merges updates', () => {
         registry.registerAll([makeLoadedSkill({ manifest: { name: 'updatable' } })]);
 
-        const fakeDefs = [{ name: 'tool1', category: 'test' as const, description: 'A tool', inputSchema: { type: 'object' as const }, riskLevel: 'safe' as const, requiredAuthority: 'self' as const, mcpExposed: false, auditFields: [] }];
+        const fakeDefs = [{ name: 'tool1', category: 'skills' as const, description: 'A tool', inputSchema: { type: 'object' as const }, riskLevel: 'safe' as const, requiredAuthority: 'self' as const, mcpExposed: false, auditFields: [] }];
         registry.updateLoadedSkill('updatable', { toolDefinitions: fakeDefs });
 
         const updated = registry.get('updatable');
         expect(updated?.toolDefinitions).toHaveLength(1);
-        expect(updated?.toolDefinitions?.[0].name).toBe('tool1');
+        expect(updated!.toolDefinitions![0]!.name).toBe('tool1');
     });
 
     it('updateLoadedSkill is no-op for unknown skill', () => {
@@ -148,7 +148,7 @@ describe('SkillRegistry.getSkillsWithHeartbeatTriggers', () => {
 
         const result = registry.getSkillsWithHeartbeatTriggers();
         expect(result).toHaveLength(1);
-        expect(result[0].manifest.name).toBe('cron-skill');
+        expect(result[0]!.manifest.name).toBe('cron-skill');
     });
 });
 

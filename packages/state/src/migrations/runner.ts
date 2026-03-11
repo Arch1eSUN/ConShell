@@ -6,7 +6,7 @@
  * the `schema_version` table and applies pending migrations in order.
  */
 import type Database from 'better-sqlite3';
-import { type Logger, MigrationError, nowISO } from '@web4-agent/core';
+import { type Logger, MigrationError, nowISO } from '@conshell/core';
 import { migrations } from './definitions.js';
 
 export interface Migration {

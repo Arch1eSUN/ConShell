@@ -1,5 +1,5 @@
 /**
- * @web4-agent/selfmod — Self-modification engine
+ * @conshell/selfmod — Self-modification engine
  *
  * Git-backed, audited self-modification with protected-file enforcement.
  */

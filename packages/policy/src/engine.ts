@@ -10,8 +10,8 @@ import type {
     PolicyDecision,
     ToolMetadata,
     Logger,
-} from '@web4-agent/core';
-import type { PolicyDecisionsRepository } from '@web4-agent/state';
+} from '@conshell/core';
+import type { PolicyDecisionsRepository } from '@conshell/state';
 
 export class PolicyEngine {
     private readonly rules: PolicyRule[];

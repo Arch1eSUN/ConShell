@@ -1,0 +1,124 @@
+/* ── LoginGate ─────────────────────────────────────────────────────── */
+
+.login-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--space-2xl);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.login-card h1 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--ink);
+    margin-bottom: var(--space-xs);
+}
+
+.login-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: var(--space-xl);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.login-input-group {
+    position: relative;
+}
+
+.login-input-group label {
+    display: block;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: var(--space-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px var(--green-dim);
+}
+
+.login-input::placeholder {
+    color: var(--muted);
+    opacity: 0.5;
+}
+
+.login-submit {
+    width: 100%;
+    padding: 12px;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--green);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.login-submit:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+}
+
+.login-submit:active {
+    transform: translateY(0);
+}
+
+.login-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.login-error {
+    font-size: 0.8rem;
+    color: var(--rose);
+    background: var(--rose-dim);
+    padding: 8px 12px;
+    border-radius: var(--radius);
+}
+
+.login-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+}

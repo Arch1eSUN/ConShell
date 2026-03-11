@@ -64,7 +64,7 @@ export class SkillRegistry {
      * Update a loaded skill with resolved tool definitions and handlers.
      */
     updateLoadedSkill(name: string, updates: {
-        toolDefinitions?: readonly import('@web4-agent/core').ToolDefinition[];
+        toolDefinitions?: readonly import('@conshell/core').ToolDefinition[];
         toolHandlers?: ReadonlyMap<string, (args: Record<string, unknown>) => Promise<string>>;
     }): void {
         const skill = this.skills.get(name);

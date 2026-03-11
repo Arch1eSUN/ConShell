@@ -1,0 +1,317 @@
+/* ═══════════════════════════════════════════════════════════════════════
+ * SecuritySettings — Dashboard Security Tab
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+.security-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.security-desc {
+    color: var(--color-text-muted, #a0a0b8);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+/* ── Constitution Laws ───────────────────────────────────────────────── */
+
+.constitution-laws {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.law-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.law-card:hover {
+    border-color: rgba(120, 160, 255, 0.25);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.law-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.law-number {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #7ca0ff;
+    background: rgba(124, 160, 255, 0.12);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.law-name {
+    font-weight: 600;
+    color: var(--color-text, #e8e8f0);
+    font-size: 0.95rem;
+}
+
+.law-badge.mandatory {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.law-desc {
+    color: var(--color-text-muted, #a0a0b8);
+    font-size: 0.82rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.constitution-hash {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hash-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted, #a0a0b8);
+    text-transform: uppercase;
+}
+
+.hash-value {
+    font-size: 0.72rem;
+    color: #64d8a0;
+    background: rgba(100, 216, 160, 0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+.security-btn {
+    background: linear-gradient(135deg, #4a6cf7 0%, #7c4dff 100%);
+    border: none;
+    color: white;
+    padding: 0.55rem 1.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.security-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(74, 108, 247, 0.35);
+}
+
+.security-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Injection Scanner ───────────────────────────────────────────────── */
+
+.scan-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.scan-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--color-text, #e8e8f0);
+    font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.scan-input:focus {
+    outline: none;
+    border-color: rgba(124, 160, 255, 0.4);
+}
+
+.scan-input::placeholder {
+    color: rgba(160, 160, 184, 0.5);
+}
+
+.scan-btn {
+    align-self: flex-start;
+}
+
+/* ── Scan Results ────────────────────────────────────────────────────── */
+
+.scan-result {
+    margin-top: 0.75rem;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    border: 1px solid;
+}
+
+.scan-result.clean {
+    background: rgba(100, 216, 160, 0.06);
+    border-color: rgba(100, 216, 160, 0.2);
+}
+
+.scan-result.alert {
+    background: rgba(255, 107, 107, 0.06);
+    border-color: rgba(255, 107, 107, 0.25);
+}
+
+.scan-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.scan-icon {
+    font-size: 1.2rem;
+}
+
+.scan-verdict {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--color-text, #e8e8f0);
+}
+
+.risk-badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.03em;
+}
+
+.risk-badge.high {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+}
+
+.risk-badge.medium {
+    color: #ffb347;
+    background: rgba(255, 179, 71, 0.15);
+}
+
+.risk-badge.low {
+    color: #64d8a0;
+    background: rgba(100, 216, 160, 0.15);
+}
+
+.detections-list {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detection-item {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 0.78rem;
+}
+
+.detection-type {
+    font-weight: 600;
+    color: #ff8a6b;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+}
+
+.detection-confidence {
+    color: var(--color-text-muted, #a0a0b8);
+    font-size: 0.72rem;
+}
+
+.detection-evidence {
+    color: #e0e0e8;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Security Status ─────────────────────────────────────────────────── */
+
+.security-status {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+}
+
+.security-status.error {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+/* ── Policy Grid ─────────────────────────────────────────────────────── */
+
+.policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.policy-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+.policy-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #a0a0b8);
+    margin-bottom: 0.35rem;
+}
+
+.policy-value {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.policy-value.enabled {
+    color: #64d8a0;
+}
+
+.policy-value.disabled {
+    color: #ff6b6b;
+}

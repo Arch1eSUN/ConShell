@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-describe('@web4-agent/app', () => {
+describe('@conshell/app', () => {
     it('exports loadConfig', async () => {
         const config = await import('./config.js');
         expect(config.loadConfig).toBeDefined();

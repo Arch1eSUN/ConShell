@@ -6,7 +6,7 @@
  * NOTE: Playwright is an optional peer dependency. If not installed,
  * these handlers will return error messages guiding the user to install it.
  */
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 import type { ToolHandler } from './web-tools.js';
 
 // ── Tool Definitions ────────────────────────────────────────────────────

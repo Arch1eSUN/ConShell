@@ -4,7 +4,7 @@
  * Enforce trust hierarchy: creator > self > peer > external.
  * Forbidden-risk tools are blocked unconditionally.
  */
-import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@web4-agent/core';
+import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@conshell/core';
 
 function deny(rule: string, category: string, reason: string): PolicyDecision {
     return { allowed: false, rule, reason, ruleCategory: category };

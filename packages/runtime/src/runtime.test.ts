@@ -1,11 +1,11 @@
 /**
- * Tests for @web4-agent/runtime
+ * Tests for @conshell/runtime
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createTestLogger } from '@web4-agent/core';
-import type { InferenceRouter, InferenceRequest, InferenceResponse, Cents, SurvivalTier } from '@web4-agent/core';
-import { openTestDatabase, TurnsRepository, HeartbeatRepository } from '@web4-agent/state';
-import { ToolRegistry } from '@web4-agent/policy';
+import { createTestLogger } from '@conshell/core';
+import type { InferenceRouter, InferenceRequest, InferenceResponse, Cents, SurvivalTier } from '@conshell/core';
+import { openTestDatabase, TurnsRepository, HeartbeatRepository } from '@conshell/state';
+import { ToolRegistry } from '@conshell/policy';
 import { AgentStateMachine } from './state-machine.js';
 import { AgentLoop } from './agent-loop.js';
 import { HeartbeatDaemon } from './heartbeat.js';
@@ -134,9 +134,10 @@ describe('AgentLoop', () => {
         });
 
         const turns = turnsRepo.findBySession('persist-session');
-        expect(turns.length).toBe(1);
-        expect(turns[0]!.model).toBe('test-model');
-        expect(turns[0]!.cost_cents).toBe(5);
+        expect(turns.length).toBe(2); // user turn + assistant turn
+        const assistantTurn = turns.find(t => t.role === 'assistant')!;
+        expect(assistantTurn.model).toBe('test-model');
+        expect(assistantTurn.cost_cents).toBe(5);
     });
 
     it('propagates inference errors', async () => {
@@ -349,7 +350,7 @@ describe('McpGateway', () => {
         expect(res.error).toBeUndefined();
         const result = res.result as Record<string, unknown>;
         expect(result['protocolVersion']).toBe('2025-06-18');
-        expect(result['serverInfo']).toEqual({ name: 'web4-agent', version: '0.1.0' });
+        expect(result['serverInfo']).toEqual({ name: 'conshell', version: '0.1.0' });
     });
 
     it('tools/list returns MCP-exposed tools', async () => {

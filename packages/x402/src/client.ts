@@ -11,7 +11,7 @@ import type {
     PaymentRequirements,
     FacilitatorAdapter,
     Logger,
-} from '@web4-agent/core';
+} from '@conshell/core';
 
 export interface X402ClientOptions {
     /** Maximum payment per request in cents */

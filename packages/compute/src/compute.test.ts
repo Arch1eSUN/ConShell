@@ -23,7 +23,7 @@ describe('LocalComputeProvider', () => {
     let tmpDir: string;
 
     beforeEach(async () => {
-        tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'web4-compute-'));
+        tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'conshell-compute-'));
         provider = new LocalComputeProvider(noopLogger, tmpDir);
     });
 

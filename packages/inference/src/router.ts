@@ -18,13 +18,13 @@ import type {
     Logger,
     Cents,
     InferenceProvider as InferenceProviderName,
-} from '@web4-agent/core';
+} from '@conshell/core';
 import type {
     ModelRegistryRepository,
     InferenceCostsRepository,
     RoutingConfigRepository,
     ModelRow,
-} from '@web4-agent/state';
+} from '@conshell/state';
 import { getModelPreferences, type ModelPreference } from './routing.js';
 
 export interface InferenceRouterOptions {

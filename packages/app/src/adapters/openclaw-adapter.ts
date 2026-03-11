@@ -15,8 +15,8 @@ import type {
     InferenceProvider as InferenceProviderName,
     InferenceAuthType,
     OpenClawSubProvider,
-} from '@web4-agent/core';
-import { Cents } from '@web4-agent/core';
+} from '@conshell/core';
+import { Cents } from '@conshell/core';
 
 interface OpenClawChatMessage {
     role: 'system' | 'user' | 'assistant';

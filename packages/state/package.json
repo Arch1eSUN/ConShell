@@ -1,7 +1,7 @@
 {
-    "name": "@web4-agent/state",
+    "name": "@conshell/state",
     "version": "0.1.0",
-    "description": "SQLite durable state: schema, migrations, and typed repositories for web4-agent",
+    "description": "SQLite durable state: schema, migrations, and typed repositories for conshell",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -12,14 +12,14 @@
         }
     },
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "clean": "rm -rf dist *.tsbuildinfo",
         "test": "vitest run",
         "test:watch": "vitest watch",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@web4-agent/core": "workspace:*",
+        "@conshell/core": "workspace:*",
         "better-sqlite3": "^11.0.0"
     },
     "devDependencies": {

@@ -4,7 +4,7 @@
  * Supports upsert seeding, query by provider/capability, and availability filtering.
  */
 import type Database from 'better-sqlite3';
-import { nowISO } from '@web4-agent/core';
+import { nowISO } from '@conshell/core';
 
 export interface ModelRow {
     readonly id: string;

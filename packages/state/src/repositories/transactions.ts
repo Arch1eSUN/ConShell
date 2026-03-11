@@ -7,7 +7,7 @@ import {
     type TransactionType,
     type TransactionStatus,
     nowISO,
-} from '@web4-agent/core';
+} from '@conshell/core';
 
 export interface TransactionRow {
     readonly id: number;

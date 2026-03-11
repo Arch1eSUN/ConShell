@@ -4,7 +4,7 @@
  * Each tool declares its `requiredCapabilities`. This rule checks that
  * every required capability is enabled in the config. God Mode bypasses.
  */
-import type { PolicyRule, PolicyDecision, PolicyEvaluationRequest, ToolMetadata, CapabilityId } from '@web4-agent/core';
+import type { PolicyRule, PolicyDecision, PolicyEvaluationRequest, ToolMetadata, CapabilityId } from '@conshell/core';
 
 export interface CapabilityConfig {
     readonly godMode: boolean;

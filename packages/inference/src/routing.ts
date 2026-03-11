@@ -12,7 +12,7 @@
  *   openclaw  → OAuth (Codex / Antigravity)
  *   nvidia    → API key
  */
-import type { SurvivalTier, InferenceTaskType } from '@web4-agent/core';
+import type { SurvivalTier, InferenceTaskType } from '@conshell/core';
 
 export interface ModelPreference {
     /** Model ID (matches seed data) */

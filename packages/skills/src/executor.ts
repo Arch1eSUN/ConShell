@@ -4,7 +4,7 @@
  * Handles the bridge between SKILL.md manifests and the runtime ToolExecutor.
  */
 import { pathToFileURL } from 'node:url';
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 import type { SkillRegistry } from './registry.js';
 
 export interface SkillExecutorDeps {

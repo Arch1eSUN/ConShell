@@ -8,8 +8,8 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import type { WalletProvider, WalletAccount, EthAddress, Logger } from '@web4-agent/core';
-import { WALLET_FILE_MODE } from '@web4-agent/core';
+import type { WalletProvider, WalletAccount, EthAddress, Logger } from '@conshell/core';
+import { WALLET_FILE_MODE } from '@conshell/core';
 
 /** Internal wallet file format */
 interface WalletFile {
@@ -87,7 +87,7 @@ function wrapAccount(account: ReturnType<typeof privateKeyToAccount>): WalletAcc
  * In production, this should be derived from a user-supplied secret.
  */
 function defaultPassphrase(walletPath: string): string {
-    return `web4-agent-wallet-${path.dirname(path.resolve(walletPath))}`;
+    return `conshell-wallet-${path.dirname(path.resolve(walletPath))}`;
 }
 
 export class LocalWalletProvider implements WalletProvider {

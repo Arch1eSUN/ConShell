@@ -4,7 +4,7 @@
  * Requires: shell_exec capability
  */
 import { exec, spawn } from 'node:child_process';
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 import type { ToolHandler } from './web-tools.js';
 
 // ── Tool Definitions ────────────────────────────────────────────────────

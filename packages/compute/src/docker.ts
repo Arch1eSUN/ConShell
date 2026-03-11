@@ -6,8 +6,8 @@
  */
 import { exec as execCb, type ExecException } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import type { Logger } from '@web4-agent/core';
-import { nowISO } from '@web4-agent/core';
+import type { Logger } from '@conshell/core';
+import { nowISO } from '@conshell/core';
 import type { ComputeProvider, ExecResult, SandboxInfo, SandboxConfig, ExecOpts } from './provider.js';
 
 const DEFAULT_IMAGE = 'node:20-slim';
@@ -31,7 +31,7 @@ export class DockerComputeProvider implements ComputeProvider {
     constructor(private readonly logger: Logger) { }
 
     async createSandbox(config: SandboxConfig): Promise<string> {
-        const name = config.name ?? `web4-${randomUUID().slice(0, 8)}`;
+        const name = config.name ?? `conshell-${randomUUID().slice(0, 8)}`;
         const image = config.image ?? DEFAULT_IMAGE;
         const memoryMb = config.memoryMb ?? DEFAULT_MEMORY_MB;
 

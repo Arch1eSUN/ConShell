@@ -4,9 +4,9 @@
  * These tasks run on the HeartbeatDaemon's cron scheduler to give the
  * agent autonomous behavior even when not in an active conversation.
  */
-import type { HeartbeatResult, Logger, SurvivalTier } from '@web4-agent/core';
+import type { HeartbeatResult, Logger, SurvivalTier } from '@conshell/core';
 import type { HeartbeatTask, HeartbeatContext } from './heartbeat.js';
-import type { SemanticMemoryRepository, EpisodicMemoryRepository, SpendRepository } from '@web4-agent/state';
+import type { SemanticMemoryRepository, EpisodicMemoryRepository, SpendRepository } from '@conshell/state';
 import { handleWebSearch, handleWebBrowse } from './tools/web-tools.js';
 
 // ── Interfaces ──────────────────────────────────────────────────────────

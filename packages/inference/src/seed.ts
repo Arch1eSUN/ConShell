@@ -5,7 +5,7 @@
  * Availability depends on API key presence — seeded as enabled.
  * OpenClaw sub-providers (Codex/Antigravity) are seeded as available.
  */
-import type { UpsertModel } from '@web4-agent/state';
+import type { UpsertModel } from '@conshell/state';
 
 export const DEFAULT_MODEL_SEED: readonly UpsertModel[] = [
     // ── Ollama (local, zero cost) ──────────────────────────────────────

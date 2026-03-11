@@ -3,7 +3,7 @@
  *
  * Calls a facilitator endpoint for verify/settle with retry + timeout.
  */
-import type { FacilitatorAdapter, VerifyRequest, VerifyResult, SettleRequest, SettleResult, Logger } from '@web4-agent/core';
+import type { FacilitatorAdapter, VerifyRequest, VerifyResult, SettleRequest, SettleResult, Logger } from '@conshell/core';
 
 export interface HttpFacilitatorOptions {
     /** Facilitator base URL (e.g. https://facilitator.x402.org) */

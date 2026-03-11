@@ -1,7 +1,7 @@
 {
-    "name": "@web4-agent/core",
+    "name": "@conshell/core",
     "version": "0.1.0",
-    "description": "Shared types, config, money primitives, logger, and error hierarchy for web4-agent",
+    "description": "Shared types, config, money primitives, logger, and error hierarchy for conshell",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -12,7 +12,7 @@
         }
     },
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "clean": "rm -rf dist *.tsbuildinfo",
         "test": "vitest run",
         "test:watch": "vitest watch",

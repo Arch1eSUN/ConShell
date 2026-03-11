@@ -9,8 +9,8 @@
  * - SurvivalTier (more aggressive at high tier, conservative at low)
  * - All changes go through ComputeProvider sandbox for isolation
  */
-import type { Logger, SurvivalTier } from '@web4-agent/core';
-import type { ComputeProvider } from '@web4-agent/compute';
+import type { Logger, SurvivalTier } from '@conshell/core';
+import type { ComputeProvider } from '@conshell/compute';
 import type { HeartbeatTask, HeartbeatContext } from './heartbeat.js';
 
 // ── Types ───────────────────────────────────────────────────────────────

@@ -1,16 +1,16 @@
 {
-    "name": "@web4-agent/compute",
+    "name": "@conshell/compute",
     "version": "0.1.0",
     "private": true,
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "test": "vitest run"
     },
     "dependencies": {
-        "@web4-agent/core": "workspace:*"
+        "@conshell/core": "workspace:*"
     },
     "devDependencies": {
         "typescript": "^5.7.0",

@@ -3,7 +3,7 @@
  *
  * Requires: internet_access capability
  */
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 import type { ToolHandler } from './web-tools.js';
 
 // ── Tool Definitions ────────────────────────────────────────────────────

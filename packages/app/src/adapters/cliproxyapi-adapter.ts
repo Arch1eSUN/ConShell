@@ -15,8 +15,8 @@ import type {
     InferenceResponse,
     InferenceProvider as InferenceProviderName,
     InferenceAuthType,
-} from '@web4-agent/core';
-import { Cents } from '@web4-agent/core';
+} from '@conshell/core';
+import { Cents } from '@conshell/core';
 
 interface OpenAIChatMessage {
     role: 'system' | 'user' | 'assistant';

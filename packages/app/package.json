@@ -1,15 +1,30 @@
 {
-    "name": "@web4-agent/app",
+    "name": "conshell",
     "version": "0.1.0",
-    "description": "Conway Automaton application — CLI, HTTP API, and WebSocket server",
+    "description": "ConShell — Sovereign AI Agent Runtime (Conway Automaton + Shell)",
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "bin": {
-        "web4": "dist/index.js"
+        "conshell": "dist/index.js"
     },
+    "files": [
+        "dist",
+        "CONSTITUTION.md",
+        "SOUL.md",
+        "README.md"
+    ],
+    "keywords": [
+        "ai-agent",
+        "sovereign-ai",
+        "conway-automaton",
+        "conshell",
+        "sovereign-ai",
+        "x402",
+        "digital-life"
+    ],
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "dev": "tsx src/index.ts start",
         "start": "node dist/index.js start",
         "test": "vitest run",
@@ -18,18 +33,19 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@web4-agent/core": "workspace:*",
-        "@web4-agent/state": "workspace:*",
-        "@web4-agent/policy": "workspace:*",
-        "@web4-agent/skills": "workspace:*",
-        "@web4-agent/inference": "workspace:*",
-        "@web4-agent/memory": "workspace:*",
-        "@web4-agent/soul": "workspace:*",
-        "@web4-agent/runtime": "workspace:*",
-        "@web4-agent/wallet": "workspace:*",
-        "@web4-agent/selfmod": "workspace:*",
-        "@web4-agent/cli": "workspace:*",
-        "@web4-agent/x402": "workspace:*",
+        "@conshell/core": "workspace:*",
+        "@conshell/state": "workspace:*",
+        "@conshell/policy": "workspace:*",
+        "@conshell/skills": "workspace:*",
+        "@conshell/inference": "workspace:*",
+        "@conshell/memory": "workspace:*",
+        "@conshell/soul": "workspace:*",
+        "@conshell/runtime": "workspace:*",
+        "@conshell/wallet": "workspace:*",
+        "@conshell/selfmod": "workspace:*",
+        "@conshell/security": "workspace:*",
+        "@conshell/cli": "workspace:*",
+        "@conshell/x402": "workspace:*",
         "commander": "^13.0.0",
         "dotenv": "^16.4.0",
         "express": "^5.0.0",

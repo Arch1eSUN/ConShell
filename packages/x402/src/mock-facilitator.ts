@@ -3,7 +3,7 @@
  *
  * Used for local development and testing. Returns deterministic mock hashes.
  */
-import type { FacilitatorAdapter, VerifyRequest, VerifyResult, SettleRequest, SettleResult, Logger } from '@web4-agent/core';
+import type { FacilitatorAdapter, VerifyRequest, VerifyResult, SettleRequest, SettleResult, Logger } from '@conshell/core';
 
 const MOCK_TX_PREFIX = '0x' + '0'.repeat(56);
 

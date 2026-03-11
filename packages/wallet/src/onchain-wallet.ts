@@ -7,7 +7,7 @@
 import { createPublicClient, http, type Chain, formatUnits } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { LocalWalletProvider } from './local-wallet.js';
-import type { EthAddress, Logger } from '@web4-agent/core';
+import type { EthAddress, Logger } from '@conshell/core';
 
 // Base Sepolia USDC contract address (Circle testnet)
 const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e' as const;

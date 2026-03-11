@@ -9,9 +9,9 @@
  *
  * Governed by config.replication (maxChildren, minChildFundingCents).
  */
-import type { Logger, SurvivalTier, Cents, ChildLifecycleState } from '@web4-agent/core';
-import type { ComputeProvider } from '@web4-agent/compute';
-import type { ChildrenRepository, InsertChild, ChildRow } from '@web4-agent/state';
+import type { Logger, SurvivalTier, Cents, ChildLifecycleState } from '@conshell/core';
+import type { ComputeProvider } from '@conshell/compute';
+import type { ChildrenRepository, InsertChild, ChildRow } from '@conshell/state';
 
 // ── Types ───────────────────────────────────────────────────────────────
 

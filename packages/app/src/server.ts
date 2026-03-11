@@ -17,12 +17,18 @@ import { createServer } from 'node:http';
 import { resolve, dirname } from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import type { Cents } from '@web4-agent/core';
-import type { UpsertModel } from '@web4-agent/state';
+import type { Cents } from '@conshell/core';
+import type { UpsertModel } from '@conshell/state';
 import type { RunningAgent } from './kernel.js';
 import { WsManager } from './ws.js';
 import { discoverModels, testProviderConnection } from './services/model-discovery.js';
-import { autoGenerateRouting, getRoutingDimensions, getModelClassification } from '@web4-agent/inference';
+import { autoGenerateRouting, getRoutingDimensions, getModelClassification } from '@conshell/inference';
+import {
+    createAuthMiddleware,
+    generateToken,
+    createRateLimitMiddleware,
+    type AuthConfig,
+} from '@conshell/security';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -38,8 +44,24 @@ export function createAppServer(agent: RunningAgent): ServerHandle {
     const app = express();
     const httpServer = createServer(app);
 
-    // WebSocket
-    const wsManager = new WsManager(agent.logger);
+    // ── Security Config ─────────────────────────────────────────────────
+    const authSecret = agent.config.authMode === 'token'
+        ? (agent.config.authSecret || generateToken())
+        : agent.config.authSecret;
+
+    const authConfig: AuthConfig = {
+        mode: agent.config.authMode,
+        secret: authSecret,
+        skipPaths: ['/health', '/api/health', '/.well-known/mcp'],
+    };
+
+    // Log auth token at startup (only for token mode)
+    if (agent.config.authMode === 'token' && authSecret) {
+        agent.logger.info('🔐 Auth token generated (use Bearer header)', { token: authSecret });
+    }
+
+    // WebSocket — with auth config for connection verification
+    const wsManager = new WsManager(agent.logger, authConfig);
     wsManager.attach(httpServer);
 
     // Middleware
@@ -49,13 +71,19 @@ export function createAppServer(agent: RunningAgent): ServerHandle {
     app.use((_req, res, next) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         if (_req.method === 'OPTIONS') {
             res.status(204).end();
             return;
         }
         next();
     });
+
+    // Rate limiting (before auth to block brute-force attempts)
+    app.use(createRateLimitMiddleware() as any);
+
+    // Authentication middleware
+    app.use(createAuthMiddleware(authConfig) as any);
 
     // ── API Routes ──────────────────────────────────────────────────────
 
@@ -66,6 +94,7 @@ export function createAppServer(agent: RunningAgent): ServerHandle {
             agent: agent.config.agentName,
             state: agent.getState(),
             uptime: process.uptime(),
+            authRequired: agent.config.authMode !== 'none',
         });
     });
 
@@ -528,7 +557,7 @@ export function createAppServer(agent: RunningAgent): ServerHandle {
             }
 
             // Reload skills
-            const { loadAllSkills } = await import('@web4-agent/skills');
+            const { loadAllSkills } = await import('@conshell/skills');
             const skillsDir = path.default.join(agent.config.agentHome, 'skills');
             const skills = await loadAllSkills({ skillsDir, logger: agent.logger });
             agent.skillRegistry.registerAll(skills);

@@ -1,5 +1,5 @@
 /**
- * Integer-only money arithmetic for web4-agent.
+ * Integer-only money arithmetic for conshell.
  *
  * All financial values are represented as branded integers:
  *  - Cents: integer US cents (1 dollar = 100 cents)

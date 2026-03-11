@@ -3,13 +3,13 @@
  *
  * Block forbidden shell patterns, self-harm commands, and rate-limit self-modifications.
  */
-import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@web4-agent/core';
+import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@conshell/core';
 import {
     FORBIDDEN_COMMAND_PATTERNS,
     DB_FILENAME,
     WALLET_FILENAME,
     DEFAULT_MAX_SELF_MOD_PER_HOUR,
-} from '@web4-agent/core';
+} from '@conshell/core';
 
 function deny(rule: string, reason: string): PolicyDecision {
     return { allowed: false, rule, reason, ruleCategory: 'command_safety' };

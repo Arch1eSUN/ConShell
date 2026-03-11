@@ -3,12 +3,12 @@
  *
  * Protect critical files from write and sensitive files from read.
  */
-import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@web4-agent/core';
+import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@conshell/core';
 import {
     PROTECTED_FILE_BASENAMES,
     PROTECTED_DIRECTORIES,
     SENSITIVE_FILE_PATTERNS,
-} from '@web4-agent/core';
+} from '@conshell/core';
 import path from 'node:path';
 
 function deny(rule: string, reason: string): PolicyDecision {

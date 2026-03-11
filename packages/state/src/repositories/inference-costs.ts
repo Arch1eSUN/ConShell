@@ -2,7 +2,7 @@
  * InferenceCostsRepository — records every LLM inference call with cost and latency.
  */
 import type Database from 'better-sqlite3';
-import { nowISO } from '@web4-agent/core';
+import { nowISO } from '@conshell/core';
 
 export interface InferenceCostRow {
     readonly id: number;

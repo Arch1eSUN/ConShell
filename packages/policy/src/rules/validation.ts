@@ -3,8 +3,8 @@
  *
  * Input format validation: npm package names, URLs, domains, git hashes, ETH addresses.
  */
-import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@web4-agent/core';
-import { NPM_PACKAGE_NAME_PATTERN, isValidEthAddress } from '@web4-agent/core';
+import type { PolicyRule, PolicyEvaluationRequest, PolicyDecision, ToolMetadata } from '@conshell/core';
+import { NPM_PACKAGE_NAME_PATTERN, isValidEthAddress } from '@conshell/core';
 
 function deny(rule: string, reason: string): PolicyDecision {
     return { allowed: false, rule, reason, ruleCategory: 'validation' };

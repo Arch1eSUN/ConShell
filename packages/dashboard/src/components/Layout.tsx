@@ -6,7 +6,9 @@ interface Props {
     children: ReactNode;
 }
 
-type Tab = 'overview' | 'chat' | 'logs' | 'heartbeat' | 'children' | 'soul' | 'settings';
+type Tab = 'overview' | 'chat' | 'logs' | 'heartbeat' | 'children' | 'soul'
+    | 'identity' | 'social' | 'plugins' | 'channels' | 'backup' | 'health' | 'metrics'
+    | 'onboard' | 'settings';
 
 interface LayoutProps extends Props {
     activeTab: Tab;
@@ -20,6 +22,14 @@ const TABS: { id: Tab; label: string }[] = [
     { id: 'heartbeat', label: 'Heartbeat' },
     { id: 'children', label: 'Children' },
     { id: 'soul', label: 'Soul' },
+    { id: 'identity', label: '🪪 Identity' },
+    { id: 'social', label: '💬 Social' },
+    { id: 'plugins', label: '🧩 Plugins' },
+    { id: 'channels', label: '📡 Channels' },
+    { id: 'backup', label: '💾 Backup' },
+    { id: 'health', label: '🩺 Health' },
+    { id: 'metrics', label: '📊 Metrics' },
+    { id: 'onboard', label: '🧭 Onboard' },
     { id: 'settings', label: '⚙ Settings' },
 ];
 

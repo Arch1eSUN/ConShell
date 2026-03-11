@@ -10,7 +10,7 @@ import {
     DB_FILENAME,
     type Logger,
     DatabaseCorruptionError,
-} from '@web4-agent/core';
+} from '@conshell/core';
 import { runMigrations } from './migrations/runner.js';
 
 export interface DatabaseOptions {

@@ -1,11 +1,11 @@
 /**
- * Tests for @web4-agent/inference
+ * Tests for @conshell/inference
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createTestLogger } from '@web4-agent/core';
-import type { InferenceProviderAdapter, InferenceRequest, InferenceResponse, Cents, InferenceProvider as InferenceProviderName, InferenceAuthType } from '@web4-agent/core';
-import { openTestDatabase, ModelRegistryRepository, InferenceCostsRepository } from '@web4-agent/state';
-import type { UpsertModel } from '@web4-agent/state';
+import { createTestLogger } from '@conshell/core';
+import type { InferenceProviderAdapter, InferenceRequest, InferenceResponse, Cents, InferenceProvider as InferenceProviderName, InferenceAuthType } from '@conshell/core';
+import { openTestDatabase, ModelRegistryRepository, InferenceCostsRepository } from '@conshell/state';
+import type { UpsertModel } from '@conshell/state';
 import { DEFAULT_MODEL_SEED } from './seed.js';
 import { getModelPreferences } from './routing.js';
 import { DefaultInferenceRouter } from './router.js';

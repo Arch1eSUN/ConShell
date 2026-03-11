@@ -1,18 +1,18 @@
 {
-    "name": "@web4-agent/wallet",
+    "name": "@conshell/wallet",
     "version": "0.1.0",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "test": "vitest run",
         "test:watch": "vitest",
         "clean": "rm -rf dist",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@web4-agent/core": "workspace:*",
+        "@conshell/core": "workspace:*",
         "viem": "^2.21.0"
     },
     "devDependencies": {

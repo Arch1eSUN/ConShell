@@ -1,22 +1,22 @@
 {
-    "name": "@web4-agent/runtime",
+    "name": "@conshell/runtime",
     "version": "0.1.0",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsc --build",
+        "build": "npx tsc --build",
         "test": "vitest run",
         "test:watch": "vitest",
         "clean": "rm -rf dist",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@web4-agent/core": "workspace:*",
-        "@web4-agent/compute": "workspace:*",
-        "@web4-agent/inference": "workspace:*",
-        "@web4-agent/policy": "workspace:*",
-        "@web4-agent/state": "workspace:*"
+        "@conshell/core": "workspace:*",
+        "@conshell/compute": "workspace:*",
+        "@conshell/inference": "workspace:*",
+        "@conshell/policy": "workspace:*",
+        "@conshell/state": "workspace:*"
     },
     "devDependencies": {
         "@types/better-sqlite3": "^7.6.13",

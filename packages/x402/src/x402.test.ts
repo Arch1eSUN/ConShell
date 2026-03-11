@@ -1,15 +1,15 @@
 /**
- * Tests for @web4-agent/x402
+ * Tests for @conshell/x402
  */
 import { describe, it, expect } from 'vitest';
 import {
     createTestLogger,
-} from '@web4-agent/core';
+} from '@conshell/core';
 import type {
     PaymentRequirements,
     EthAddress,
     CAIP2NetworkId,
-} from '@web4-agent/core';
+} from '@conshell/core';
 import { MockFacilitator } from './mock-facilitator.js';
 import { X402Server } from './server.js';
 import type { SimpleRequest } from './server.js';

@@ -10,7 +10,7 @@ import type {
     FacilitatorAdapter,
     PaymentRequirements,
     Logger,
-} from '@web4-agent/core';
+} from '@conshell/core';
 
 export interface X402RouteConfig {
     /** The payment requirements for this route */

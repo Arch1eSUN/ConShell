@@ -8,8 +8,8 @@
  * 4. Truncate result to MAX_TOOL_RESULT_SIZE
  * 5. Return structured result
  */
-import type { Logger, ToolCallRequest, ToolCallResult as CoreToolCallResult, AgentState, SurvivalTier } from '@web4-agent/core';
-import type { PolicyEngine } from '@web4-agent/policy';
+import type { Logger, ToolCallRequest, ToolCallResult as CoreToolCallResult, AgentState, SurvivalTier } from '@conshell/core';
+import type { PolicyEngine } from '@conshell/policy';
 import type { ToolHandler } from './tools/web-tools.js';
 
 export const MAX_TOOL_RESULT_SIZE = 32_768; // 32KB

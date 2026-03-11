@@ -4,7 +4,7 @@
  * These tools are exposed through the MCP Gateway with payment requirements.
  * External agents/users pay USDC to use them, generating revenue for the agent.
  */
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 import type { ToolHandler } from './web-tools.js';
 
 // ── Paid Tool Definitions ───────────────────────────────────────────────

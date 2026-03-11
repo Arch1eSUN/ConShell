@@ -2,7 +2,7 @@
  * Spend tracking repository — append-only spend entries for rate limiting.
  */
 import type Database from 'better-sqlite3';
-import { type Cents, type SpendType, nowISO } from '@web4-agent/core';
+import { type Cents, type SpendType, nowISO } from '@conshell/core';
 
 export interface SpendRow {
     readonly id: number;

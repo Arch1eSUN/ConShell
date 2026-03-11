@@ -10,7 +10,8 @@
  */
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server as HttpServer } from 'node:http';
-import type { Logger } from '@web4-agent/core';
+import type { Logger } from '@conshell/core';
+import { verifyAuth, type AuthConfig } from '@conshell/security';
 
 // ── Event Types ─────────────────────────────────────────────────────────
 
@@ -26,7 +27,10 @@ export class WsManager {
     private wss: WebSocketServer | null = null;
     private readonly clients: Set<WebSocket> = new Set();
 
-    constructor(private readonly logger: Logger) { }
+    constructor(
+        private readonly logger: Logger,
+        private readonly authConfig?: AuthConfig,
+    ) { }
 
     /**
      * Attach to an HTTP server on the /ws path.
@@ -34,7 +38,22 @@ export class WsManager {
     attach(server: HttpServer): void {
         this.wss = new WebSocketServer({ server, path: '/ws' });
 
-        this.wss.on('connection', (ws) => {
+        this.wss.on('connection', (ws, req) => {
+            // ── WebSocket Authentication ─────────────────────────────
+            if (this.authConfig && this.authConfig.mode !== 'none') {
+                // Extract token from query string (?token=xxx) or Sec-WebSocket-Protocol header
+                const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+                const token = url.searchParams.get('token')
+                    ?? (req.headers['sec-websocket-protocol'] as string | undefined);
+
+                const result = verifyAuth(this.authConfig, token ?? undefined);
+                if (!result.authenticated) {
+                    this.logger.warn('WebSocket auth rejected', { reason: result.reason });
+                    ws.close(4401, result.reason ?? 'Unauthorized');
+                    return;
+                }
+            }
+
             this.clients.add(ws);
             this.logger.info('WebSocket client connected', { total: this.clients.size });
 
@@ -103,3 +122,4 @@ export class WsManager {
         return this.clients.size;
     }
 }
+

@@ -7,7 +7,7 @@
  *   - Anthropic — returns known model list (no standard discovery endpoint)
  *   - Gemini — returns known model list
  */
-import type { Logger } from '@web4-agent/core';
+import type { Logger } from '@conshell/core';
 
 export interface DiscoveredModel {
     readonly id: string;

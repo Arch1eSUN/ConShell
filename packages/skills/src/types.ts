@@ -1,7 +1,7 @@
 /**
- * @web4-agent/skills — Skill type definitions.
+ * @conshell/skills — Skill type definitions.
  */
-import type { CapabilityId, ToolDefinition } from '@web4-agent/core';
+import type { CapabilityId, ToolDefinition } from '@conshell/core';
 
 export interface SkillManifest {
     readonly name: string;

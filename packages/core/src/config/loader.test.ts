@@ -10,7 +10,7 @@ describe('config loader', () => {
     let testDir: string;
 
     beforeEach(() => {
-        testDir = join(tmpdir(), `web4-test-${randomUUID()}`);
+        testDir = join(tmpdir(), `conshell-test-${randomUUID()}`);
         mkdirSync(testDir, { recursive: true });
     });
 

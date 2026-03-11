@@ -1,5 +1,5 @@
 /**
- * @web4-agent/state — Public API
+ * @conshell/state — Public API
  *
  * SQLite durable state: connection, migrations, and typed repositories.
  */

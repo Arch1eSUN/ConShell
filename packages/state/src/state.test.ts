@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { createTestLogger, cents, nowISO } from '@web4-agent/core';
-import type { Cents } from '@web4-agent/core';
+import { createTestLogger, cents, nowISO } from '@conshell/core';
+import type { Cents } from '@conshell/core';
 import { runMigrations, migrations } from './migrations/index.js';
 import { TurnsRepository } from './repositories/turns.js';
 import { PolicyDecisionsRepository } from './repositories/policy-decisions.js';
@@ -108,6 +108,7 @@ describe('TurnsRepository', () => {
     it('inserts and retrieves turns', () => {
         const id = repo.insert({
             sessionId: 'session-1',
+            role: 'assistant',
             thinking: 'I should do X',
             inputTokens: 100,
             outputTokens: 50,
@@ -125,17 +126,17 @@ describe('TurnsRepository', () => {
     });
 
     it('finds turns by session', () => {
-        repo.insert({ sessionId: 's1', inputTokens: 10, outputTokens: 5, costCents: cents(1) });
-        repo.insert({ sessionId: 's1', inputTokens: 20, outputTokens: 10, costCents: cents(2) });
-        repo.insert({ sessionId: 's2', inputTokens: 30, outputTokens: 15, costCents: cents(3) });
+        repo.insert({ sessionId: 's1', role: 'user', inputTokens: 10, outputTokens: 5, costCents: cents(1) });
+        repo.insert({ sessionId: 's1', role: 'assistant', inputTokens: 20, outputTokens: 10, costCents: cents(2) });
+        repo.insert({ sessionId: 's2', role: 'user', inputTokens: 30, outputTokens: 15, costCents: cents(3) });
 
         expect(repo.findBySession('s1')).toHaveLength(2);
         expect(repo.findBySession('s2')).toHaveLength(1);
     });
 
     it('counts turns by session', () => {
-        repo.insert({ sessionId: 's1', inputTokens: 10, outputTokens: 5, costCents: cents(1) });
-        repo.insert({ sessionId: 's1', inputTokens: 20, outputTokens: 10, costCents: cents(2) });
+        repo.insert({ sessionId: 's1', role: 'user', inputTokens: 10, outputTokens: 5, costCents: cents(1) });
+        repo.insert({ sessionId: 's1', role: 'assistant', inputTokens: 20, outputTokens: 10, costCents: cents(2) });
 
         expect(repo.countBySession('s1')).toBe(2);
         expect(repo.countBySession('nonexistent')).toBe(0);

@@ -1,5 +1,5 @@
 {
-    "name": "web4-agent",
+    "name": "conshell-monorepo",
     "private": true,
     "version": "0.1.0",
     "description": "Local-first sovereign AI agent runtime with x402 payment, MCP exposure, and autonomous operation",
@@ -9,11 +9,11 @@
         "pnpm": ">=9.0.0"
     },
     "scripts": {
-        "build": "pnpm -r --filter '!@web4-agent/dashboard' run build",
-        "build:dashboard": "pnpm --filter @web4-agent/dashboard run build",
+        "build": "pnpm -r --filter '!@conshell/dashboard' run build",
+        "build:dashboard": "pnpm --filter @conshell/dashboard run build",
         "build:all": "pnpm run build && pnpm run build:dashboard",
-        "dev:dashboard": "pnpm --filter @web4-agent/dashboard run dev",
-        "web4": "node packages/app/dist/index.js",
+        "dev:dashboard": "pnpm --filter @conshell/dashboard run dev",
+        "conshell": "node packages/app/dist/index.js",
         "start": "pnpm run build:all && node packages/app/dist/index.js start",
         "test": "pnpm -r run test",
         "test:watch": "pnpm -r run test:watch",

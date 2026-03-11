@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createTestLogger } from '@web4-agent/core';
-import { openTestDatabase, SoulHistoryRepository } from '@web4-agent/state';
+import { createTestLogger } from '@conshell/core';
+import { openTestDatabase, SoulHistoryRepository } from '@conshell/state';
 import { SoulSystem, EMPTY_SOUL, validateSoul, serializeSoul, parseSoul, hashSoul } from './soul.js';
 import type { SoulDocument } from './soul.js';
 import type Database from 'better-sqlite3';
@@ -197,7 +197,7 @@ describe('SoulSystem', () => {
         const soul = new SoulSystem(repo, noopLogger);
 
         const { score } = soul.reflect();
-        expect(score).toBe(70); // 50 + 10 (identity > 20 chars) + 10 (3 values)
+        expect(score).toBe(100); // 50 + 10 (identity > 20) + 10 (7 values) + 10 (7 capabilities) + 10 (4 goals) + 10 (alignment notes)
     });
 
     it('getHistory returns all versions', () => {

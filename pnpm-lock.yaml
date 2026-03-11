@@ -29,40 +29,43 @@ importers:
 
   packages/app:
     dependencies:
-      '@web4-agent/cli':
+      '@conshell/cli':
         specifier: workspace:*
         version: link:../cli
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/inference':
+      '@conshell/inference':
         specifier: workspace:*
         version: link:../inference
-      '@web4-agent/memory':
+      '@conshell/memory':
         specifier: workspace:*
         version: link:../memory
-      '@web4-agent/policy':
+      '@conshell/policy':
         specifier: workspace:*
         version: link:../policy
-      '@web4-agent/runtime':
+      '@conshell/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@web4-agent/selfmod':
+      '@conshell/security':
+        specifier: workspace:*
+        version: link:../security
+      '@conshell/selfmod':
         specifier: workspace:*
         version: link:../selfmod
-      '@web4-agent/skills':
+      '@conshell/skills':
         specifier: workspace:*
         version: link:../skills
-      '@web4-agent/soul':
+      '@conshell/soul':
         specifier: workspace:*
         version: link:../soul
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
-      '@web4-agent/wallet':
+      '@conshell/wallet':
         specifier: workspace:*
         version: link:../wallet
-      '@web4-agent/x402':
+      '@conshell/x402':
         specifier: workspace:*
         version: link:../x402
       commander:
@@ -99,10 +102,13 @@ importers:
 
   packages/cli:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/state':
+      '@conshell/security':
+        specifier: workspace:*
+        version: link:../security
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -121,7 +127,7 @@ importers:
 
   packages/compute:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -172,10 +178,10 @@ importers:
 
   packages/inference:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -194,10 +200,10 @@ importers:
 
   packages/memory:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -216,10 +222,10 @@ importers:
 
   packages/policy:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -238,19 +244,19 @@ importers:
 
   packages/runtime:
     dependencies:
-      '@web4-agent/compute':
+      '@conshell/compute':
         specifier: workspace:*
         version: link:../compute
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/inference':
+      '@conshell/inference':
         specifier: workspace:*
         version: link:../inference
-      '@web4-agent/policy':
+      '@conshell/policy':
         specifier: workspace:*
         version: link:../policy
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -267,12 +273,21 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@25.3.5)
 
+  packages/security:
+    devDependencies:
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@25.3.5)
+
   packages/selfmod:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -291,7 +306,7 @@ importers:
 
   packages/skills:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
       yaml:
@@ -307,10 +322,10 @@ importers:
 
   packages/soul:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
-      '@web4-agent/state':
+      '@conshell/state':
         specifier: workspace:*
         version: link:../state
     devDependencies:
@@ -329,7 +344,7 @@ importers:
 
   packages/state:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
       better-sqlite3:
@@ -348,7 +363,7 @@ importers:
 
   packages/wallet:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
       viem:
@@ -364,7 +379,7 @@ importers:
 
   packages/x402:
     dependencies:
-      '@web4-agent/core':
+      '@conshell/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

@@ -2,7 +2,7 @@
  * Policy decisions repository — append-only audit of all policy evaluations.
  */
 import type Database from 'better-sqlite3';
-import { nowISO } from '@web4-agent/core';
+import { nowISO } from '@conshell/core';
 
 export interface PolicyDecisionRow {
     readonly id: number;

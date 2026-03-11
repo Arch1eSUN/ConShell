@@ -5,7 +5,7 @@
  */
 import { readFile, writeFile, readdir, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { ToolDefinition } from '@web4-agent/core';
+import type { ToolDefinition } from '@conshell/core';
 import type { ToolHandler } from './web-tools.js';
 
 // ── Tool Definitions ────────────────────────────────────────────────────

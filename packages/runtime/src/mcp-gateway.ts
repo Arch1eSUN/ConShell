@@ -7,8 +7,8 @@
  * - resources/list: Lists available resource URIs
  * - resources/read: Reads a resource by URI
  */
-import type { Logger, ToolDefinition } from '@web4-agent/core';
-import type { ToolRegistry } from '@web4-agent/policy';
+import type { Logger, ToolDefinition } from '@conshell/core';
+import type { ToolRegistry } from '@conshell/policy';
 
 // ── JSON-RPC Types ──────────────────────────────────────────────────────
 
@@ -128,7 +128,7 @@ export class McpGateway {
                 resources: { subscribe: false, listChanged: false },
             },
             serverInfo: {
-                name: 'web4-agent',
+                name: 'conshell',
                 version: '0.1.0',
             },
         });

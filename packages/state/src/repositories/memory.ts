@@ -2,7 +2,7 @@
  * Memory Repositories — CRUD for the 5 memory tiers + session_summaries.
  */
 import type Database from 'better-sqlite3';
-import { nowISO } from '@web4-agent/core';
+import { nowISO } from '@conshell/core';
 
 // ── Row types ──────────────────────────────────────────────────────────
 

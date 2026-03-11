@@ -1,5 +1,5 @@
 /**
- * @web4-agent/runtime — Public API
+ * @conshell/runtime — Public API
  */
 export { AgentStateMachine, type AgentState } from './state-machine.js';
 export { AgentLoop, type AgentLoopDeps, type AgentMessage, type AgentTurnResult, type ToolCallResult } from './agent-loop.js';

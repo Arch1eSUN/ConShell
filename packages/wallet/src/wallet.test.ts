@@ -1,11 +1,11 @@
 /**
- * Tests for @web4-agent/wallet
+ * Tests for @conshell/wallet
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { createTestLogger } from '@web4-agent/core';
+import { createTestLogger } from '@conshell/core';
 import { LocalWalletProvider } from './local-wallet.js';
 
 function tmpWalletPath(): string {

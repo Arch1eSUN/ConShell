@@ -20,9 +20,9 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import type { ModificationType, SHA256Hash } from '@web4-agent/core';
-import type { ModificationsRepository, ModificationRow } from '@web4-agent/state';
-import type { Logger } from '@web4-agent/core';
+import type { ModificationType, SHA256Hash } from '@conshell/core';
+import type { ModificationsRepository, ModificationRow } from '@conshell/state';
+import type { Logger } from '@conshell/core';
 
 const execFileAsync = promisify(execFile);
 

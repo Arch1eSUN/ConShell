@@ -11,9 +11,12 @@ coverage/
 wallet.json
 api-key
 .DS_Store
+.pnpm-store/
+.tmp-test/
 
-# Stale build artifacts
+# macOS duplicates (Finder creates these)
+*copy*
 dist */
 node_modules_locked/
+node_modules_old/
 *.tsbuildinfo.bak
-tsconfig.tsbuildinfo.bak

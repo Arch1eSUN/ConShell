@@ -216,8 +216,8 @@ describe('ToolExecutor', () => {
     // Import ToolExecutor with inline lazy import to avoid circular deps
     it('registers and executes handlers', async () => {
         const { ToolExecutor } = await import('./tool-executor.js');
-        const { PolicyEngine, ToolRegistry } = await import('@web4-agent/policy');
-        const { createTestLogger } = await import('@web4-agent/core');
+        const { PolicyEngine, ToolRegistry } = await import('@conshell/policy');
+        const { createTestLogger } = await import('@conshell/core');
 
         const { logger } = createTestLogger();
         const toolRegistry = new ToolRegistry(logger);
@@ -267,8 +267,8 @@ describe('ToolExecutor', () => {
 
     it('returns error for unknown tool (denied by policy)', async () => {
         const { ToolExecutor } = await import('./tool-executor.js');
-        const { PolicyEngine } = await import('@web4-agent/policy');
-        const { createTestLogger } = await import('@web4-agent/core');
+        const { PolicyEngine } = await import('@conshell/policy');
+        const { createTestLogger } = await import('@conshell/core');
 
         const { logger } = createTestLogger();
         // getDefinition returns undefined → policy denies the call
@@ -303,8 +303,8 @@ describe('ToolExecutor', () => {
 describe('MCP x402 Payment Gating', () => {
     it('returns payment-required for priced tool without signature', async () => {
         const { McpGateway } = await import('./mcp-gateway.js');
-        const { ToolRegistry } = await import('@web4-agent/policy');
-        const { createTestLogger } = await import('@web4-agent/core');
+        const { ToolRegistry } = await import('@conshell/policy');
+        const { createTestLogger } = await import('@conshell/core');
 
         const { logger } = createTestLogger();
         const toolRegistry = new ToolRegistry(logger);
@@ -338,8 +338,8 @@ describe('MCP x402 Payment Gating', () => {
 
     it('allows free tools without payment', async () => {
         const { McpGateway } = await import('./mcp-gateway.js');
-        const { ToolRegistry } = await import('@web4-agent/policy');
-        const { createTestLogger } = await import('@web4-agent/core');
+        const { ToolRegistry } = await import('@conshell/policy');
+        const { createTestLogger } = await import('@conshell/core');
 
         const { logger } = createTestLogger();
         const toolRegistry = new ToolRegistry(logger);
@@ -370,8 +370,8 @@ describe('MCP x402 Payment Gating', () => {
 
     it('allows paid tool with payment signature', async () => {
         const { McpGateway } = await import('./mcp-gateway.js');
-        const { ToolRegistry } = await import('@web4-agent/policy');
-        const { createTestLogger } = await import('@web4-agent/core');
+        const { ToolRegistry } = await import('@conshell/policy');
+        const { createTestLogger } = await import('@conshell/core');
 
         const { logger } = createTestLogger();
         const toolRegistry = new ToolRegistry(logger);

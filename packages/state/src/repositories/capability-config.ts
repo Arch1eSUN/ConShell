@@ -4,9 +4,9 @@
  * Uses the existing `kv` table with key = 'capability_config'.
  */
 import type Database from 'better-sqlite3';
-import { nowISO } from '@web4-agent/core';
+import { nowISO } from '@conshell/core';
 
-/** Mirrors CapabilityConfig from @web4-agent/policy (inlined to avoid cross-dep). */
+/** Mirrors CapabilityConfig from @conshell/policy (inlined to avoid cross-dep). */
 export interface CapabilityConfigData {
     readonly godMode: boolean;
     readonly capabilities: Readonly<Record<string, boolean>>;

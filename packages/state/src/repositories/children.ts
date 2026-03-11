@@ -2,7 +2,7 @@
  * Children repository — tracks child agent lifecycle state.
  */
 import type Database from 'better-sqlite3';
-import { type Cents, type ChildLifecycleState, nowISO } from '@web4-agent/core';
+import { type Cents, type ChildLifecycleState, nowISO } from '@conshell/core';
 
 export interface ChildRow {
     readonly id: string;

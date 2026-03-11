@@ -1,5 +1,5 @@
 /**
- * Common enums and utility types shared across all web4-agent modules.
+ * Common enums and utility types shared across all conshell modules.
  */
 
 // ── Lifecycle ──────────────────────────────────────────────────────────

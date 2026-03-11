@@ -14,7 +14,7 @@ import { type AutomatonConfig, automatonConfigSchema } from '../types/config.js'
 
 /**
  * Resolve the agent home directory path.
- * Default: ~/.web4-agent/
+ * Default: ~/.conshell-agent/
  */
 export function resolveAgentHome(overridePath?: string): string {
     return overridePath ?? join(homedir(), AGENT_HOME_DIR);
@@ -31,7 +31,7 @@ export function resolveConfigPath(agentHome: string): string {
  * Load and validate the configuration.
  * Deep-merges user config with defaults via Zod's .default() chains.
  *
- * @param agentHome - Agent home directory (default: ~/.web4-agent/)
+ * @param agentHome - Agent home directory (default: ~/.conshell-agent/)
  * @returns Validated, frozen configuration object
  * @throws ConfigNotFoundError if config file doesn't exist
  * @throws ConfigValidationError if config is invalid
