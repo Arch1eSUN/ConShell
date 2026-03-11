@@ -35,6 +35,7 @@ export const knowledgeQueryDefinition: ToolDefinition = {
     requiredAuthority: 'external',
     mcpExposed: true,
     auditFields: ['query'],
+    requiredCapabilities: ['payment_enabled'],
 };
 
 export const documentSummaryDefinition: ToolDefinition = {
@@ -53,6 +54,7 @@ export const documentSummaryDefinition: ToolDefinition = {
     requiredAuthority: 'external',
     mcpExposed: true,
     auditFields: [],
+    requiredCapabilities: ['payment_enabled'],
 };
 
 export const codeReviewDefinition: ToolDefinition = {
@@ -71,6 +73,7 @@ export const codeReviewDefinition: ToolDefinition = {
     requiredAuthority: 'external',
     mcpExposed: true,
     auditFields: [],
+    requiredCapabilities: ['payment_enabled'],
 };
 
 export const PAID_TOOL_CONFIGS: readonly PaidToolConfig[] = [

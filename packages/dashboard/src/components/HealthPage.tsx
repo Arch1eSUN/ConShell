@@ -1,4 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+interface HealthData {
+    status: string;
+    agent: string;
+    state: string;
+    uptime: number;
+    authRequired: boolean;
+}
 
 interface HealthCheck {
     name: string;
@@ -6,33 +14,81 @@ interface HealthCheck {
     detail: string;
 }
 
-const DEFAULT_CHECKS: HealthCheck[] = [
-    { name: 'Node.js Version', status: 'pass', detail: 'v20+ ✓' },
-    { name: 'SQLite Integrity', status: 'pass', detail: 'PRAGMA integrity_check OK' },
-    { name: 'Ollama Reachability', status: 'checking', detail: 'Checking...' },
-    { name: 'Disk Space', status: 'pass', detail: '> 1 GB available' },
-    { name: 'Wallet Permissions', status: 'pass', detail: 'File mode 0600 ✓' },
-    { name: 'Heartbeat Scheduler', status: 'pass', detail: 'Running' },
-    { name: 'Error Rate (1h)', status: 'pass', detail: '0 errors' },
-    { name: 'Conway Cloud', status: 'warn', detail: 'Not configured' },
-];
-
-const STATUS_EMOJI: Record<string, string> = {
-    pass: '🟢',
-    warn: '🟡',
-    fail: '🔴',
-    checking: '⏳',
+const STATUS_ICON: Record<string, string> = {
+    pass: '✓',
+    warn: '△',
+    fail: '×',
+    checking: '…',
 };
 
+function buildChecks(data: HealthData): HealthCheck[] {
+    const checks: HealthCheck[] = [
+        {
+            name: 'Server Status',
+            status: data.status === 'ok' ? 'pass' : 'fail',
+            detail: data.status === 'ok' ? 'Running' : `Status: ${data.status}`,
+        },
+        {
+            name: 'Agent State',
+            status: ['running', 'idle'].includes(data.state) ? 'pass' : 'warn',
+            detail: data.state,
+        },
+        {
+            name: 'Uptime',
+            status: data.uptime > 60 ? 'pass' : 'warn',
+            detail: formatUptime(data.uptime),
+        },
+        {
+            name: 'Authentication',
+            status: 'pass',
+            detail: data.authRequired ? 'Required' : 'Disabled',
+        },
+        {
+            name: 'Agent Name',
+            status: data.agent ? 'pass' : 'warn',
+            detail: data.agent || 'Not configured',
+        },
+    ];
+    return checks;
+}
+
+function formatUptime(seconds: number): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return `${h}h ${m}m`;
+}
+
 export function HealthPage() {
-    const [checks] = useState<HealthCheck[]>(DEFAULT_CHECKS);
+    const [checks, setChecks] = useState<HealthCheck[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const runDiagnostics = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch('/api/health');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data: HealthData = await res.json();
+            setChecks(buildChecks(data));
+        } catch (err) {
+            setError('Unable to reach server. Is ConShell running?');
+            setChecks([]);
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => { runDiagnostics(); }, [runDiagnostics]);
+
     const passCount = checks.filter(c => c.status === 'pass').length;
 
     return (
         <div className="page-health">
             <header className="page-header">
-                <h2 className="page-title">🩺 Health</h2>
-                <p className="page-subtitle">System diagnostics — {passCount}/{checks.length} checks passing</p>
+                <h2 className="page-title">Health</h2>
+                <p className="page-subtitle">
+                    System diagnostics{checks.length > 0 ? ` — ${passCount}/${checks.length} checks passing` : ''}
+                </p>
             </header>
 
             <div className="settings-card">
@@ -42,26 +98,43 @@ export function HealthPage() {
                         <div className="settings-card-subtitle">Equivalent to `conshell doctor`</div>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button className="settings-btn settings-btn-secondary">🔄 Re-run</button>
-                        <button className="settings-btn settings-btn-primary">🔧 Auto-fix</button>
+                        <button
+                            className="settings-btn settings-btn-primary"
+                            onClick={runDiagnostics}
+                            disabled={loading}
+                        >
+                            {loading ? 'Running...' : 'Re-run'}
+                        </button>
                     </div>
                 </div>
 
-                <div className="provider-list" style={{ marginTop: '0.5rem' }}>
-                    {checks.map(check => (
-                        <div key={check.name} className="provider-item">
-                            <div className="provider-item-info">
-                                <span style={{ fontSize: '1.25rem', marginRight: '0.5rem' }}>
-                                    {STATUS_EMOJI[check.status]}
-                                </span>
-                                <div>
-                                    <div className="provider-item-name">{check.name}</div>
-                                    <div className="provider-item-type">{check.detail}</div>
+                {error ? (
+                    <div className="settings-empty" style={{ marginTop: '0.5rem', color: 'var(--ink-muted)' }}>
+                        {error}
+                    </div>
+                ) : (
+                    <div className="provider-list" style={{ marginTop: '0.5rem' }}>
+                        {checks.map(check => (
+                            <div key={check.name} className="provider-item">
+                                <div className="provider-item-info">
+                                    <span style={{
+                                        fontSize: '1.25rem',
+                                        marginRight: '0.5rem',
+                                        fontWeight: 600,
+                                        color: check.status === 'pass' ? 'var(--color-accent, #16A34A)' :
+                                               check.status === 'warn' ? '#d97706' : 'var(--ink-muted)',
+                                    }}>
+                                        {STATUS_ICON[check.status]}
+                                    </span>
+                                    <div>
+                                        <div className="provider-item-name">{check.name}</div>
+                                        <div className="provider-item-type">{check.detail}</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

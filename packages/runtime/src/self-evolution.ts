@@ -184,25 +184,33 @@ export class SelfEvolutionEngine {
 
 // ── Heartbeat Task Factory ──────────────────────────────────────────────
 
-export function createSelfEvolutionTask(engine: SelfEvolutionEngine): HeartbeatTask {
+export interface SelfEvolutionTaskDeps {
+    readonly engine: SelfEvolutionEngine;
+    /** Callback to fetch real performance metrics from repos */
+    readonly getMetrics?: () => PerformanceMetrics;
+}
+
+export function createSelfEvolutionTask(deps: SelfEvolutionTaskDeps): HeartbeatTask {
     return {
         name: 'self_evolution',
         cronExpression: '0 */6 * * *', // Every 6 hours
-        minTier: 'normal' as SurvivalTier,
+        minTier: 'normal',
         handler: async (ctx: HeartbeatContext): Promise<'success' | 'failure'> => {
-            // Placeholder metrics — in production, these come from actual repos
-            const metrics: PerformanceMetrics = {
-                taskSuccessRate: 0.85,
-                avgInferenceCostCents: 20,
-                memoryRecallQuality: 0.7,
-                errorRate: 0.05,
-            };
-
-            const patch = await engine.analyze(metrics, ctx.tier);
-            if (patch) {
-                return 'success';
+            let metrics: PerformanceMetrics;
+            if (deps.getMetrics) {
+                try {
+                    metrics = deps.getMetrics();
+                } catch {
+                    // Fallback to conservative defaults that won't trigger changes
+                    metrics = { taskSuccessRate: 1, avgInferenceCostCents: 0, memoryRecallQuality: 1, errorRate: 0 };
+                }
+            } else {
+                // No metrics provider — skip analysis
+                metrics = { taskSuccessRate: 1, avgInferenceCostCents: 0, memoryRecallQuality: 1, errorRate: 0 };
             }
-            return 'success'; // No patch needed is also success
+
+            const patch = await deps.engine.analyze(metrics, ctx.tier);
+            return patch ? 'success' : 'success'; // No patch needed is also success
         },
     };
 }

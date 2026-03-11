@@ -1,53 +1,47 @@
-/* ── App layout ─────────────────────────────────────────────────── */
+/* ── App Layout ─────────────────────────────────────────────────── */
 .page-header {
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+}
+
+.page-label {
+    display: block;
+    margin-bottom: var(--space-xs);
 }
 
 .page-title {
     font-family: var(--font-display);
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin-bottom: var(--space-xs);
 }
 
 .page-subtitle {
-    font-size: 0.875rem;
-    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-top: var(--space-xs);
 }
 
-/* Overview grid */
+/* ── Overview layout ─────────────────────────────────────────────── */
+.overview-status {
+    margin-bottom: var(--space-lg);
+}
+
 .overview-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-lg);
     margin-bottom: var(--space-lg);
-    animation: slideUp 400ms ease;
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.overview-full {
+    margin-bottom: var(--space-lg);
 }
 
-.overview-chat {
-    animation: slideUp 400ms ease 100ms both;
-}
-
-/* Tab pages */
-.page-chat,
-.page-logs,
-.page-soul {
-    animation: slideUp 300ms ease;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -57,5 +51,9 @@
 
     .page-title {
         font-size: 1.5rem;
+    }
+
+    .page-header {
+        margin-bottom: var(--space-lg);
     }
 }

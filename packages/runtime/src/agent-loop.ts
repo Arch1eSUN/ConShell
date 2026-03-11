@@ -18,6 +18,7 @@ import type {
     SurvivalTier,
     InferenceTaskType,
     Cents,
+    CapabilityId,
 } from '@conshell/core';
 import type { TurnsRepository, InsertTurn } from '@conshell/state';
 import type { ToolExecutor } from './tool-executor.js';
@@ -43,8 +44,10 @@ export interface AgentLoopDeps {
     };
     /** Tool registry for building tool catalog in system prompt */
     readonly toolRegistry: {
-        list(): readonly { name: string; description: string; riskLevel: string; category: string; mcpExposed: boolean }[];
+        list(): readonly { name: string; description: string; riskLevel: string; category: string; mcpExposed: boolean; requiredCapabilities?: readonly CapabilityId[] }[];
     };
+    /** Current capability config — used to filter which tools appear in the system prompt */
+    readonly getCapabilityConfig?: () => { godMode: boolean; capabilities: Readonly<Record<CapabilityId, boolean>> };
     /** Max ReAct iterations before forcing yield (prevents infinite loops) */
     readonly maxIterations?: number;
 }
@@ -261,7 +264,11 @@ export class AgentLoop {
         // 1. Identity + values (from Soul)
         try {
             const soulDoc = soul.view();
-            const identity = soulDoc.identity || 'You are a sovereign AI agent operating on the ConShell protocol.';
+            // Inject the agent name at the top
+            if (soulDoc.name && soulDoc.name !== '{NAME}') {
+                sections.push(`<agent_name>${soulDoc.name}</agent_name>`);
+            }
+            const identity = soulDoc.identity || 'You are a sovereign AI agent operating on the ConShell protocol, under the Web4 manifesto.';
             sections.push(`<constitution>\n${identity}\n</constitution>`);
 
             if (soulDoc.values && soulDoc.values.length > 0) {
@@ -295,9 +302,19 @@ export class AgentLoop {
             });
         }
 
-        // 3. Tool catalog
+        // 3. Tool catalog (filtered by current capability config)
         try {
-            const tools = toolRegistry.list();
+            let tools = toolRegistry.list();
+
+            // Filter tools based on enabled capabilities (skip if God Mode)
+            const capConfig = this.deps.getCapabilityConfig?.();
+            if (capConfig && !capConfig.godMode) {
+                tools = tools.filter(t => {
+                    const required = t.requiredCapabilities ?? [];
+                    return required.every(cap => capConfig.capabilities[cap]);
+                });
+            }
+
             if (tools.length > 0) {
                 const toolCatalog = tools.map((t: { name: string; description: string; riskLevel: string }) =>
                     `- ${t.name}: ${t.description} [risk: ${t.riskLevel}]`

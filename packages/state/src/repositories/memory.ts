@@ -4,6 +4,9 @@
 import type Database from 'better-sqlite3';
 import { nowISO } from '@conshell/core';
 
+/** Optional text sanitizer for PII redaction before writes */
+export type TextSanitizer = (text: string) => string;
+
 // ── Row types ──────────────────────────────────────────────────────────
 
 export interface WorkingMemoryRow {
@@ -106,13 +109,14 @@ export interface UpsertRelationship {
 // ── Working Memory Repository ──────────────────────────────────────────
 
 export class WorkingMemoryRepository {
-    constructor(private readonly db: Database.Database) { }
+    constructor(private readonly db: Database.Database, private readonly sanitize?: TextSanitizer) { }
 
     insert(mem: InsertWorkingMemory): number {
+        const content = this.sanitize ? this.sanitize(mem.content) : mem.content;
         const stmt = this.db.prepare(`
             INSERT INTO working_memory (session_id, type, content, created_at)
             VALUES (?, ?, ?, ?)`);
-        const result = stmt.run(mem.sessionId, mem.type, mem.content, nowISO());
+        const result = stmt.run(mem.sessionId, mem.type, content, nowISO());
         return Number(result.lastInsertRowid);
     }
 
@@ -131,15 +135,16 @@ export class WorkingMemoryRepository {
 // ── Episodic Memory Repository ─────────────────────────────────────────
 
 export class EpisodicMemoryRepository {
-    constructor(private readonly db: Database.Database) { }
+    constructor(private readonly db: Database.Database, private readonly sanitize?: TextSanitizer) { }
 
     insert(mem: InsertEpisodicMemory): number {
+        const content = this.sanitize ? this.sanitize(mem.content) : mem.content;
         const stmt = this.db.prepare(`
             INSERT INTO episodic_memory (event_type, content, importance, classification, session_id, turn_id, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)`);
         const result = stmt.run(
             mem.eventType,
-            mem.content,
+            content,
             mem.importance ?? 5,
             mem.classification ?? null,
             mem.sessionId ?? null,
@@ -169,9 +174,10 @@ export class EpisodicMemoryRepository {
 // ── Semantic Memory Repository ─────────────────────────────────────────
 
 export class SemanticMemoryRepository {
-    constructor(private readonly db: Database.Database) { }
+    constructor(private readonly db: Database.Database, private readonly sanitize?: TextSanitizer) { }
 
     upsert(mem: UpsertSemanticMemory): number {
+        const value = this.sanitize ? this.sanitize(mem.value) : mem.value;
         const now = nowISO();
         const stmt = this.db.prepare(`
             INSERT INTO semantic_memory (category, key, value, confidence, source, created_at, updated_at)
@@ -180,7 +186,7 @@ export class SemanticMemoryRepository {
         const result = stmt.run(
             mem.category,
             mem.key,
-            mem.value,
+            value,
             mem.confidence ?? 5,
             mem.source ?? null,
             now,

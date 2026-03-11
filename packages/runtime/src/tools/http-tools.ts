@@ -43,6 +43,10 @@ const httpRequestHandler: ToolHandler = async (args) => {
     const body = args['body'] as string | undefined;
     const timeout = (args['timeout'] as number) ?? 15000;
 
+    if (!url || !url.startsWith('http')) {
+        return JSON.stringify({ error: 'Invalid URL. Must start with http:// or https://' });
+    }
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
 
@@ -76,6 +80,9 @@ const httpRequestHandler: ToolHandler = async (args) => {
             bodyLength: responseBody.length,
             truncated,
         });
+    } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        return JSON.stringify({ error: `HTTP request failed: ${msg}` });
     } finally {
         clearTimeout(timer);
     }

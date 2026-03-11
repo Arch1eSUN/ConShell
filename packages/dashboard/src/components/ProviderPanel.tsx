@@ -31,10 +31,10 @@ export function ProviderPanel() {
     }
 
     const AUTH_ICONS: Record<string, string> = {
-        local: '🏠',
-        apiKey: '🔑',
-        oauth: '🔗',
-        proxy: '🔀',
+        local: '*',
+        apiKey: '#',
+        oauth: '~',
+        proxy: '/',
     };
 
     return (
@@ -49,7 +49,7 @@ export function ProviderPanel() {
                             <span className="provider-dot" />
                             <span className="provider-name">{p.name}</span>
                             <span className="provider-auth">
-                                {AUTH_ICONS[p.authType] ?? '❓'} {p.authType}
+                                {AUTH_ICONS[p.authType] ?? '?'} {p.authType}
                             </span>
                             <span className="provider-status">
                                 {p.available ? '✓ ready' : '✗ offline'}

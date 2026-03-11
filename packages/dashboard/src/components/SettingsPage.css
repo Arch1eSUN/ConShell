@@ -1,7 +1,6 @@
-/* ── Settings Page Styles ─────────────────────────────────────────────── */
+/* ── Settings Page — Web4.ai aligned ──────────────────────────────────── */
 
 .settings-page {
-    padding: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -9,102 +8,107 @@
 /* Sub-tabs */
 .settings-tabs {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 0.5rem;
+    gap: 0.25rem;
+    margin-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-sm);
 }
 
 .settings-tab-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.75rem;
     border: none;
     background: transparent;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    letter-spacing: 0.02em;
+    border-radius: var(--radius);
+    transition: color var(--transition), background var(--transition);
 }
 
 .settings-tab-btn:hover {
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--ink);
+    background: rgba(26, 26, 26, 0.04);
 }
 
 .settings-tab-btn.active {
-    color: #7dd3fc;
-    background: rgba(125, 211, 252, 0.1);
+    color: var(--green);
+    background: var(--green-dim);
 }
 
 /* ── Cards ─────────────────────────────────────────────────────────────── */
 
 .settings-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 1.25rem;
-    backdrop-filter: blur(12px);
-    margin-bottom: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .settings-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-lg);
 }
 
 .settings-card-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--ink);
 }
 
 .settings-card-subtitle {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    margin-top: 0.2rem;
 }
 
 /* ── Form Elements ────────────────────────────────────────────────────── */
 
 .settings-form-group {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-md);
 }
 
 .settings-label {
     display: block;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 0.35rem;
 }
 
 .settings-input,
 .settings-select {
     width: 100%;
-    padding: 0.55rem 0.75rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #e2e8f0;
+    padding: 0.5rem 0.75rem;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--ink);
     font-size: 0.85rem;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color var(--transition);
     box-sizing: border-box;
 }
 
 .settings-input:focus,
 .settings-select:focus {
-    border-color: #7dd3fc;
-    box-shadow: 0 0 0 2px rgba(125, 211, 252, 0.15);
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px var(--green-dim);
 }
 
 .settings-input::placeholder {
-    color: rgba(255, 255, 255, 0.25);
+    color: var(--muted);
 }
 
 .settings-input-row {
@@ -116,50 +120,49 @@
 /* ── Buttons ──────────────────────────────────────────────────────────── */
 
 .settings-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.45rem 0.875rem;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition);
     font-family: inherit;
 }
 
 .settings-btn-primary {
-    background: linear-gradient(135deg, #0ea5e9, #7dd3fc);
-    color: #0c1524;
+    background: var(--green);
+    color: #FFFFFF;
 }
 
 .settings-btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    opacity: 0.9;
 }
 
 .settings-btn-primary:disabled {
-    opacity: 0.5;
-    transform: none;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
 .settings-btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: var(--ink-light);
+    border: 1px solid var(--border);
 }
 
 .settings-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--border-hover);
+    background: rgba(26, 26, 26, 0.03);
 }
 
 .settings-btn-danger {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: var(--rose-dim);
+    color: var(--rose);
+    border: 1px solid rgba(244, 63, 94, 0.15);
 }
 
 .settings-btn-danger:hover {
-    background: rgba(239, 68, 68, 0.25);
+    background: rgba(244, 63, 94, 0.18);
 }
 
 .settings-btn-row {
@@ -182,14 +185,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.6rem 0.75rem;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
-    transition: border-color 0.15s;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color var(--transition);
 }
 
 .provider-item:hover {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--border-hover);
 }
 
 .provider-item-info {
@@ -200,24 +203,24 @@
 }
 
 .provider-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
 }
 
-.provider-dot.enabled { background: #34d399; }
-.provider-dot.disabled { background: #6b7280; }
+.provider-dot.enabled { background: var(--green); }
+.provider-dot.disabled { background: var(--muted); }
 
 .provider-item-name {
     font-size: 0.85rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--ink);
 }
 
 .provider-item-type {
     font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.35);
-    font-family: 'MonoLisa', 'JetBrains Mono', monospace;
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
 }
 
 .provider-item-actions {
@@ -229,16 +232,16 @@
     padding: 0.3rem 0.45rem;
     border: none;
     background: transparent;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ink-muted);
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--radius);
     font-size: 0.75rem;
     transition: all 0.15s;
 }
 
 .provider-action-btn:hover {
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--ink);
+    background: rgba(26, 26, 26, 0.05);
 }
 
 /* ── Models Grid ──────────────────────────────────────────────────────── */
@@ -254,32 +257,31 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.7rem;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: border-color var(--transition);
 }
 
 .model-card:hover {
-    border-color: rgba(125, 211, 252, 0.3);
-    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--border-hover);
 }
 
 .model-card.selected {
-    border-color: rgba(125, 211, 252, 0.5);
-    background: rgba(125, 211, 252, 0.08);
+    border-color: var(--green);
+    background: var(--green-dim);
 }
 
 .model-checkbox {
-    accent-color: #7dd3fc;
-    width: 15px;
-    height: 15px;
+    accent-color: var(--green);
+    width: 14px;
+    height: 14px;
 }
 
 .model-name {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--ink);
     font-weight: 500;
 }
 
@@ -291,41 +293,47 @@
 }
 
 .model-tier-badge {
-    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
     padding: 0.1rem 0.35rem;
-    border-radius: 4px;
+    border-radius: var(--radius);
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .model-tier-badge.flagship {
-    background: rgba(251, 191, 36, 0.15);
-    color: #fbbf24;
+    background: var(--amber-dim);
+    color: var(--amber);
 }
 
 .model-tier-badge.strong {
-    background: rgba(168, 85, 247, 0.15);
-    color: #a855f7;
+    background: rgba(168, 85, 247, 0.12);
+    color: #7c3aed;
 }
 
 .model-tier-badge.fast {
-    background: rgba(34, 211, 153, 0.15);
-    color: #22d3a1;
+    background: var(--green-dim);
+    color: var(--green);
 }
 
 .model-tier-badge.local {
-    background: rgba(148, 163, 184, 0.15);
-    color: #94a3b8;
+    background: rgba(26, 26, 26, 0.06);
+    color: var(--ink-muted);
 }
 
 .model-zero-cost {
+    font-family: var(--font-mono);
     font-size: 0.6rem;
-    color: #34d399;
+    color: var(--green);
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .model-provider {
     font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--muted);
 }
 
 /* ── Routing Matrix ───────────────────────────────────────────────────── */
@@ -343,42 +351,46 @@
 .routing-table th {
     padding: 0.5rem;
     text-align: left;
-    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
     font-weight: 500;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
     white-space: nowrap;
 }
 
 .routing-table td {
     padding: 0.4rem 0.5rem;
-    color: rgba(255, 255, 255, 0.7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--ink-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .routing-table tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(26, 26, 26, 0.02);
 }
 
 .routing-model-chip {
     display: inline-block;
     padding: 0.15rem 0.4rem;
-    background: rgba(125, 211, 252, 0.1);
-    color: #7dd3fc;
-    border-radius: 4px;
+    background: var(--green-dim);
+    color: var(--green);
+    border-radius: var(--radius);
     font-size: 0.7rem;
-    font-family: 'MonoLisa', 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     margin: 0.1rem;
 }
 
 .routing-priority {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--muted);
     font-size: 0.65rem;
     margin-left: 0.25rem;
 }
 
 .routing-custom-badge {
     font-size: 0.6rem;
-    color: #fbbf24;
+    color: var(--amber);
     margin-left: 0.25rem;
 }
 
@@ -390,8 +402,10 @@
 }
 
 .guide-section h3 {
-    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--font-display);
+    color: var(--ink);
     font-size: 1rem;
+    font-weight: 400;
     margin: 1.25rem 0 0.5rem;
 }
 
@@ -400,7 +414,7 @@
 }
 
 .guide-section p {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--ink-light);
     margin: 0.5rem 0;
 }
 
@@ -409,22 +423,23 @@
     gap: 0.75rem;
     margin: 0.75rem 0;
     padding: 0.75rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    border-left: 3px solid rgba(125, 211, 252, 0.3);
+    background: var(--paper);
+    border-radius: var(--radius);
+    border-left: 2px solid var(--green);
 }
 
 .guide-step-number {
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    background: linear-gradient(135deg, #0ea5e9, #7dd3fc);
-    color: #0c1524;
+    width: 22px;
+    height: 22px;
+    background: var(--green);
+    color: #FFFFFF;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
     font-weight: 700;
 }
 
@@ -433,24 +448,24 @@
 }
 
 .guide-step-title {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    color: var(--ink);
     margin-bottom: 0.2rem;
 }
 
 .guide-step-desc {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ink-light);
     font-size: 0.8rem;
 }
 
 .guide-code {
     display: block;
     padding: 0.5rem 0.75rem;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 6px;
-    color: #7dd3fc;
-    font-family: 'MonoLisa', 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
+    background: var(--ink);
+    border-radius: var(--radius);
+    color: var(--terminal-text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     margin: 0.5rem 0;
     overflow-x: auto;
     white-space: pre;
@@ -463,32 +478,32 @@
     align-items: center;
     gap: 0.4rem;
     padding: 0.5rem 0.75rem;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-size: 0.8rem;
     margin-bottom: 0.75rem;
 }
 
 .settings-status.success {
-    background: rgba(34, 211, 153, 0.1);
-    color: #34d399;
-    border: 1px solid rgba(34, 211, 153, 0.15);
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid rgba(22, 163, 74, 0.15);
 }
 
 .settings-status.error {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.15);
+    background: var(--rose-dim);
+    color: var(--rose);
+    border: 1px solid rgba(244, 63, 94, 0.15);
 }
 
 .settings-status.info {
-    background: rgba(125, 211, 252, 0.1);
-    color: #7dd3fc;
-    border: 1px solid rgba(125, 211, 252, 0.15);
+    background: var(--blue-dim);
+    color: var(--blue);
+    border: 1px solid rgba(96, 165, 250, 0.15);
 }
 
 .settings-empty {
     text-align: center;
     padding: 2rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--muted);
     font-size: 0.85rem;
 }

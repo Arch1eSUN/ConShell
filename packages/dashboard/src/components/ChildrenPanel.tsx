@@ -42,7 +42,7 @@ export function ChildrenPanel() {
             <div className="children-panel">
                 <h3>Child Agents</h3>
                 <div className="children-empty">
-                    <div className="children-empty-icon">🧬</div>
+                    <div className="children-empty-icon">*</div>
                     <p>Loading child agents…</p>
                 </div>
             </div>
@@ -69,7 +69,7 @@ export function ChildrenPanel() {
 
             {children.length === 0 ? (
                 <div className="children-empty">
-                    <div className="children-empty-icon">🌱</div>
+                    <div className="children-empty-icon">—</div>
                     <p>No child agents spawned yet</p>
                 </div>
             ) : (

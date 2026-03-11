@@ -19,13 +19,13 @@ html {
 body {
     font-family: var(--font-ui);
     background-color: var(--paper);
-    color: var(--ink);
+    color: var(--ink-light);
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
 }
 
-/* ── Paper grain overlay (like conshell) ───────────────────────────── */
+/* ── Paper grain overlay ───────────────────────────────────────────── */
 body::before {
     content: '';
     position: fixed;
@@ -41,25 +41,26 @@ h2,
 h3,
 h4 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 400;
+    color: var(--ink);
     line-height: 1.2;
     letter-spacing: -0.01em;
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
 }
 
 h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
 }
 
 h3 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
 }
 
 h4 {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 
@@ -67,7 +68,17 @@ code,
 pre,
 .mono {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
+}
+
+/* ── Label utility — JetBrains Mono uppercase (web4.ai style) ────── */
+.label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
 }
 
 /* ── Links & interactive ──────────────────────────────────────────── */
@@ -78,7 +89,7 @@ a {
 }
 
 a:hover {
-    color: var(--blue);
+    text-decoration: underline;
 }
 
 button {
@@ -109,8 +120,8 @@ input:focus-visible {
 
 /* ── Scrollbar (webkit) ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
 }
 
 ::-webkit-scrollbar-track {

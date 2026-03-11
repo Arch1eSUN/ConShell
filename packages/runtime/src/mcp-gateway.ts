@@ -176,9 +176,10 @@ export class McpGateway {
                         message: `This tool requires payment of $${(priceCents / 100).toFixed(2)} USDC`,
                     }));
                 }
-                // In production, verify the payment signature here via the x402 facilitator.
-                // For now, log it and proceed.
-                this.deps.logger.info('x402 payment received', { tool: toolName, priceCents });
+                // ⚠️ SECURITY TODO: Verify payment signature via x402 facilitator.
+                // Currently ANY non-empty signature passes — this MUST be implemented
+                // before exposing paid tools in production.
+                this.deps.logger.warn('x402 payment signature NOT VERIFIED (stub)', { tool: toolName, priceCents });
             }
         }
 

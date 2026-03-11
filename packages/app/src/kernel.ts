@@ -67,7 +67,7 @@ import {
     createPaidToolHandlers,
     createAllHeartbeatTasks,
 } from '@conshell/runtime';
-import { CapabilityGateRule, DEFAULT_CAPABILITY_CONFIG, type CapabilityConfig } from '@conshell/policy';
+import { CapabilityGateRule, DEFAULT_CAPABILITY_CONFIG, SECURITY_TIER_PRESETS, type CapabilityConfig } from '@conshell/policy';
 import { loadAllSkills, SkillRegistry, loadSkillHandlers } from '@conshell/skills';
 import { CliAdmin } from '@conshell/cli';
 import { X402Server, MockFacilitator } from '@conshell/x402';
@@ -221,8 +221,11 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
     }
 
     // Capability permission system (God Mode + per-capability toggles)
-    // Load from SQLite, fall back to defaults
-    let capabilityConfigState: CapabilityConfig = repos.capabilityConfig.load(DEFAULT_CAPABILITY_CONFIG);
+    // Use tier-based defaults from config
+    const tier = config.securityLevel ?? 'standard';
+    const tierDefaults = SECURITY_TIER_PRESETS[tier] ?? SECURITY_TIER_PRESETS.standard;
+    // Load from SQLite, fall back to tier-based defaults
+    let capabilityConfigState: CapabilityConfig = repos.capabilityConfig.load(tierDefaults);
     const capabilityConfigHolder = {
         get: () => capabilityConfigState,
         set: (c: CapabilityConfig) => {
@@ -373,9 +376,57 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
         dynamicRouting: true,
     });
 
-    // 5. Soul system
-    const soul = new SoulSystem(repos.soulHistory, logger, EMPTY_SOUL);
-    logger.info('Soul system initialized');
+    // Auto-generate routing config from discovered models so the dynamic
+    // routing uses actual model IDs instead of the hardcoded static matrix.
+    if (totalDiscovered > 0 && !repos.routingConfig.hasEntries()) {
+        const availableModels = repos.modelRegistry.listAvailable();
+        if (availableModels.length > 0) {
+            const tiers = ['high', 'normal', 'low', 'critical'] as const;
+            const taskTypes = ['reasoning', 'coding', 'analysis', 'conversation', 'planning'] as const;
+            const routingEntries: Array<{
+                tier: string; taskType: string; modelId: string; priority: number; isCustom: boolean;
+            }> = [];
+
+            for (const tier of tiers) {
+                for (const taskType of taskTypes) {
+                    for (let i = 0; i < availableModels.length; i++) {
+                        routingEntries.push({
+                            tier,
+                            taskType,
+                            modelId: availableModels[i]!.id,
+                            priority: i,
+                            isCustom: false,
+                        });
+                    }
+                }
+            }
+
+            repos.routingConfig.replaceAll(routingEntries);
+            logger.info('Auto-generated routing config from discovered models', {
+                models: availableModels.map(m => m.id),
+                entries: routingEntries.length,
+            });
+        }
+    }
+
+    // 5. Soul system — inject configured agent name into the template
+    const personalizedSoul = {
+        ...EMPTY_SOUL,
+        name: config.agentName || 'ConShell Agent',
+        identity: EMPTY_SOUL.identity.replaceAll('{NAME}', config.agentName || 'ConShell Agent'),
+    };
+    const soul = new SoulSystem(repos.soulHistory, logger, personalizedSoul);
+    // Force-update soul if the persisted name doesn't match the configured name
+    const currentSoul = soul.view();
+    const expectedName = config.agentName || 'ConShell Agent';
+    if (currentSoul.name !== expectedName) {
+        soul.update({
+            name: expectedName,
+            identity: personalizedSoul.identity,
+        });
+        logger.info('Soul name updated to match config', { from: currentSoul.name, to: expectedName });
+    }
+    logger.info('Soul system initialized', { name: expectedName });
 
     // 6. Memory tier manager
     const memoryManager = new MemoryTierManager({
@@ -438,6 +489,7 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
             },
         },
         toolRegistry,
+        getCapabilityConfig: () => capabilityConfigHolder.get(),
         maxIterations: 10,
     });
     logger.info('Agent loop created (ReAct engine)');
@@ -657,14 +709,11 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
         },
     };
 
-    // ── Graceful shutdown hooks ─────────────────────────────────────────
-    const handleShutdown = (signal: string) => {
-        logger.info(`Received ${signal}, shutting down gracefully`);
-        agent.shutdown();
-        process.exit(0);
-    };
-    process.on('SIGINT', () => handleShutdown('SIGINT'));
-    process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+    // NOTE: Signal handlers (SIGINT/SIGTERM) are NOT registered here.
+    // The caller (start.ts, gateway.ts) owns the HTTP server lifecycle and
+    // registers its own handlers to ensure correct shutdown order:
+    //   1. server.close()  →  stop accepting new connections
+    //   2. agent.shutdown() →  stop heartbeat + close DB
 
     return agent;
 }

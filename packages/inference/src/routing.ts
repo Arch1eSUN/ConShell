@@ -198,6 +198,23 @@ const ROUTING_MATRIX: Record<SurvivalTier, Record<InferenceTaskType, readonly Mo
             { modelId: 'ollama:llama3.1-8b' },
         ],
     },
+    emergency: {
+        reasoning: [
+            { modelId: 'ollama:llama3.1-8b' },
+        ],
+        coding: [
+            { modelId: 'ollama:llama3.1-8b' },
+        ],
+        analysis: [
+            { modelId: 'ollama:llama3.1-8b' },
+        ],
+        conversation: [
+            { modelId: 'ollama:llama3.1-8b' },
+        ],
+        planning: [
+            { modelId: 'ollama:llama3.1-8b' },
+        ],
+    },
 };
 
 /**

@@ -1,8 +1,6 @@
 {
     "compilerOptions": {
         "types": [
-            "better-sqlite3",
-            "ws",
             "node"
         ],
         "target": "ES2022",
@@ -16,6 +14,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "composite": true,
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
         "rootDir": "src",
         "outDir": "dist",
         "paths": {
@@ -54,6 +53,9 @@
             ],
             "@web4-agent/skills": [
                 "../skills/src/index.ts"
+            ],
+            "@conshell/proxy": [
+                "../proxy/src/index.ts"
             ]
         }
     },
@@ -99,6 +101,9 @@
         },
         {
             "path": "../skills"
+        },
+        {
+            "path": "../proxy"
         }
     ]
 }

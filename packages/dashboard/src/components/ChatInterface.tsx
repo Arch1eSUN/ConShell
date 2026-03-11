@@ -14,7 +14,7 @@ interface SessionInfo {
     last_activity: string;
 }
 
-const SESSION_KEY = 'conway_session_id';
+const SESSION_KEY = 'conshell_session_id';
 
 function getPersistedSessionId(): string {
     const stored = localStorage.getItem(SESSION_KEY);
@@ -137,7 +137,7 @@ export function ChatInterface() {
                         const updated = [...prev];
                         const last = updated[updated.length - 1];
                         if (last.role === 'agent') {
-                            last.content = `⏳ 网络波动，正在重试 (${attempt + 1}/${MAX_RETRIES})…`;
+                            last.content = `Retrying (${attempt + 1}/${MAX_RETRIES})...`;
                         }
                         return updated;
                     });
@@ -154,7 +154,7 @@ export function ChatInterface() {
                     const updated = [...prev];
                     const last = updated[updated.length - 1];
                     if (last.role === 'agent' && !last.content) {
-                        last.content = '⏹ 已停止生成';
+                        last.content = 'Generation stopped.';
                     }
                     return updated;
                 });
@@ -163,7 +163,7 @@ export function ChatInterface() {
                     const updated = [...prev];
                     const last = updated[updated.length - 1];
                     if (last.role === 'agent') {
-                        last.content = '⚠️ 连接失败，请检查后端服务是否在运行，然后重试。';
+                        last.content = 'Connection failed. Check if the backend is running.';
                     }
                     return updated;
                 });

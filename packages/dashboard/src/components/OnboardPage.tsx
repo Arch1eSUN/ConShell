@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '../lib/api';
 
 type Step = 'name' | 'inference' | 'security' | 'wallet' | 'channels' | 'complete';
 
-const STEPS: { id: Step; label: string; emoji: string; optional?: boolean }[] = [
-    { id: 'name', label: 'Agent Name', emoji: '📝' },
-    { id: 'inference', label: 'Inference', emoji: '🧠' },
-    { id: 'security', label: 'Security', emoji: '🔒' },
-    { id: 'wallet', label: 'Wallet', emoji: '💰', optional: true },
-    { id: 'channels', label: 'Channels', emoji: '📡', optional: true },
+const STEPS: { id: Step; label: string; optional?: boolean }[] = [
+    { id: 'name', label: 'Agent Name' },
+    { id: 'inference', label: 'Inference' },
+    { id: 'security', label: 'Security' },
+    { id: 'wallet', label: 'Wallet', optional: true },
+    { id: 'channels', label: 'Channels', optional: true },
 ];
 
 export function OnboardPage() {
@@ -45,12 +46,12 @@ export function OnboardPage() {
         return (
             <div className="page-onboard">
                 <header className="page-header">
-                    <h2 className="page-title">🎉 Setup Complete!</h2>
+                    <h2 className="page-title">Setup Complete</h2>
                     <p className="page-subtitle">Your agent "{data.agentName}" is ready</p>
                 </header>
 
                 <div className="settings-card" style={{ textAlign: 'center', padding: '3rem' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚀</div>
+                    <div style={{ fontSize: '2rem', marginBottom: '1rem', fontWeight: 600 }}>✓</div>
                     <div className="settings-card-title" style={{ fontSize: '1.5rem' }}>Agent Configured</div>
                     <div className="settings-card-subtitle" style={{ marginTop: '0.5rem' }}>
                         Mode: {data.inferenceMode} · Security: {data.securityLevel}
@@ -65,7 +66,7 @@ export function OnboardPage() {
     return (
         <div className="page-onboard">
             <header className="page-header">
-                <h2 className="page-title">🧭 Onboarding</h2>
+                <h2 className="page-title">Onboarding</h2>
                 <p className="page-subtitle">
                     Step {currentIdx + 1} of {STEPS.length} — {progress}% complete
                 </p>
@@ -93,7 +94,7 @@ export function OnboardPage() {
                         disabled={i > currentIdx}
                         style={{ opacity: i > currentIdx ? 0.4 : 1 }}
                     >
-                        {s.emoji} {s.label} {s.optional ? '(opt)' : ''}
+                        {s.label} {s.optional ? '(opt)' : ''}
                     </button>
                 ))}
             </div>
@@ -135,9 +136,9 @@ export function OnboardPage() {
                         <div className="settings-card-subtitle">How will your agent think?</div>
                         <div style={{ marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
                             {([
-                                { value: 'ollama', label: '🖥️ Local (Ollama)', desc: 'Free, private, runs on your machine' },
-                                { value: 'cloud', label: '☁️ Conway Cloud', desc: 'Powerful models via Conway Terminal MCP' },
-                                { value: 'api', label: '🔑 Direct API', desc: 'OpenAI/Anthropic/etc with your own keys' },
+                                { value: 'ollama', label: 'Local (Ollama)', desc: 'Free, private, runs on your machine' },
+                                { value: 'cloud', label: 'ConShell Cloud', desc: 'Powerful models via ConShell Terminal MCP' },
+                                { value: 'api', label: 'Direct API', desc: 'OpenAI/Anthropic/etc with your own keys' },
                             ] as const).map(opt => (
                                 <label
                                     key={opt.value}
@@ -160,6 +161,11 @@ export function OnboardPage() {
                                 </label>
                             ))}
                         </div>
+
+                        {/* CLIProxy Auto-Detect Banner */}
+                        {(data.inferenceMode === 'cloud' || data.inferenceMode === 'api') && (
+                            <CliProxyDetectBanner />
+                        )}
                     </>
                 )}
 
@@ -169,9 +175,9 @@ export function OnboardPage() {
                         <div className="settings-card-subtitle">Configure how strict the agent's safety system should be</div>
                         <div style={{ marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
                             {([
-                                { value: 'standard', label: '🟢 Standard', desc: 'Constitution + injection defense + path protection' },
-                                { value: 'strict', label: '🟡 Strict', desc: 'Standard + command whitelist + financial limits' },
-                                { value: 'paranoid', label: '🔴 Paranoid', desc: 'Strict + all tool calls require confirmation' },
+                                { value: 'standard', label: 'Standard', desc: 'Constitution + injection defense + path protection' },
+                                { value: 'strict', label: 'Strict', desc: 'Standard + command whitelist + financial limits' },
+                                { value: 'paranoid', label: 'Paranoid', desc: 'Strict + all tool calls require confirmation' },
                             ] as const).map(opt => (
                                 <label
                                     key={opt.value}
@@ -269,6 +275,95 @@ export function OnboardPage() {
                     {currentIdx === STEPS.length - 1 ? '✓ Finish' : 'Next →'}
                 </button>
             </div>
+        </div>
+    );
+}
+
+// ── CLIProxy Auto-Detect Banner ─────────────────────────────────────
+
+function CliProxyDetectBanner() {
+    const [status, setStatus] = useState<'idle' | 'detecting' | 'found' | 'notfound' | 'registered'>('idle');
+    const [proxyInfo, setProxyInfo] = useState<{ endpoint: string; modelCount: number } | null>(null);
+
+    const detect = useCallback(async () => {
+        setStatus('detecting');
+        try {
+            const data = await api.cliproxyDetect();
+            if (data.available && data.endpoint) {
+                setProxyInfo({ endpoint: data.endpoint, modelCount: data.models?.length ?? 0 });
+                setStatus('found');
+            } else {
+                setStatus('notfound');
+            }
+        } catch {
+            setStatus('notfound');
+        }
+    }, []);
+
+    useEffect(() => { detect(); }, [detect]);
+
+    const registerProxy = async () => {
+        if (!proxyInfo) return;
+        try {
+            await fetch('/api/settings/providers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'cliproxyapi',
+                    authType: 'proxy',
+                    endpoint: proxyInfo.endpoint,
+                    apiKey: '',
+                    priority: 10,
+                }),
+            });
+            setStatus('registered');
+        } catch { /* ignore */ }
+    };
+
+    return (
+        <div style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            borderRadius: '8px',
+            background: status === 'found' ? 'rgba(0,255,136,0.08)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${
+                status === 'found' ? 'rgba(0,255,136,0.2)' :
+                status === 'registered' ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.1)'
+            }`,
+        }}>
+            <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                CLIProxyAPI Auto-Detect
+            </div>
+            {status === 'idle' || status === 'detecting' ? (
+                <div style={{ color: '#888', fontSize: '0.8rem' }}>Scanning local ports...</div>
+            ) : status === 'found' && proxyInfo ? (
+                <div style={{ fontSize: '0.8rem' }}>
+                    <span style={{ color: '#00ff88' }}>Found at {proxyInfo.endpoint}</span>
+                    <span style={{ color: '#888' }}> — {proxyInfo.modelCount} models available</span>
+                    <button
+                        className="settings-btn settings-btn-primary"
+                        style={{ marginLeft: '1rem', fontSize: '0.75rem', padding: '0.3rem 0.8rem' }}
+                        onClick={registerProxy}
+                    >
+                        Register as Provider
+                    </button>
+                </div>
+            ) : status === 'registered' ? (
+                <div style={{ color: '#6366f1', fontSize: '0.8rem' }}>
+                    Registered. Models will be available after setup.
+                </div>
+            ) : (
+                <div style={{ fontSize: '0.8rem' }}>
+                    <span style={{ color: '#888' }}>No local CLIProxyAPI detected.</span>
+                    <button
+                        className="settings-btn"
+                        style={{ marginLeft: '0.5rem', fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
+                        onClick={detect}
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

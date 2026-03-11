@@ -28,3 +28,13 @@ export {
     type CheckResult,
     type CheckStatus,
 } from './doctor.js';
+
+export {
+    installDaemon,
+    uninstallDaemon,
+    getDaemonStatus,
+    type DaemonConfig,
+    type DaemonStatus,
+} from './daemon.js';
+
+export { loginProviderInline } from './login-inline.js';

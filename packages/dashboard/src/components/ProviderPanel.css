@@ -1,17 +1,16 @@
 .provider-panel {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
 }
 
 .provider-panel .panel-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 var(--space-md);
 }
 
 .provider-list {
@@ -26,60 +25,60 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 0.75rem;
-    background: var(--surface-elevated, rgba(255, 255, 255, 0.03));
+    background: var(--paper);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-size: 0.8125rem;
-    transition: border-color 0.2s;
+    transition: border-color var(--transition);
 }
 
 .provider-row:hover {
-    border-color: var(--cyan, #06b6d4);
+    border-color: var(--border-hover);
 }
 
 .provider-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
 .provider-row.available .provider-dot {
-    background: var(--green, #10b981);
-    box-shadow: 0 0 6px var(--green, #10b981);
+    background: var(--green);
+    box-shadow: 0 0 4px var(--green-dim);
 }
 
 .provider-row.unavailable .provider-dot {
-    background: var(--muted, #6b7280);
+    background: var(--muted);
 }
 
 .provider-name {
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: 500;
+    color: var(--ink);
     text-transform: capitalize;
 }
 
 .provider-auth {
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: var(--ink-muted);
 }
 
 .provider-status {
     font-size: 0.75rem;
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-family: var(--font-mono);
 }
 
 .provider-row.available .provider-status {
-    color: var(--green, #10b981);
+    color: var(--green);
 }
 
 .provider-row.unavailable .provider-status {
-    color: var(--rose, #f43f5e);
+    color: var(--rose);
 }
 
 .provider-empty {
     text-align: center;
     color: var(--muted);
-    font-size: 0.875rem;
-    padding: 1rem;
+    font-size: 0.85rem;
+    padding: var(--space-lg);
 }

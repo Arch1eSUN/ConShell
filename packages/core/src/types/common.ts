@@ -14,7 +14,7 @@ export type AgentState =
     | 'recovering'
     | 'dead';
 
-export type SurvivalTier = 'critical' | 'low' | 'normal' | 'high';
+export type SurvivalTier = 'emergency' | 'critical' | 'low' | 'normal' | 'high';
 
 // ── Authority & Risk ───────────────────────────────────────────────────
 
@@ -53,7 +53,11 @@ export type CapabilityId =
     | 'financial_ops'
     | 'account_creation'
     | 'self_deploy'
-    | 'self_modify';
+    | 'self_modify'
+    | 'payment_enabled';
+
+/** Progressive security tiers: each tier enables more capabilities. */
+export type SecurityTier = 'sandbox' | 'standard' | 'autonomous' | 'godmode';
 
 // ── Compute ────────────────────────────────────────────────────────────
 

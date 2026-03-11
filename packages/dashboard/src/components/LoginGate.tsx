@@ -109,8 +109,8 @@ export function LoginGate({ children }: Props) {
     return (
         <div className="login-gate">
             <div className="login-card">
-                <div className="login-icon">🔒</div>
-                <h1>Conway Automaton</h1>
+                <div className="login-icon">*</div>
+                <h1>ConShell</h1>
                 <p className="login-subtitle">Sovereign AI Runtime</p>
 
                 <form className="login-form" onSubmit={handleSubmit}>

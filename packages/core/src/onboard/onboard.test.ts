@@ -58,12 +58,12 @@ describe('OnboardWizard', () => {
         wiz.nextStep();
         wiz.setInference('cloud');
         wiz.nextStep();
-        wiz.setSecurity('strict');
+        wiz.setSecurity('autonomous');
         wiz.nextStep();
         const data = wiz.finalize();
         expect(data.agentName).toBe('FinalAgent');
         expect(data.inferenceMode).toBe('cloud');
-        expect(data.securityLevel).toBe('strict');
+        expect(data.securityLevel).toBe('autonomous');
     });
 
     it('rejects finalize when incomplete', () => {

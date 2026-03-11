@@ -14,7 +14,7 @@
     "scripts": {
         "build": "npx tsc --build",
         "clean": "rm -rf dist *.tsbuildinfo",
-        "test": "vitest run",
+        "test": "npx vitest run",
         "test:watch": "vitest watch",
         "typecheck": "tsc --noEmit"
     },

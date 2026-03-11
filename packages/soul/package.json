@@ -7,7 +7,7 @@
     "types": "./dist/index.d.ts",
     "scripts": {
         "build": "npx tsc --build",
-        "test": "vitest run"
+        "test": "npx vitest run"
     },
     "dependencies": {
         "@conshell/core": "workspace:*",

@@ -181,7 +181,7 @@ export function createCreditMonitorTask(deps: CreditMonitorDeps): HeartbeatTask 
                 // Higher spend → lower tier (more cautious)
                 let newTier: SurvivalTier;
                 if (dailySpend > 10000) { // > $100/day — emergency
-                    newTier = 'emergency' as SurvivalTier;
+                    newTier = 'emergency';
                 } else if (dailySpend > 5000) { // > $50/day
                     newTier = 'critical';
                 } else if (dailySpend > 1000) { // > $10/day
@@ -193,7 +193,7 @@ export function createCreditMonitorTask(deps: CreditMonitorDeps): HeartbeatTask 
                 }
 
                 // Death check: if emergency tier persists, trigger death
-                if (newTier === ('emergency' as SurvivalTier)) {
+                if (newTier === 'emergency') {
                     logger.error('SURVIVAL CRITICAL: Spend rate exceeds emergency threshold', {
                         dailySpend,
                         hourlySpend,
@@ -237,7 +237,7 @@ export interface AllHeartbeatTaskDeps {
     readonly learningTopics?: readonly string[];
     readonly onTierChange?: (newTier: SurvivalTier, balanceCents: number) => void;
     /** Called when agent enters emergency tier — triggers death sequence */
-    readonly onDeath?: () => void;
+    readonly onDeath?: (reason: string) => void;
 }
 
 export function createAllHeartbeatTasks(deps: AllHeartbeatTaskDeps): readonly HeartbeatTask[] {

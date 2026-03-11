@@ -61,30 +61,29 @@ export default function App() {
                     {activeTab === 'overview' && (
                         <div className="page-overview">
                             <header className="page-header">
-                                <h2 className="page-title">Dashboard</h2>
-                                <p className="page-subtitle">Conway Automaton — Sovereign AI Runtime</p>
+                                <span className="page-label label">Sovereign AI Runtime</span>
+                                <h2 className="page-title">ConShell</h2>
                             </header>
 
-                            <div className="overview-grid">
+                            <section className="overview-status">
                                 <StatusPanel
                                     status={status}
                                     connected={connected}
                                     loading={statusLoading}
                                 />
+                            </section>
+
+                            <section className="overview-grid">
                                 <FinancialCard
                                     status={status}
                                     onFunded={refreshStatus}
                                 />
-                            </div>
-
-                            <div className="overview-grid">
-                                <MemoryPanel />
                                 <ProviderPanel />
-                            </div>
+                            </section>
 
-                            <div className="overview-chat">
-                                <ChatInterface />
-                            </div>
+                            <section className="overview-full">
+                                <MemoryPanel />
+                            </section>
                         </div>
                     )}
 

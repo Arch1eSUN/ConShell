@@ -1,7 +1,7 @@
 /**
  * Minimal type declarations for Express.
  * @types/express is broken in locked node_modules — this provides
- * just enough typing for server.ts to compile.
+ * just enough typing for server.ts and route modules to compile.
  */
 declare module 'express' {
     import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -28,6 +28,9 @@ declare module 'express' {
         writeHead(statusCode: number, headers?: Record<string, string>): this;
         write(chunk: any): boolean;
         headersSent: boolean;
+        writableEnded: boolean;
+        on(event: string, listener: (...args: any[]) => void): this;
+        once(event: string, listener: (...args: any[]) => void): this;
         setTimeout(msecs: number, callback?: () => void): this;
     }
 
@@ -35,12 +38,13 @@ declare module 'express' {
         (err?: any): void;
     }
 
-    type RequestHandler = (req: Request, res: Response, next: NextFunction) => void;
+    type RequestHandler = (req: Request, res: Response, next: NextFunction) => void | Promise<void>;
 
     interface Router {
         get(path: string, ...handlers: RequestHandler[]): Router;
         post(path: string, ...handlers: RequestHandler[]): Router;
         put(path: string, ...handlers: RequestHandler[]): Router;
+        patch(path: string, ...handlers: RequestHandler[]): Router;
         delete(path: string, ...handlers: RequestHandler[]): Router;
         use(...handlers: (RequestHandler | string)[]): Router;
     }
@@ -67,3 +71,51 @@ declare module 'express' {
 
     export = express;
 }
+
+/**
+ * Ambient Express types for route modules.
+ * These mirror the interfaces from the express module declaration above
+ * but are available for direct import from this file.
+ */
+declare global {
+    namespace ConShellExpress {
+        interface Request {
+            body: any;
+            params: Record<string, string>;
+            query: Record<string, string>;
+            headers: Record<string, string | string[] | undefined>;
+            method: string;
+            url: string;
+            path: string;
+            setTimeout(msecs: number, callback?: () => void): this;
+        }
+
+        interface Response {
+            status(code: number): Response;
+            json(body: any): Response;
+            send(body?: any): Response;
+            sendFile(path: string, options?: any, fn?: (err?: Error) => void): void;
+            set(field: string, value: string): Response;
+            setHeader(name: string, value: string | number | readonly string[]): this;
+            end(): void;
+            writeHead(statusCode: number, headers?: Record<string, string>): this;
+            write(chunk: any): boolean;
+            headersSent: boolean;
+            writableEnded: boolean;
+            on(event: string, listener: (...args: any[]) => void): this;
+            once(event: string, listener: (...args: any[]) => void): this;
+            setTimeout(msecs: number, callback?: () => void): this;
+        }
+
+        interface Router {
+            get(path: string, ...handlers: Array<(req: Request, res: Response, next?: (err?: any) => void) => void | Promise<void>>): Router;
+            post(path: string, ...handlers: Array<(req: Request, res: Response, next?: (err?: any) => void) => void | Promise<void>>): Router;
+            put(path: string, ...handlers: Array<(req: Request, res: Response, next?: (err?: any) => void) => void | Promise<void>>): Router;
+            patch(path: string, ...handlers: Array<(req: Request, res: Response, next?: (err?: any) => void) => void | Promise<void>>): Router;
+            delete(path: string, ...handlers: Array<(req: Request, res: Response, next?: (err?: any) => void) => void | Promise<void>>): Router;
+            use(...handlers: (((req: Request, res: Response, next: (err?: any) => void) => void | Promise<void>) | string)[]): Router;
+        }
+    }
+}
+
+export {};

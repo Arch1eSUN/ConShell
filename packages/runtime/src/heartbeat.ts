@@ -35,6 +35,7 @@ const TIER_ORDER: Record<SurvivalTier, number> = {
     normal: 3,
     low: 2,
     critical: 1,
+    emergency: 0,
 };
 
 /**

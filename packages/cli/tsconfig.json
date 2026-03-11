@@ -1,18 +1,22 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "rootDir": "src",
-        "outDir": "dist",
-        "composite": true
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "composite": true,
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "paths": {
+            "@conshell/core": [
+                "../core/src/index.ts"
+            ],
+            "@conshell/state": [
+                "../state/src/index.ts"
+            ],
+            "@conshell/security": [
+                "../security/src/index.ts"
+            ]
+        }
     },
-    "include": [
-        "src/**/*.ts"
-    ],
-    "exclude": [
-        "dist",
-        "node_modules",
-        "**/*.test.ts"
-    ],
     "references": [
         {
             "path": "../core"
@@ -23,5 +27,11 @@
         {
             "path": "../security"
         }
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
     ]
 }

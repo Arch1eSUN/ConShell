@@ -12,14 +12,14 @@ interface SkillInfo {
 }
 
 const CAPABILITY_ICONS: Record<string, string> = {
-    internet_access: '🌐',
-    browser_control: '🖥️',
-    shell_exec: '⚡',
-    file_system: '📁',
-    financial_ops: '💰',
-    account_creation: '🔑',
-    self_deploy: '🚀',
-    self_modify: '🧬',
+    internet_access: 'NET',
+    browser_control: 'BRW',
+    shell_exec: 'SHL',
+    file_system: 'FS',
+    financial_ops: 'FIN',
+    account_creation: 'ACC',
+    self_deploy: 'DEP',
+    self_modify: 'MOD',
 };
 
 export function SkillsPanel() {
@@ -56,7 +56,7 @@ export function SkillsPanel() {
     return (
         <div className="skills-panel">
             <div className="skills-header">
-                <h2>🧩 Agent Skills</h2>
+                <h2>Agent Skills</h2>
                 <p className="skills-subtitle">
                     Installed skills extend your agent's capabilities.
                     Place skill folders in <code>~/.conshell/skills/</code>
@@ -65,7 +65,7 @@ export function SkillsPanel() {
 
             {skills.length === 0 ? (
                 <div className="skills-empty">
-                    <span className="skills-empty-icon">📦</span>
+                    <span className="skills-empty-icon">*</span>
                     <h3>No Skills Installed</h3>
                     <p>Create a folder in <code>~/.conshell/skills/your-skill/</code> with a <code>SKILL.md</code> file.</p>
                     <pre className="skills-example">{`---
@@ -106,7 +106,7 @@ triggers:
                                     <div className="skill-caps">
                                         {skill.capabilities.map(cap => (
                                             <span key={cap} className="skill-cap-badge">
-                                                {CAPABILITY_ICONS[cap] || '❓'} {cap.replace(/_/g, ' ')}
+                                                {CAPABILITY_ICONS[cap] || '?'} {cap.replace(/_/g, ' ')}
                                             </span>
                                         ))}
                                     </div>
@@ -126,7 +126,7 @@ triggers:
                                         <span className="skill-meta-label">Triggers:</span>
                                         {skill.triggers.map((t, i) => (
                                             <span key={i} className="skill-trigger-badge">
-                                                {t.heartbeat ? `⏰ ${t.heartbeat}` : `📡 ${t.event}`}
+                                                {t.heartbeat ? `cron: ${t.heartbeat}` : `on: ${t.event}`}
                                             </span>
                                         ))}
                                     </div>
@@ -134,8 +134,8 @@ triggers:
 
                                 <div className="skill-type">
                                     {skill.handlerPath
-                                        ? <span className="skill-type-code">📝 Code + Docs</span>
-                                        : <span className="skill-type-md">📄 Docs Only</span>
+                                        ? <span className="skill-type-code">Code + Docs</span>
+                                        : <span className="skill-type-md">Docs Only</span>
                                     }
                                 </div>
                             </div>

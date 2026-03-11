@@ -7,12 +7,16 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "npx tsc --build",
-        "test": "vitest run"
+        "test": "npx vitest run"
     },
     "dependencies": {
         "@conshell/core": "workspace:*",
         "@conshell/state": "workspace:*",
-        "@conshell/security": "workspace:*"
+        "@conshell/security": "workspace:*",
+        "@inquirer/prompts": "^7.0.0",
+        "chalk": "^5.3.0",
+        "ora": "^8.1.0",
+        "open": "^10.1.0"
     },
     "devDependencies": {
         "@types/better-sqlite3": "^7.6.13",

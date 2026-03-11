@@ -20,6 +20,9 @@
             "path": "./packages/inference"
         },
         {
+            "path": "./packages/proxy"
+        },
+        {
             "path": "./packages/runtime"
         },
         {

@@ -59,17 +59,25 @@ export interface AppConfig {
     readonly dailyBudgetCents: number;
 
     // Security
+    readonly securityLevel: import('@conshell/core').SecurityTier;
     readonly authMode: 'none' | 'token' | 'password';
     readonly authSecret?: string;
+
+    // Identity (populated at runtime from wallet)
+    readonly walletAddress?: string;
 }
 
 // ── Provider detection ──────────────────────────────────────────────────
 
-function detectProviders(): LlmProviderConfig[] {
+function detectProviders(json: Record<string, unknown>): LlmProviderConfig[] {
     const providers: LlmProviderConfig[] = [];
 
+    // Helper: env var > config.json value > default
+    const get = (envKey: string, jsonKey?: string, fallback?: string): string | undefined =>
+        process.env[envKey] || (json[jsonKey ?? envKey] as string | undefined) || fallback;
+
     // Ollama (local, always assumed available)
-    const ollamaUrl = process.env['OLLAMA_URL'] || 'http://localhost:11434';
+    const ollamaUrl = get('OLLAMA_URL', 'ollamaUrl', 'http://localhost:11434')!;
     providers.push({
         name: 'ollama',
         authType: 'local',
@@ -78,7 +86,7 @@ function detectProviders(): LlmProviderConfig[] {
     });
 
     // OpenAI
-    const openaiKey = process.env['OPENAI_API_KEY'];
+    const openaiKey = get('OPENAI_API_KEY');
     providers.push({
         name: 'openai',
         authType: 'apiKey',
@@ -87,7 +95,7 @@ function detectProviders(): LlmProviderConfig[] {
     });
 
     // Anthropic
-    const anthropicKey = process.env['ANTHROPIC_API_KEY'];
+    const anthropicKey = get('ANTHROPIC_API_KEY');
     providers.push({
         name: 'anthropic',
         authType: 'apiKey',
@@ -96,7 +104,7 @@ function detectProviders(): LlmProviderConfig[] {
     });
 
     // Gemini
-    const geminiKey = process.env['GEMINI_API_KEY'];
+    const geminiKey = get('GEMINI_API_KEY');
     providers.push({
         name: 'gemini',
         authType: 'apiKey',
@@ -105,8 +113,8 @@ function detectProviders(): LlmProviderConfig[] {
     });
 
     // OpenClaw (OAuth → Codex / Antigravity)
-    const openclawToken = process.env['OPENCLAW_OAUTH_TOKEN'];
-    const openclawEndpoint = process.env['OPENCLAW_ENDPOINT'] || 'https://api.openclaw.com';
+    const openclawToken = get('OPENCLAW_OAUTH_TOKEN');
+    const openclawEndpoint = get('OPENCLAW_ENDPOINT', undefined, 'https://api.openclaw.com')!;
     providers.push({
         name: 'openclaw',
         authType: 'oauth',
@@ -116,7 +124,7 @@ function detectProviders(): LlmProviderConfig[] {
     });
 
     // NVIDIA NIM
-    const nvidiaKey = process.env['NVIDIA_API_KEY'];
+    const nvidiaKey = get('NVIDIA_API_KEY');
     providers.push({
         name: 'nvidia',
         authType: 'apiKey',
@@ -125,9 +133,9 @@ function detectProviders(): LlmProviderConfig[] {
     });
 
     // CLIProxyAPI (subscription/OAuth proxy gateway)
-    const cliproxyapiKey = process.env['CLIPROXYAPI_API_KEY'];
-    const cliproxyapiUrl = process.env['CLIPROXYAPI_BASE_URL'] || 'http://localhost:8317';
-    const cliproxyapiEnabled = process.env['CLIPROXYAPI_ENABLED'] !== 'false';
+    const cliproxyapiKey = get('CLIPROXYAPI_API_KEY');
+    const cliproxyapiUrl = get('CLIPROXYAPI_BASE_URL', undefined, 'http://localhost:8317')!;
+    const cliproxyapiEnabled = get('CLIPROXYAPI_ENABLED') !== 'false';
     providers.push({
         name: 'cliproxyapi',
         authType: 'proxy' as import('@conshell/core').InferenceAuthType,
@@ -162,12 +170,12 @@ export function loadConfig(envPath?: string): AppConfig {
     const json = loadConfigJson();
 
     const agentHome = process.env['AGENT_HOME'] || (json.agentHome as string | undefined) || process.cwd();
-    const providers = detectProviders();
+    const providers = detectProviders(json);
 
     const authMode = (process.env['CONSHELL_AUTH_MODE'] || (json.authMode as string | undefined) || 'none') as 'none' | 'token' | 'password';
 
     return {
-        agentName: process.env['AGENT_NAME'] || (json.agentName as string | undefined) || 'conway-automaton',
+        agentName: process.env['AGENT_NAME'] || (json.agentName as string | undefined) || 'ConShell Agent',
         genesisPrompt: process.env['GENESIS_PROMPT'] || (json.genesisPrompt as string | undefined) || 'You are a sovereign AI agent.',
         port: parseInt(process.env['PORT'] || String(json.port ?? 4200), 10),
         dbPath: process.env['DB_PATH'] || (json.dbPath as string | undefined) || resolve(agentHome, 'state.db'),
@@ -176,6 +184,7 @@ export function loadConfig(envPath?: string): AppConfig {
         walletPrivateKey: process.env['WALLET_PRIVATE_KEY'],
         providers,
         dailyBudgetCents: parseInt(process.env['DAILY_BUDGET_CENTS'] || String(json.dailyBudgetCents ?? 5000), 10),
+        securityLevel: ((json.securityLevel as string | undefined) || 'standard') as import('@conshell/core').SecurityTier,
         authMode,
         authSecret: process.env['CONSHELL_AUTH_SECRET'] || (json.authSecret as string | undefined),
     };

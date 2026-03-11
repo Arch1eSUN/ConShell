@@ -1,77 +1,78 @@
 .memory-panel {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
 }
 
 .memory-panel .panel-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 var(--space-md);
 }
 
 .memory-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.75rem;
+    gap: var(--space-sm);
 }
 
 .memory-tier-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-xs);
     padding: 0.75rem;
-    background: var(--surface-elevated, rgba(255, 255, 255, 0.03));
+    background: var(--paper);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    transition: border-color 0.2s;
+    border-radius: var(--radius);
+    transition: border-color var(--transition);
 }
 
 .memory-tier-card:hover {
-    border-color: var(--cyan, #06b6d4);
+    border-color: var(--border-hover);
 }
 
 .tier-icon {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
 }
 
 .tier-name {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    text-transform: capitalize;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 .tier-count {
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: var(--ink-light);
 }
 
 .tier-tokens {
     font-size: 0.625rem;
-    color: var(--muted);
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
 }
 
 .memory-empty {
     grid-column: 1 / -1;
     text-align: center;
     color: var(--muted);
-    font-size: 0.875rem;
-    padding: 1rem;
+    font-size: 0.85rem;
+    padding: var(--space-lg);
 }
 
 .panel-skeleton {
     height: 120px;
-    background: linear-gradient(90deg, transparent 35%, rgba(255, 255, 255, 0.04) 50%, transparent 65%);
+    background: linear-gradient(90deg, var(--border) 25%, var(--paper) 50%, var(--border) 75%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.5s infinite;
-    border-radius: 8px;
+    border-radius: var(--radius);
 }
 
 @keyframes skeleton-shimmer {

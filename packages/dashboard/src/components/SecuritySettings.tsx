@@ -84,7 +84,7 @@ export function SecuritySettings() {
             {/* ── Constitution ────────────────────────────────────── */}
             <div className="settings-card">
                 <div className="settings-card-title">
-                    📜 Three Laws — Constitution
+                    Three Laws — Constitution
                 </div>
                 <p className="security-desc">
                     不可篡改的核心安全法则。所有 agent 行为必须遵守这三条法律。
@@ -96,7 +96,7 @@ export function SecuritySettings() {
                         onClick={loadConstitution}
                         disabled={loadingConst}
                     >
-                        {loadingConst ? '⏳ Loading...' : '🔍 查看宪法'}
+                        {loadingConst ? 'Loading...' : 'View Constitution'}
                     </button>
                 ) : (
                     <div className="constitution-laws">
@@ -123,7 +123,7 @@ export function SecuritySettings() {
             {/* ── Injection Scanner ──────────────────────────────── */}
             <div className="settings-card">
                 <div className="settings-card-title">
-                    🛡️ Prompt Injection Scanner
+                    Prompt Injection Scanner
                 </div>
                 <p className="security-desc">
                     8 模式检测器，实时扫描可疑输入。可用于测试/验证你的安全策略。
@@ -142,7 +142,7 @@ export function SecuritySettings() {
                         onClick={runScan}
                         disabled={scanning || !scanText.trim()}
                     >
-                        {scanning ? '⏳ Scanning...' : '🔬 Run Scan'}
+                        {scanning ? 'Scanning...' : 'Run Scan'}
                     </button>
                 </div>
 
@@ -150,7 +150,7 @@ export function SecuritySettings() {
                     <div className={`scan-result ${scanResult.clean ? 'clean' : 'alert'}`}>
                         <div className="scan-header">
                             <span className="scan-icon">
-                                {scanResult.clean ? '✅' : '🚨'}
+                                {scanResult.clean ? '✓' : '✖'}
                             </span>
                             <span className="scan-verdict">
                                 {scanResult.clean ? 'CLEAN — No threats detected' : 'ALERT — Potential injection detected'}
@@ -184,7 +184,7 @@ export function SecuritySettings() {
             {/* ── Security Policy Overview ───────────────────── */}
             <div className="settings-card">
                 <div className="settings-card-title">
-                    ⚙️ Security Policy
+                    Security Policy
                 </div>
                 <div className="policy-grid">
                     <div className="policy-item">

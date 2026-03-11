@@ -64,6 +64,44 @@ export interface FundResult {
     error?: string;
 }
 
+export interface OAuthProviderInfo {
+    provider: string;
+    connected: boolean;
+    displayName: string;
+    flowType: 'device_code' | 'authorization_code' | 'guided_key';
+    flow: OAuthFlowState | null;
+}
+
+export interface OAuthFlowState {
+    status: string;
+    flowType: string;
+    userCode?: string;
+    verificationUri?: string;
+    authUrl?: string;
+    guideUrl?: string;
+    error?: string;
+}
+
+export interface OAuthProvidersResponse {
+    providers: OAuthProviderInfo[];
+}
+
+export interface OAuthFlowResponse {
+    flow: OAuthFlowState;
+}
+
+export interface OAuthStatusResponse {
+    provider: string;
+    connected: boolean;
+    flow: OAuthFlowState | null;
+}
+
+export interface CLIProxyDetectResponse {
+    available: boolean;
+    models?: Array<{ id: string; name?: string }>;
+    endpoint?: string;
+}
+
 // ── Fetchers ────────────────────────────────────────────────────────
 
 async function get<T>(path: string): Promise<T> {
@@ -78,6 +116,12 @@ async function post<T>(path: string, body: unknown): Promise<T> {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
+    if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+    return res.json();
+}
+
+async function del<T>(path: string): Promise<T> {
+    const res = await fetch(`${BASE}${path}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
     return res.json();
 }
@@ -143,4 +187,14 @@ export const api = {
 
     /** Abort current generation for a session */
     chatAbort: (sessionId: string) => post<{ success: boolean; message: string }>('/api/chat/abort', { sessionId }),
+
+    // ── OAuth ───────────────────────────────────────────────────────
+    oauthProviders: () => get<OAuthProvidersResponse>('/api/oauth/providers'),
+    oauthStart: (provider: string) => post<OAuthFlowResponse>(`/api/oauth/${provider}/start`, {}),
+    oauthStatus: (provider: string) => get<OAuthStatusResponse>(`/api/oauth/${provider}/status`),
+    oauthManual: (provider: string, apiKey: string) => post<{ ok: boolean }>(`/api/oauth/${provider}/manual`, { apiKey }),
+    oauthDisconnect: (provider: string) => del<{ ok: boolean }>(`/api/oauth/${provider}`),
+
+    // ── CLIProxy Detection ──────────────────────────────────────────
+    cliproxyDetect: () => get<CLIProxyDetectResponse>('/api/settings/cliproxy/detect'),
 };

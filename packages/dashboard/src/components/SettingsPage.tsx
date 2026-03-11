@@ -3,6 +3,7 @@ import './SettingsPage.css';
 import { CapabilitySettings } from './CapabilitySettings';
 import { SkillsPanel } from './SkillsPanel';
 import { SecuritySettings } from './SecuritySettings';
+import { OAuthPanel } from './OAuthPanel';
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ interface RoutingEntry {
     is_custom: number;
 }
 
-type SettingsTab = 'providers' | 'models' | 'routing' | 'capabilities' | 'skills' | 'security' | 'guide';
+type SettingsTab = 'providers' | 'oauth' | 'models' | 'routing' | 'capabilities' | 'skills' | 'security' | 'guide';
 
 const API = '/api/settings';
 
@@ -78,23 +79,25 @@ export function SettingsPage() {
             </header>
 
             <div className="settings-tabs">
-                {(['providers', 'models', 'routing', 'capabilities', 'skills', 'security', 'guide'] as SettingsTab[]).map(t => (
+                {(['providers', 'oauth', 'models', 'routing', 'capabilities', 'skills', 'security', 'guide'] as SettingsTab[]).map(t => (
                     <button
                         key={t}
                         className={`settings-tab-btn ${tab === t ? 'active' : ''}`}
                         onClick={() => setTab(t)}
                     >
-                        {t === 'providers' ? '🔌 Providers' :
-                            t === 'models' ? '🤖 Models' :
-                                t === 'routing' ? '🧭 Routing' :
-                                    t === 'capabilities' ? '🛡️ Permissions' :
-                                        t === 'skills' ? '🧩 Skills' :
-                                            t === 'security' ? '🔒 Security' : '📘 Guide'}
+                        {t === 'providers' ? 'Providers' :
+                            t === 'oauth' ? 'OAuth' :
+                                t === 'models' ? 'Models' :
+                                    t === 'routing' ? 'Routing' :
+                                        t === 'capabilities' ? 'Permissions' :
+                                            t === 'skills' ? 'Skills' :
+                                                t === 'security' ? 'Security' : 'Guide'}
                     </button>
                 ))}
             </div>
 
             {tab === 'providers' && <ProvidersSection />}
+            {tab === 'oauth' && <OAuthPanel />}
             {tab === 'models' && <ModelsSection />}
             {tab === 'routing' && <RoutingSection />}
             {tab === 'capabilities' && <CapabilitySettings />}
@@ -268,28 +271,28 @@ function ProvidersSection() {
                                         title="Toggle enabled"
                                         onClick={() => handleToggle(p.name, !!p.enabled)}
                                     >
-                                        {p.enabled ? '✅' : '⏸'}
+                                        {p.enabled ? 'On' : 'Off'}
                                     </button>
                                     <button
                                         className="provider-action-btn"
                                         title="Test connection"
                                         onClick={() => handleTest(p.name)}
                                     >
-                                        🔍
+                                        Test
                                     </button>
                                     <button
                                         className="provider-action-btn"
                                         title="Refresh models"
                                         onClick={() => handleDiscover(p.name)}
                                     >
-                                        🔄
+                                        Sync
                                     </button>
                                     <button
                                         className="provider-action-btn"
                                         title="Delete"
                                         onClick={() => handleDelete(p.name)}
                                     >
-                                        🗑
+                                        Del
                                     </button>
                                 </div>
                             </div>
@@ -475,7 +478,7 @@ function RoutingSection() {
                         </div>
                     </div>
                     <button className="settings-btn settings-btn-secondary" onClick={handleReset}>
-                        🔄 Regenerate
+                        Regenerate
                     </button>
                 </div>
 
@@ -533,7 +536,7 @@ function GuideSection() {
     return (
         <div className="settings-card">
             <div className="settings-card-title" style={{ marginBottom: '1rem' }}>
-                🚀 CLIProxyAPI 快速接入指南
+                CLIProxyAPI 快速接入指南
             </div>
 
             <div className="guide-section">
@@ -579,9 +582,9 @@ accounts:
                 <div className="guide-step">
                     <div className="guide-step-number">3</div>
                     <div className="guide-step-content">
-                        <div className="guide-step-title">在 Conway 中添加 Provider</div>
+                        <div className="guide-step-title">在 ConShell 中添加 Provider</div>
                         <div className="guide-step-desc">
-                            回到上方的 <strong>🔌 Providers</strong> 标签页，点击 "+ Add Provider"：
+                            回到上方的 <strong>Providers</strong> 标签页，点击 "+ Add Provider"：
                         </div>
                         <code className="guide-code">{`Name:     cliproxyapi
 Type:     Proxy (CLIProxyAPI)
@@ -595,7 +598,7 @@ API Key:  (如果已设定密钥则填写)`}</code>
                     <div className="guide-step-content">
                         <div className="guide-step-title">选择模型</div>
                         <div className="guide-step-desc">
-                            保存后系统会自动发现可用模型。切换到 <strong>🤖 Models</strong> 标签页，
+                            保存后系统会自动发现可用模型。切换到 <strong>Models</strong> 标签页，
                             勾选你想启用的模型，点击 "Save Selection"。
                         </div>
                     </div>
@@ -607,7 +610,7 @@ API Key:  (如果已设定密钥则填写)`}</code>
                         <div className="guide-step-title">查看路由</div>
                         <div className="guide-step-desc">
                             系统会根据模型能力和成本自动生成路由矩阵。
-                            切换到 <strong>🧭 Routing</strong> 标签页查看或手动调整。
+                            切换到 <strong>Routing</strong> 标签页查看或手动调整。
                             零成本模型（订阅/本地）将被优先使用。
                         </div>
                     </div>
@@ -615,7 +618,7 @@ API Key:  (如果已设定密钥则填写)`}</code>
 
                 <h3>工作原理</h3>
                 <p>
-                    Conway 的智能路由系统会根据以下规则自动分配模型：
+                    ConShell 的智能路由系统会根据以下规则自动分配模型：
                 </p>
                 <div className="guide-step">
                     <div className="guide-step-number">→</div>

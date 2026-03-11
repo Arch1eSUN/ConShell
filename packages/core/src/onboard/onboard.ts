@@ -4,6 +4,7 @@
  * Guided setup flow for first-time agent configuration.
  * Steps: Name → Inference → Security → Wallet → Channels
  */
+import type { SecurityTier } from '../types/common.js';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -16,7 +17,7 @@ export interface OnboardState {
         agentName: string;
         genesisPrompt: string;
         inferenceMode: 'ollama' | 'cloud' | 'api';
-        securityLevel: 'standard' | 'strict' | 'paranoid';
+        securityLevel: SecurityTier;
         walletEnabled: boolean;
         channels: string[];
     };
@@ -152,7 +153,7 @@ export class OnboardWizard {
                 }
                 break;
             case 'security':
-                if (!['standard', 'strict', 'paranoid'].includes(this.state.data.securityLevel)) {
+                if (!['sandbox', 'standard', 'autonomous', 'godmode'].includes(this.state.data.securityLevel)) {
                     errors.push('Invalid security level');
                 }
                 break;

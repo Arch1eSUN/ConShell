@@ -25,6 +25,7 @@ export const webSearchDefinition: ToolDefinition = {
     requiredAuthority: 'self',
     mcpExposed: true,
     auditFields: ['query'],
+    requiredCapabilities: ['internet_access'],
 };
 
 export const webBrowseDefinition: ToolDefinition = {
@@ -43,6 +44,7 @@ export const webBrowseDefinition: ToolDefinition = {
     requiredAuthority: 'self',
     mcpExposed: true,
     auditFields: ['url'],
+    requiredCapabilities: ['internet_access'],
 };
 
 export const readRssDefinition: ToolDefinition = {
@@ -61,6 +63,7 @@ export const readRssDefinition: ToolDefinition = {
     requiredAuthority: 'self',
     mcpExposed: true,
     auditFields: ['feedUrl'],
+    requiredCapabilities: ['internet_access'],
 };
 
 export const WEB_TOOL_DEFINITIONS: readonly ToolDefinition[] = [

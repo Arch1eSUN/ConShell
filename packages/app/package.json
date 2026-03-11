@@ -27,7 +27,7 @@
         "build": "npx tsc --build",
         "dev": "tsx src/index.ts start",
         "start": "node dist/index.js start",
-        "test": "vitest run",
+        "test": "npx vitest run",
         "test:watch": "vitest watch",
         "clean": "rm -rf dist",
         "typecheck": "tsc --noEmit"
@@ -44,11 +44,16 @@
         "@conshell/wallet": "workspace:*",
         "@conshell/selfmod": "workspace:*",
         "@conshell/security": "workspace:*",
+        "@conshell/proxy": "workspace:*",
         "@conshell/cli": "workspace:*",
         "@conshell/x402": "workspace:*",
+        "@inquirer/prompts": "^7.0.0",
+        "chalk": "^5.3.0",
         "commander": "^13.0.0",
         "dotenv": "^16.4.0",
         "express": "^5.0.0",
+        "open": "^10.1.0",
+        "ora": "^8.1.0",
         "ws": "^8.18.0"
     },
     "devDependencies": {

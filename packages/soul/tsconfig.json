@@ -3,14 +3,17 @@
     "compilerOptions": {
         "outDir": "./dist",
         "rootDir": "./src",
-        "composite": true
+        "composite": true,
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "paths": {
+            "@conshell/core": [
+                "../core/src/index.ts"
+            ],
+            "@conshell/state": [
+                "../state/src/index.ts"
+            ]
+        }
     },
-    "include": [
-        "src/**/*.ts"
-    ],
-    "exclude": [
-        "src/**/*.test.ts"
-    ],
     "references": [
         {
             "path": "../core"
@@ -18,5 +21,11 @@
         {
             "path": "../state"
         }
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
     ]
 }

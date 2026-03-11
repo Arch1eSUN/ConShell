@@ -1,0 +1,28 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "composite": true,
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "paths": {
+            "@conshell/core": [
+                "../core/src/index.ts"
+            ]
+        }
+    },
+    "references": [
+        {
+            "path": "../core"
+        },
+        {
+            "path": "../inference"
+        }
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
+    ]
+}

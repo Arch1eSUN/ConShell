@@ -30,11 +30,11 @@ export function MemoryPanel() {
     }
 
     const TIER_ICONS: Record<string, string> = {
-        working: '⚡',
-        episodic: '📖',
-        semantic: '🧠',
-        procedural: '⚙️',
-        relationship: '🤝',
+        working: 'W',
+        episodic: 'E',
+        semantic: 'S',
+        procedural: 'P',
+        relationship: 'R',
     };
 
     return (
@@ -46,7 +46,7 @@ export function MemoryPanel() {
                 ) : (
                     stats.map(s => (
                         <div key={s.tier} className="memory-tier-card">
-                            <span className="tier-icon">{TIER_ICONS[s.tier] ?? '📦'}</span>
+                            <span className="tier-icon">{TIER_ICONS[s.tier] ?? '*'}</span>
                             <span className="tier-name">{s.tier}</span>
                             <span className="tier-count">{s.count} entries</span>
                             <span className="tier-tokens">{(s.totalTokens ?? 0).toLocaleString()} tokens</span>
