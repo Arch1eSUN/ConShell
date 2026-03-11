@@ -3,10 +3,10 @@
 #  ConShell — Installer Script (GitHub-based)
 #
 #  Usage:
-#    bash <(curl -fsSL https://raw.githubusercontent.com/Arch1eSUN/WEB4.0/main/scripts/install.sh)
+#    git clone git@github.com:Arch1eSUN/WEB4.0.git && cd WEB4.0 && bash scripts/install.sh
 #
-#  Or clone first:
-#    git clone https://github.com/Arch1eSUN/WEB4.0.git && cd WEB4.0 && bash scripts/install.sh
+#  Or if you already have the repo:
+#    cd WEB4.0 && bash scripts/install.sh
 #
 #  What this does:
 #    1. Checks for Node.js (≥ 20), pnpm, git
@@ -18,7 +18,7 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/Arch1eSUN/WEB4.0.git"
+REPO_URL="git@github.com:Arch1eSUN/WEB4.0.git"
 INSTALL_DIR="${CONSHELL_INSTALL_DIR:-$HOME/.conshell/source}"
 
 # ── Colors ───────────────────────────────────────────────────────────────
@@ -192,7 +192,7 @@ echo -e "    ${CYAN}conshell configure${NC}     # Edit configuration"
 echo -e "    ${CYAN}conshell doctor${NC}        # Health diagnostics"
 echo ""
 echo "  Source:  ${INSTALL_DIR}"
-echo "  Update:  cd ${INSTALL_DIR} && git pull && pnpm build"
+echo "  Update:  conshell update"
 echo ""
-echo -e "  Docs: ${CYAN}https://web4.ai${NC}"
+echo -e "  Docs: ${CYAN}https://github.com/Arch1eSUN/WEB4.0${NC}"
 echo ""

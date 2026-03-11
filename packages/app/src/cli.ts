@@ -1273,7 +1273,7 @@ program
             console.error('✗ Cannot find ConShell source directory.');
             console.error('  Expected at: ~/.conshell/source/');
             console.error('  Or set CONSHELL_SOURCE_DIR environment variable.');
-            console.error('  Re-install: bash <(curl -fsSL https://raw.githubusercontent.com/Arch1eSUN/WEB4.0/main/scripts/install.sh)');
+            console.error('  Re-install: git clone git@github.com:Arch1eSUN/WEB4.0.git && cd WEB4.0 && bash scripts/install.sh');
             process.exit(1);
         }
 
