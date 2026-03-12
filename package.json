@@ -2,6 +2,7 @@
     "name": "conshell",
     "version": "0.1.0",
     "description": "ConShell — Sovereign AI Agent Runtime with Conway Automaton, x402 payments, and multi-provider inference",
+    "license": "SEE LICENSE IN LICENSE",
     "type": "module",
     "main": "packages/app/dist/index.js",
     "bin": {
@@ -11,7 +12,8 @@
         "packages/*/dist/**",
         "packages/app/CONSTITUTION.md",
         "packages/app/SOUL.md",
-        "README.md"
+        "README.md",
+        "LICENSE"
     ],
     "publishConfig": {
         "access": "public"

@@ -1,0 +1,89 @@
+# ConShell Proprietary License / ConShell 专有许可证
+
+Copyright (c) 2026 Archie Sun. All Rights Reserved.
+
+## English
+
+### 1. Ownership
+
+All intellectual property rights in and to the ConShell software, including but not limited to source code, documentation, design, architecture, and associated materials (collectively, the "Software"), are exclusively owned by Archie Sun (the "Author").
+
+### 2. Restrictions
+
+Unless expressly authorized in writing by the Author, **YOU MAY NOT**:
+
+- Copy, reproduce, duplicate, or mirror the Software in whole or in part;
+- Create derivative works based on the Software;
+- Modify, adapt, translate, reverse-engineer, decompile, or disassemble the Software;
+- Distribute, sublicense, lease, rent, loan, or otherwise transfer the Software to any third party;
+- Use the Software, its architecture, design patterns, or substantial portions of its code as the basis for any other software project;
+- Publicly display, publish, or make available the Software or any portion thereof without prior written consent.
+
+### 3. Plagiarism and Unauthorized Reproduction
+
+Any unauthorized copying, reproduction, adaptation, or creation of derivative works that substantially resembles or is based upon the Software — including but not limited to replicating its core logic, architecture, unique design patterns, or significant code sections — constitutes **plagiarism** and a violation of this license.
+
+### 4. Legal Enforcement
+
+**Violations of this license will result in legal action.** The Author reserves the right to pursue all available legal remedies, including but not limited to:
+
+- Injunctive relief (cease and desist orders);
+- Monetary damages, including actual damages, statutory damages, and disgorgement of profits;
+- Recovery of attorney's fees and litigation costs;
+- Criminal prosecution where applicable under intellectual property and copyright law.
+
+### 5. Limited Viewing Permission
+
+This Software is made available on GitHub solely for **viewing and reference purposes**. Viewing the source code does not grant any license or right to use, copy, modify, or distribute the Software.
+
+### 6. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. THE AUTHOR SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OR INABILITY TO USE THE SOFTWARE.
+
+### 7. Governing Law
+
+This license shall be governed by and construed in accordance with applicable intellectual property and copyright laws. The Author reserves the right to enforce this license in any jurisdiction.
+
+---
+
+## 中文
+
+### 1. 所有权
+
+ConShell 软件（以下简称"软件"）的所有知识产权，包括但不限于源代码、文档、设计、架构及相关材料，均归 Archie Sun（以下简称"作者"）独家所有。
+
+### 2. 限制条款
+
+未经作者书面明确授权，**您不得**：
+
+- 全部或部分复制、再制作、翻版或镜像本软件；
+- 基于本软件创作衍生作品；
+- 修改、改编、翻译、逆向工程、反编译或反汇编本软件；
+- 向任何第三方分发、再许可、出租、出借或以其他方式转让本软件；
+- 将本软件的架构、设计模式或大量代码作为任何其他软件项目的基础；
+- 未经事先书面同意，公开展示、发布或提供本软件或其任何部分。
+
+### 3. 抄袭与未授权再创作
+
+任何未经授权的复制、再制作、改编或创作与本软件实质相似、或基于本软件的衍生作品——包括但不限于复制其核心逻辑、架构、独特设计模式或重要代码片段——均构成**抄袭**，并违反本许可证。
+
+### 4. 法律追究
+
+**违反本许可证将被追究法律责任。** 作者保留采取一切可用法律手段的权利，包括但不限于：
+
+- 禁令救济（停止侵权通知）；
+- 金钱赔偿，包括实际损害赔偿、法定损害赔偿及利润追缴；
+- 律师费及诉讼费用的追偿；
+- 在知识产权及著作权法适用的情况下提起刑事诉讼。
+
+### 5. 有限查看许可
+
+本软件在 GitHub 上公开仅供**查看和参考之用**。查看源代码不授予任何使用、复制、修改或分发本软件的许可或权利。
+
+### 6. 免责声明
+
+本软件按"原样"提供，不附带任何明示或默示的保证。作者不对因使用或无法使用本软件而产生的任何索赔、损害或其他责任承担任何责任。
+
+### 7. 适用法律
+
+本许可证受适用的知识产权法和著作权法管辖并据其解释。作者保留在任何司法辖区内执行本许可证的权利。
