@@ -135,7 +135,7 @@ export function createKnowledgeReviewTask(deps: LearningTaskDeps): HeartbeatTask
                 }
 
                 // Count learning events
-                const learningEvents = topEvents.filter(e => e.classification === 'knowledge_acquisition');
+                const learningEvents = topEvents.filter((e: { classification: string | null }) => e.classification === 'knowledge_acquisition');
 
                 logger.info('Knowledge review complete', {
                     totalEvents: topEvents.length,

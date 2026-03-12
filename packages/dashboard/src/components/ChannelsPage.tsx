@@ -1,166 +1,218 @@
-import { useState, useEffect, useCallback } from 'react';
+/**
+ * ChannelsPage — Manage messaging channels and webhooks.
+ *
+ * Sections:
+ * 1. Connected Messaging Platforms (Telegram, Discord, Slack, WhatsApp, iMessage, Matrix, Email)
+ * 2. Webhook Endpoints (existing functionality)
+ * 3. Add New Channel modal
+ */
+import React, { useState, useEffect } from 'react';
 
-interface Webhook {
-    id: string;
-    name: string;
-    action: 'chat' | 'event';
-    eventName?: string;
-    enabled: boolean;
-    description?: string;
+interface ChannelInfo {
+  channelId: string;
+  type: string;
+  label: string;
+  status: 'connected' | 'disconnected' | 'error';
+  messageCount: number;
+  connectedAt?: number;
+  isolated: boolean;
 }
 
-export function ChannelsPage() {
-    const [webhooks, setWebhooks] = useState<Webhook[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [showAdd, setShowAdd] = useState(false);
-    const [form, setForm] = useState({ name: '', action: 'chat' as 'chat' | 'event', secret: '' });
+const PLATFORM_META: Record<string, { icon: string; name: string; credLabel: string; credKey: string }> = {
+  discord:   { icon: '💬', name: 'Discord',   credLabel: 'Bot Token',     credKey: 'token' },
+  telegram:  { icon: '✈️', name: 'Telegram',  credLabel: 'Bot Token',     credKey: 'token' },
+  slack:     { icon: '🔗', name: 'Slack',     credLabel: 'Bot Token',     credKey: 'token' },
+  whatsapp:  { icon: '📱', name: 'WhatsApp',  credLabel: 'Phone Number',  credKey: 'phone' },
+  imessage:  { icon: '💎', name: 'iMessage',  credLabel: 'Phone/Email',   credKey: 'phone' },
+  matrix:    { icon: '🌐', name: 'Matrix',    credLabel: 'Access Token',  credKey: 'token' },
+  email:     { icon: '📧', name: 'Email',     credLabel: 'Email Address', credKey: 'email' },
+  webhook:   { icon: '🔗', name: 'Webhook',   credLabel: 'URL',           credKey: 'url' },
+};
 
-    const fetchWebhooks = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await fetch('/api/webhooks');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            setWebhooks(data.webhooks ?? []);
-        } catch {
-            setWebhooks([]);
-        }
-        setLoading(false);
-    }, []);
+const STATUS_COLORS: Record<string, string> = {
+  connected: '#00b894',
+  disconnected: '#636e72',
+  error: '#d63031',
+};
 
-    useEffect(() => { fetchWebhooks(); }, [fetchWebhooks]);
+export default function ChannelsPage() {
+  const [channels, setChannels] = useState<ChannelInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [addType, setAddType] = useState('telegram');
+  const [addLabel, setAddLabel] = useState('');
+  const [addCred, setAddCred] = useState('');
+  const [addChatId, setAddChatId] = useState('');
 
-    const addWebhook = async () => {
-        if (!form.name) return;
-        try {
-            const res = await fetch('/api/webhooks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: form.name,
-                    action: form.action,
-                    secret: form.secret || undefined,
-                }),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            setForm({ name: '', action: 'chat', secret: '' });
-            setShowAdd(false);
-            fetchWebhooks();
-        } catch (err) {
-            console.error('Failed to create webhook:', err);
-        }
-    };
+  useEffect(() => {
+    loadChannels();
+  }, []);
 
-    const deleteWebhook = async (id: string) => {
-        try {
-            await fetch(`/api/webhooks/${id}`, { method: 'DELETE' });
-            fetchWebhooks();
-        } catch (err) {
-            console.error('Failed to delete webhook:', err);
-        }
-    };
+  async function loadChannels() {
+    try {
+      const resp = await fetch('/api/channels');
+      if (resp.ok) {
+        const data = await resp.json();
+        setChannels(data.channels ?? []);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    return (
-        <div className="page-channels">
-            <header className="page-header">
-                <h2 className="page-title">Channels</h2>
-                <p className="page-subtitle">Webhook endpoints for external integrations</p>
-            </header>
+  async function addChannel() {
+    const meta = PLATFORM_META[addType];
+    if (!meta) return;
 
-            <div className="settings-card">
-                <div className="settings-card-header">
-                    <div>
-                        <div className="settings-card-title">Webhooks</div>
-                        <div className="settings-card-subtitle">{webhooks.length} webhooks configured</div>
+    try {
+      const resp = await fetch('/api/channels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: addType,
+          label: addLabel || `${meta.name} Channel`,
+          credentials: {
+            [meta.credKey]: addCred,
+            ...(addChatId ? { chat_id: addChatId } : {}),
+          },
+        }),
+      });
+      if (resp.ok) {
+        setShowAdd(false);
+        setAddLabel('');
+        setAddCred('');
+        setAddChatId('');
+        loadChannels();
+      }
+    } catch (err) {
+      console.error('Add channel failed:', err);
+    }
+  }
+
+  async function removeChannel(channelId: string) {
+    if (!confirm('Remove this channel?')) return;
+    try {
+      await fetch(`/api/channels/${channelId}`, { method: 'DELETE' });
+      loadChannels();
+    } catch (err) {
+      console.error('Remove channel failed:', err);
+    }
+  }
+
+  const messagingChannels = channels.filter(ch => ch.type !== 'webhook');
+  const webhookChannels = channels.filter(ch => ch.type === 'webhook');
+
+  return (
+    <div className="page-container">
+      <div className="page-header">
+        <h1>📡 Channels</h1>
+        <button className="btn-accent" onClick={() => setShowAdd(true)}>+ Add Channel</button>
+      </div>
+
+      {loading ? (
+        <div className="loading-state">Loading channels…</div>
+      ) : (
+        <>
+          {/* Messaging Platforms */}
+          <section className="section-card">
+            <h2>Messaging Platforms</h2>
+            {messagingChannels.length === 0 ? (
+              <p className="empty-state">No messaging channels connected. Click "Add Channel" to get started.</p>
+            ) : (
+              <div className="channel-list">
+                {messagingChannels.map(ch => {
+                  const meta = PLATFORM_META[ch.type] ?? { icon: '❓', name: ch.type };
+                  return (
+                    <div key={ch.channelId} className="channel-row">
+                      <span className="ch-icon">{meta.icon}</span>
+                      <div className="ch-info">
+                        <strong>{ch.label}</strong>
+                        <small>{meta.name} · {ch.messageCount} messages</small>
+                      </div>
+                      <span className="ch-status" style={{ color: STATUS_COLORS[ch.status] ?? '#636e72' }}>
+                        ● {ch.status}
+                      </span>
+                      {ch.isolated && <span className="ch-badge">isolated</span>}
+                      <button className="btn-ghost" onClick={() => removeChannel(ch.channelId)}>✕</button>
                     </div>
-                    <button
-                        className="settings-btn settings-btn-primary"
-                        onClick={() => setShowAdd(!showAdd)}
-                    >
-                        {showAdd ? 'Cancel' : '+ Add Webhook'}
-                    </button>
-                </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
 
-                {showAdd && (
-                    <div style={{ marginBottom: '1rem', padding: '1rem', background: 'var(--surface, rgba(255,255,255,0.5))', borderRadius: '0.375rem' }}>
-                        <div className="settings-input-row">
-                            <div className="settings-form-group">
-                                <label className="settings-label">Webhook Name</label>
-                                <input
-                                    className="settings-input"
-                                    placeholder="e.g., github-deploy"
-                                    value={form.name}
-                                    onChange={e => setForm({ ...form, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="settings-form-group">
-                                <label className="settings-label">Action</label>
-                                <select
-                                    className="settings-select"
-                                    value={form.action}
-                                    onChange={e => setForm({ ...form, action: e.target.value as 'chat' | 'event' })}
-                                >
-                                    <option value="chat">Chat (send to agent)</option>
-                                    <option value="event">Event (broadcast)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="settings-form-group">
-                            <label className="settings-label">Secret (optional, for signature verification)</label>
-                            <input
-                                className="settings-input"
-                                type="password"
-                                placeholder="HMAC-SHA256 secret"
-                                value={form.secret}
-                                onChange={e => setForm({ ...form, secret: e.target.value })}
-                            />
-                        </div>
-                        <div style={{ marginTop: '0.75rem' }}>
-                            <button
-                                className="settings-btn settings-btn-primary"
-                                disabled={!form.name}
-                                onClick={addWebhook}
-                            >
-                                Create Webhook
-                            </button>
-                        </div>
+          {/* Webhooks */}
+          <section className="section-card">
+            <h2>Webhook Endpoints</h2>
+            {webhookChannels.length === 0 ? (
+              <p className="empty-state">No webhooks configured.</p>
+            ) : (
+              <div className="channel-list">
+                {webhookChannels.map(ch => (
+                  <div key={ch.channelId} className="channel-row">
+                    <span className="ch-icon">🔗</span>
+                    <div className="ch-info">
+                      <strong>{ch.label}</strong>
+                      <small>{ch.messageCount} messages</small>
                     </div>
-                )}
+                    <span className="ch-status" style={{ color: STATUS_COLORS[ch.status] ?? '#636e72' }}>
+                      ● {ch.status}
+                    </span>
+                    <button className="btn-ghost" onClick={() => removeChannel(ch.channelId)}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
 
-                {loading ? (
-                    <div className="settings-empty">Loading webhooks...</div>
-                ) : webhooks.length === 0 ? (
-                    <div className="settings-empty">
-                        No webhooks configured. Create one to receive external triggers via HTTP POST.
-                    </div>
-                ) : (
-                    <div className="provider-list">
-                        {webhooks.map(wh => (
-                            <div key={wh.id} className="provider-item">
-                                <div className="provider-item-info">
-                                    <span className={`provider-dot ${wh.enabled ? 'enabled' : 'disabled'}`} />
-                                    <div>
-                                        <div className="provider-item-name">{wh.name}</div>
-                                        <div className="provider-item-type">
-                                            {wh.action} · ID: {wh.id}
-                                            {wh.eventName ? ` · Event: ${wh.eventName}` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="provider-item-actions">
-                                    <button
-                                        className="provider-action-btn"
-                                        title="Delete"
-                                        onClick={() => deleteWebhook(wh.id)}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+      {/* Add Channel Modal */}
+      {showAdd && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowAdd(false)}>
+          <div className="modal-card">
+            <h3>Add Channel</h3>
+
+            <div className="form-group">
+              <label>Platform</label>
+              <div className="platform-picker">
+                {Object.entries(PLATFORM_META).map(([key, meta]) => (
+                  <button key={key} className={`platform-btn ${addType === key ? 'selected' : ''}`}
+                    onClick={() => setAddType(key)}>
+                    <span>{meta.icon}</span>
+                    <span>{meta.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            <div className="form-group">
+              <label>Label (optional)</label>
+              <input type="text" value={addLabel} onChange={e => setAddLabel(e.target.value)}
+                placeholder={`${PLATFORM_META[addType]?.name ?? ''} Channel`} />
+            </div>
+
+            <div className="form-group">
+              <label>{PLATFORM_META[addType]?.credLabel ?? 'Credential'}</label>
+              <input type="text" value={addCred} onChange={e => setAddCred(e.target.value)} />
+            </div>
+
+            {['telegram', 'discord', 'slack'].includes(addType) && (
+              <div className="form-group">
+                <label>Chat / Channel ID</label>
+                <input type="text" value={addChatId} onChange={e => setAddChatId(e.target.value)} />
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowAdd(false)}>Cancel</button>
+              <button className="btn-primary" onClick={addChannel} disabled={!addCred}>Add</button>
+            </div>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 }

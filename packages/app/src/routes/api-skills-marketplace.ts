@@ -139,6 +139,20 @@ export const registerSkillsMarketplaceRoutes: RouteRegistrar = (router, { agent 
     const home = process.env['HOME'] || process.env['USERPROFILE'] || '.';
     const skillsDir = resolve(home, '.conshell', 'workspace', 'skills');
 
+    // Search skills (alias used by PluginsPage frontend)
+    router.get('/api/skills/search', (req: Request, res: Response) => {
+        const keyword = (req.query.keyword as string | undefined)?.toLowerCase();
+        if (!keyword) {
+            res.json({ entries: COMMUNITY_REGISTRY, count: COMMUNITY_REGISTRY.length });
+            return;
+        }
+        const results = COMMUNITY_REGISTRY.filter(
+            r => r.name.includes(keyword) || r.description.toLowerCase().includes(keyword)
+                || r.tags.some(t => t.includes(keyword)),
+        );
+        res.json({ entries: results, count: results.length });
+    });
+
     // Browse marketplace
     router.get('/api/skills/marketplace', (req: Request, res: Response) => {
         const query = (req.query.q as string | undefined)?.toLowerCase();

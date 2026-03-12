@@ -1,0 +1,28 @@
+{
+    "name": "@conshell/openclaw-bridge",
+    "version": "0.0.1",
+    "description": "OpenClaw integration bridge — ClawHub skills, CDP browser, channel routing",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "npx tsc --build",
+        "test": "npx vitest run"
+    },
+    "dependencies": {
+        "@conshell/core": "workspace:*",
+        "@conshell/skills": "workspace:*"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3",
+        "vitest": "^1.2.2"
+    },
+    "peerDependencies": {
+        "chrome-remote-interface": ">=0.33.0",
+        "playwright": ">=1.40.0"
+    },
+    "peerDependenciesMeta": {
+        "chrome-remote-interface": { "optional": true },
+        "playwright": { "optional": true }
+    }
+}

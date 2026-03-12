@@ -20,7 +20,11 @@ import { BackupPage } from './components/BackupPage';
 import { HealthPage } from './components/HealthPage';
 import { MetricsPage } from './components/MetricsPage';
 import { OnboardPage } from './components/OnboardPage';
+import { TasksPage } from './components/TasksPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { CanvasPage } from './components/CanvasPage';
+import { VoicePage } from './components/VoicePage';
+import { MediaPage } from './components/MediaPage';
 import { useWebSocket } from './lib/useWebSocket';
 import { useAgentStatus, useLogs, useSoul } from './lib/hooks';
 import './App.css';
@@ -143,6 +147,7 @@ export default function App() {
                         </div>
                     )}
 
+                    {activeTab === 'tasks' && <TasksPage />}
                     {activeTab === 'identity' && <IdentityPage />}
                     {activeTab === 'social' && <SocialPage />}
                     {activeTab === 'plugins' && <PluginsPage />}
@@ -151,6 +156,9 @@ export default function App() {
                     {activeTab === 'health' && <HealthPage />}
                     {activeTab === 'metrics' && <MetricsPage />}
                     {activeTab === 'onboard' && <OnboardPage />}
+                    {activeTab === 'canvas' && <CanvasPage />}
+                    {activeTab === 'voice' && <VoicePage />}
+                    {activeTab === 'media' && <MediaPage />}
 
                     {activeTab === 'settings' && (
                         <SettingsPage />

@@ -1,369 +1,492 @@
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+/**
+ * OnboardPage — 7-step onboarding wizard for Conway × OpenClaw.
+ *
+ * Steps:
+ * 1. Agent Name + Genesis Prompt
+ * 2. Inference Engine (Ollama / CLIProxy / Direct API / Skip)
+ * 3. Security & Constitution
+ * 4. Wallet (optional)
+ * 5. Channels (7 platforms)
+ * 6. Skills & ClawHub
+ * 7. Browser Automation
+ */
+import React, { useState, useCallback } from 'react';
+import './OnboardPage.css';
 
-type Step = 'name' | 'inference' | 'security' | 'wallet' | 'channels' | 'complete';
+// ── Types ──────────────────────────────────────────────────────────────
 
-const STEPS: { id: Step; label: string; optional?: boolean }[] = [
-    { id: 'name', label: 'Agent Name' },
-    { id: 'inference', label: 'Inference' },
-    { id: 'security', label: 'Security' },
-    { id: 'wallet', label: 'Wallet', optional: true },
-    { id: 'channels', label: 'Channels', optional: true },
-];
-
-export function OnboardPage() {
-    const [step, setStep] = useState<Step>('name');
-    const [data, setData] = useState({
-        agentName: '',
-        genesisPrompt: '',
-        inferenceMode: 'ollama' as 'ollama' | 'cloud' | 'api',
-        securityLevel: 'standard' as 'standard' | 'strict' | 'paranoid',
-        walletEnabled: false,
-        channels: [] as string[],
-    });
-
-    const currentIdx = STEPS.findIndex(s => s.id === step);
-    const progress = step === 'complete' ? 100 : Math.round((currentIdx / STEPS.length) * 100);
-
-    const canNext = (): boolean => {
-        if (step === 'name') return data.agentName.length > 0;
-        return true;
-    };
-
-    const next = () => {
-        if (currentIdx < STEPS.length - 1) {
-            setStep(STEPS[currentIdx + 1]!.id);
-        } else {
-            setStep('complete');
-        }
-    };
-
-    const prev = () => {
-        if (currentIdx > 0) setStep(STEPS[currentIdx - 1]!.id);
-    };
-
-    if (step === 'complete') {
-        return (
-            <div className="page-onboard">
-                <header className="page-header">
-                    <h2 className="page-title">Setup Complete</h2>
-                    <p className="page-subtitle">Your agent "{data.agentName}" is ready</p>
-                </header>
-
-                <div className="settings-card" style={{ textAlign: 'center', padding: '3rem' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '1rem', fontWeight: 600 }}>✓</div>
-                    <div className="settings-card-title" style={{ fontSize: '1.5rem' }}>Agent Configured</div>
-                    <div className="settings-card-subtitle" style={{ marginTop: '0.5rem' }}>
-                        Mode: {data.inferenceMode} · Security: {data.securityLevel}
-                        {data.walletEnabled && ' · Wallet: Enabled'}
-                        {data.channels.length > 0 && ` · Channels: ${data.channels.join(', ')}`}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="page-onboard">
-            <header className="page-header">
-                <h2 className="page-title">Onboarding</h2>
-                <p className="page-subtitle">
-                    Step {currentIdx + 1} of {STEPS.length} — {progress}% complete
-                </p>
-            </header>
-
-            {/* Progress bar */}
-            <div style={{
-                height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px',
-                marginBottom: '1.5rem', overflow: 'hidden',
-            }}>
-                <div style={{
-                    height: '100%', width: `${progress}%`,
-                    background: 'var(--color-accent, #6366f1)',
-                    transition: 'width 0.3s ease',
-                }} />
-            </div>
-
-            {/* Step indicators */}
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                {STEPS.map((s, i) => (
-                    <button
-                        key={s.id}
-                        className={`settings-tab-btn ${step === s.id ? 'active' : ''}`}
-                        onClick={() => i <= currentIdx && setStep(s.id)}
-                        disabled={i > currentIdx}
-                        style={{ opacity: i > currentIdx ? 0.4 : 1 }}
-                    >
-                        {s.label} {s.optional ? '(opt)' : ''}
-                    </button>
-                ))}
-            </div>
-
-            <div className="settings-card">
-                {step === 'name' && (
-                    <>
-                        <div className="settings-card-title">Name Your Agent</div>
-                        <div className="settings-card-subtitle">Choose a name and describe its purpose</div>
-                        <div style={{ marginTop: '1rem', display: 'grid', gap: '0.75rem' }}>
-                            <div className="settings-form-group">
-                                <label className="settings-label">Agent Name *</label>
-                                <input
-                                    className="settings-input"
-                                    placeholder="e.g., ConShell-Alpha"
-                                    value={data.agentName}
-                                    onChange={e => setData({ ...data, agentName: e.target.value })}
-                                    maxLength={64}
-                                />
-                            </div>
-                            <div className="settings-form-group">
-                                <label className="settings-label">Genesis Prompt</label>
-                                <textarea
-                                    className="settings-input"
-                                    rows={4}
-                                    placeholder="Describe your agent's initial purpose and personality..."
-                                    value={data.genesisPrompt}
-                                    onChange={e => setData({ ...data, genesisPrompt: e.target.value })}
-                                    style={{ resize: 'vertical' }}
-                                />
-                            </div>
-                        </div>
-                    </>
-                )}
-
-                {step === 'inference' && (
-                    <>
-                        <div className="settings-card-title">Choose Inference Mode</div>
-                        <div className="settings-card-subtitle">How will your agent think?</div>
-                        <div style={{ marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
-                            {([
-                                { value: 'ollama', label: 'Local (Ollama)', desc: 'Free, private, runs on your machine' },
-                                { value: 'cloud', label: 'ConShell Cloud', desc: 'Powerful models via ConShell Terminal MCP' },
-                                { value: 'api', label: 'Direct API', desc: 'OpenAI/Anthropic/etc with your own keys' },
-                            ] as const).map(opt => (
-                                <label
-                                    key={opt.value}
-                                    className={`provider-item ${data.inferenceMode === opt.value ? 'selected' : ''}`}
-                                    style={{ cursor: 'pointer', border: data.inferenceMode === opt.value ? '1px solid var(--color-accent, #6366f1)' : '1px solid transparent' }}
-                                >
-                                    <div className="provider-item-info">
-                                        <input
-                                            type="radio"
-                                            name="inference"
-                                            checked={data.inferenceMode === opt.value}
-                                            onChange={() => setData({ ...data, inferenceMode: opt.value })}
-                                            style={{ marginRight: '0.75rem' }}
-                                        />
-                                        <div>
-                                            <div className="provider-item-name">{opt.label}</div>
-                                            <div className="provider-item-type">{opt.desc}</div>
-                                        </div>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-
-                        {/* CLIProxy Auto-Detect Banner */}
-                        {(data.inferenceMode === 'cloud' || data.inferenceMode === 'api') && (
-                            <CliProxyDetectBanner />
-                        )}
-                    </>
-                )}
-
-                {step === 'security' && (
-                    <>
-                        <div className="settings-card-title">Security Level</div>
-                        <div className="settings-card-subtitle">Configure how strict the agent's safety system should be</div>
-                        <div style={{ marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
-                            {([
-                                { value: 'standard', label: 'Standard', desc: 'Constitution + injection defense + path protection' },
-                                { value: 'strict', label: 'Strict', desc: 'Standard + command whitelist + financial limits' },
-                                { value: 'paranoid', label: 'Paranoid', desc: 'Strict + all tool calls require confirmation' },
-                            ] as const).map(opt => (
-                                <label
-                                    key={opt.value}
-                                    className={`provider-item ${data.securityLevel === opt.value ? 'selected' : ''}`}
-                                    style={{ cursor: 'pointer', border: data.securityLevel === opt.value ? '1px solid var(--color-accent, #6366f1)' : '1px solid transparent' }}
-                                >
-                                    <div className="provider-item-info">
-                                        <input
-                                            type="radio"
-                                            name="security"
-                                            checked={data.securityLevel === opt.value}
-                                            onChange={() => setData({ ...data, securityLevel: opt.value })}
-                                            style={{ marginRight: '0.75rem' }}
-                                        />
-                                        <div>
-                                            <div className="provider-item-name">{opt.label}</div>
-                                            <div className="provider-item-type">{opt.desc}</div>
-                                        </div>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {step === 'wallet' && (
-                    <>
-                        <div className="settings-card-title">Ethereum Wallet (Optional)</div>
-                        <div className="settings-card-subtitle">Enable on-chain identity and x402 payments</div>
-                        <div style={{ marginTop: '1rem' }}>
-                            <label className="provider-item" style={{ cursor: 'pointer' }}>
-                                <div className="provider-item-info">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.walletEnabled}
-                                        onChange={e => setData({ ...data, walletEnabled: e.target.checked })}
-                                        style={{ marginRight: '0.75rem' }}
-                                    />
-                                    <div>
-                                        <div className="provider-item-name">Generate Wallet</div>
-                                        <div className="provider-item-type">
-                                            Creates an Ethereum keypair for ERC-8004 AgentCard + USDC payments
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </>
-                )}
-
-                {step === 'channels' && (
-                    <>
-                        <div className="settings-card-title">Messaging Channels (Optional)</div>
-                        <div className="settings-card-subtitle">Connect your agent to messaging platforms</div>
-                        <div style={{ marginTop: '1rem', display: 'grid', gap: '0.5rem' }}>
-                            {['telegram', 'discord', 'slack'].map(ch => (
-                                <label key={ch} className="provider-item" style={{ cursor: 'pointer' }}>
-                                    <div className="provider-item-info">
-                                        <input
-                                            type="checkbox"
-                                            checked={data.channels.includes(ch)}
-                                            onChange={e => {
-                                                const next = e.target.checked
-                                                    ? [...data.channels, ch]
-                                                    : data.channels.filter(c => c !== ch);
-                                                setData({ ...data, channels: next });
-                                            }}
-                                            style={{ marginRight: '0.75rem' }}
-                                        />
-                                        <div className="provider-item-name" style={{ textTransform: 'capitalize' }}>
-                                            {ch}
-                                        </div>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
-
-            {/* Navigation */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-                <button
-                    className="settings-btn settings-btn-secondary"
-                    onClick={prev}
-                    disabled={currentIdx === 0}
-                >
-                    ← Back
-                </button>
-                <button
-                    className="settings-btn settings-btn-primary"
-                    onClick={next}
-                    disabled={!canNext()}
-                >
-                    {currentIdx === STEPS.length - 1 ? '✓ Finish' : 'Next →'}
-                </button>
-            </div>
-        </div>
-    );
+interface OnboardFormData {
+  agentName: string;
+  genesisPrompt: string;
+  inferenceMode: 'ollama' | 'cliproxy' | 'direct-api' | 'conway-cloud' | 'skip';
+  model: string;
+  ollamaUrl: string;
+  apiProvider: string;
+  apiKey: string;
+  proxyBaseUrl: string;
+  proxyApiKey: string;
+  proxyEnabled: boolean;
+  securityLevel: 'sandbox' | 'standard' | 'autonomous' | 'godmode';
+  constitutionAccepted: boolean;
+  walletEnabled: boolean;
+  channels: string[];
+  channelCredentials: Record<string, Record<string, string>>;
+  skillsDir: string;
+  clawHubEnabled: boolean;
+  clawHubToken: string;
+  browserProvider: 'playwright' | 'cdp' | 'none';
+  browserHeadless: boolean;
 }
 
-// ── CLIProxy Auto-Detect Banner ─────────────────────────────────────
+// ── Step Definitions ───────────────────────────────────────────────────
 
-function CliProxyDetectBanner() {
-    const [status, setStatus] = useState<'idle' | 'detecting' | 'found' | 'notfound' | 'registered'>('idle');
-    const [proxyInfo, setProxyInfo] = useState<{ endpoint: string; modelCount: number } | null>(null);
+const STEPS = [
+  { key: 'identity', icon: '🧬', label: 'Identity' },
+  { key: 'inference', icon: '🧠', label: 'Inference' },
+  { key: 'security', icon: '🛡️', label: 'Security' },
+  { key: 'wallet', icon: '💳', label: 'Wallet' },
+  { key: 'channels', icon: '📡', label: 'Channels' },
+  { key: 'skills', icon: '🔧', label: 'Skills' },
+  { key: 'browser', icon: '🌐', label: 'Browser' },
+] as const;
 
-    const detect = useCallback(async () => {
-        setStatus('detecting');
-        try {
-            const data = await api.cliproxyDetect();
-            if (data.available && data.endpoint) {
-                setProxyInfo({ endpoint: data.endpoint, modelCount: data.models?.length ?? 0 });
-                setStatus('found');
-            } else {
-                setStatus('notfound');
-            }
-        } catch {
-            setStatus('notfound');
-        }
-    }, []);
+// ── Channel Definitions ────────────────────────────────────────────────
 
-    useEffect(() => { detect(); }, [detect]);
+const CHANNEL_DEFS = [
+  { id: 'discord', icon: '💬', name: 'Discord', credLabel: 'Bot Token', credKey: 'token' },
+  { id: 'telegram', icon: '✈️', name: 'Telegram', credLabel: 'Bot Token', credKey: 'token' },
+  { id: 'slack', icon: '🔗', name: 'Slack', credLabel: 'Bot Token', credKey: 'token' },
+  { id: 'whatsapp', icon: '📱', name: 'WhatsApp', credLabel: 'Phone Number', credKey: 'phone' },
+  { id: 'imessage', icon: '💎', name: 'iMessage', credLabel: 'Phone/Email', credKey: 'phone' },
+  { id: 'matrix', icon: '🌐', name: 'Matrix', credLabel: 'Access Token', credKey: 'token' },
+  { id: 'email', icon: '📧', name: 'Email', credLabel: 'Email Address', credKey: 'email' },
+] as const;
 
-    const registerProxy = async () => {
-        if (!proxyInfo) return;
-        try {
-            await fetch('/api/settings/providers', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: 'cliproxyapi',
-                    authType: 'proxy',
-                    endpoint: proxyInfo.endpoint,
-                    apiKey: '',
-                    priority: 10,
-                }),
-            });
-            setStatus('registered');
-        } catch { /* ignore */ }
-    };
+// ── Provider Definitions ───────────────────────────────────────────────
 
+const PROVIDER_DEFS = [
+  { id: 'openai', icon: '🟢', name: 'OpenAI', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] },
+  { id: 'anthropic', icon: '🟣', name: 'Anthropic', models: ['claude-sonnet-4-20250514', 'claude-3-5-haiku-20241022'] },
+  { id: 'google', icon: '🔵', name: 'Google', models: ['gemini-2.5-pro', 'gemini-2.5-flash'] },
+  { id: 'deepseek', icon: '🟡', name: 'DeepSeek', models: ['deepseek-chat', 'deepseek-reasoner'] },
+  { id: 'openrouter', icon: '🌐', name: 'OpenRouter', models: ['auto'] },
+] as const;
+
+// ── Initial State ──────────────────────────────────────────────────────
+
+function initialFormData(): OnboardFormData {
+  return {
+    agentName: 'conshell-agent',
+    genesisPrompt: 'Autonomous sovereign AI agent',
+    inferenceMode: 'ollama',
+    model: 'llama3.2',
+    ollamaUrl: 'http://localhost:11434',
+    apiProvider: '',
+    apiKey: '',
+    proxyBaseUrl: 'http://localhost:4200/v1',
+    proxyApiKey: '',
+    proxyEnabled: true,
+    securityLevel: 'standard',
+    constitutionAccepted: true,
+    walletEnabled: false,
+    channels: [],
+    channelCredentials: {},
+    skillsDir: '~/.conshell/skills',
+    clawHubEnabled: false,
+    clawHubToken: '',
+    browserProvider: 'playwright',
+    browserHeadless: true,
+  };
+}
+
+// ── Component ──────────────────────────────────────────────────────────
+
+export default function OnboardPage() {
+  const [step, setStep] = useState(0);
+  const [data, setData] = useState<OnboardFormData>(initialFormData);
+  const [saving, setSaving] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const update = useCallback(<K extends keyof OnboardFormData>(key: K, value: OnboardFormData[K]) => {
+    setData(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const toggleChannel = useCallback((chId: string) => {
+    setData(prev => {
+      const channels = prev.channels.includes(chId)
+        ? prev.channels.filter(c => c !== chId)
+        : [...prev.channels, chId];
+      return { ...prev, channels };
+    });
+  }, []);
+
+  const setChannelCred = useCallback((chId: string, key: string, value: string) => {
+    setData(prev => ({
+      ...prev,
+      channelCredentials: {
+        ...prev.channelCredentials,
+        [chId]: { ...prev.channelCredentials[chId], [key]: value },
+      },
+    }));
+  }, []);
+
+  const next = () => setStep(s => Math.min(s + 1, STEPS.length - 1));
+  const prev = () => setStep(s => Math.max(s - 1, 0));
+  const isLast = step === STEPS.length - 1;
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const resp = await fetch('/api/onboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      setDone(true);
+    } catch (err) {
+      console.error('Onboard save failed:', err);
+      alert('Failed to save configuration. Check console for details.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (done) {
     return (
-        <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            borderRadius: '8px',
-            background: status === 'found' ? 'rgba(0,255,136,0.08)' : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${
-                status === 'found' ? 'rgba(0,255,136,0.2)' :
-                status === 'registered' ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.1)'
-            }`,
-        }}>
-            <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem' }}>
-                CLIProxyAPI Auto-Detect
-            </div>
-            {status === 'idle' || status === 'detecting' ? (
-                <div style={{ color: '#888', fontSize: '0.8rem' }}>Scanning local ports...</div>
-            ) : status === 'found' && proxyInfo ? (
-                <div style={{ fontSize: '0.8rem' }}>
-                    <span style={{ color: '#00ff88' }}>Found at {proxyInfo.endpoint}</span>
-                    <span style={{ color: '#888' }}> — {proxyInfo.modelCount} models available</span>
-                    <button
-                        className="settings-btn settings-btn-primary"
-                        style={{ marginLeft: '1rem', fontSize: '0.75rem', padding: '0.3rem 0.8rem' }}
-                        onClick={registerProxy}
-                    >
-                        Register as Provider
-                    </button>
-                </div>
-            ) : status === 'registered' ? (
-                <div style={{ color: '#6366f1', fontSize: '0.8rem' }}>
-                    Registered. Models will be available after setup.
-                </div>
-            ) : (
-                <div style={{ fontSize: '0.8rem' }}>
-                    <span style={{ color: '#888' }}>No local CLIProxyAPI detected.</span>
-                    <button
-                        className="settings-btn"
-                        style={{ marginLeft: '0.5rem', fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
-                        onClick={detect}
-                    >
-                        Retry
-                    </button>
-                </div>
-            )}
+      <div className="onboard-page">
+        <div className="onboard-card onboard-done">
+          <div className="done-icon">🎉</div>
+          <h2>ConShell is Ready!</h2>
+          <div className="done-summary">
+            <SummaryRow label="Agent" value={data.agentName} />
+            <SummaryRow label="Engine" value={`${data.inferenceMode} / ${data.model}`} />
+            <SummaryRow label="CLIProxy" value={data.proxyEnabled ? '✓ enabled' : 'disabled'} />
+            <SummaryRow label="Security" value={data.securityLevel} />
+            <SummaryRow label="Wallet" value={data.walletEnabled ? '✓ enabled' : 'disabled'} />
+            <SummaryRow label="Channels" value={data.channels.length > 0 ? data.channels.join(', ') : 'none'} />
+            <SummaryRow label="Skills" value={data.clawHubEnabled ? `ClawHub + ${data.skillsDir}` : data.skillsDir} />
+            <SummaryRow label="Browser" value={data.browserProvider === 'none' ? 'disabled' : `${data.browserProvider} (${data.browserHeadless ? 'headless' : 'headed'})`} />
+          </div>
+          <button className="btn-primary" onClick={() => window.location.href = '/'}>
+            Open Dashboard →
+          </button>
         </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="onboard-page">
+      <div className="onboard-card">
+        {/* Progress Bar */}
+        <div className="onboard-progress">
+          {STEPS.map((s, i) => (
+            <div
+              key={s.key}
+              className={`progress-step ${i === step ? 'active' : i < step ? 'done' : ''}`}
+              onClick={() => i <= step && setStep(i)}
+              title={s.label}
+            >
+              <span className="step-icon">{i < step ? '✓' : s.icon}</span>
+              <span className="step-label">{s.label}</span>
+            </div>
+          ))}
+          <div className="progress-bar">
+            <div className="progress-bar-fill" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="onboard-step-content">
+          {step === 0 && <StepIdentity data={data} update={update} />}
+          {step === 1 && <StepInference data={data} update={update} />}
+          {step === 2 && <StepSecurity data={data} update={update} />}
+          {step === 3 && <StepWallet data={data} update={update} />}
+          {step === 4 && <StepChannels data={data} toggleChannel={toggleChannel} setChannelCred={setChannelCred} />}
+          {step === 5 && <StepSkills data={data} update={update} />}
+          {step === 6 && <StepBrowser data={data} update={update} />}
+        </div>
+
+        {/* Navigation */}
+        <div className="onboard-nav">
+          <button className="btn-secondary" onClick={prev} disabled={step === 0}>
+            ← Back
+          </button>
+          {isLast ? (
+            <button className="btn-primary" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving…' : '✨ Complete Setup'}
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={next}>
+              Next →
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Step Components ────────────────────────────────────────────────────
+
+function StepIdentity({ data, update }: { data: OnboardFormData; update: <K extends keyof OnboardFormData>(k: K, v: OnboardFormData[K]) => void }) {
+  return (
+    <div className="step-section">
+      <h2>🧬 Agent Identity</h2>
+      <p className="step-desc">Name your agent and define its purpose.</p>
+      <div className="form-group">
+        <label>Agent Name</label>
+        <input type="text" value={data.agentName} onChange={e => update('agentName', e.target.value)} placeholder="conshell-agent" />
+      </div>
+      <div className="form-group">
+        <label>Genesis Prompt</label>
+        <textarea value={data.genesisPrompt} onChange={e => update('genesisPrompt', e.target.value)} rows={3} placeholder="What should this agent do?" />
+      </div>
+    </div>
+  );
+}
+
+function StepInference({ data, update }: { data: OnboardFormData; update: <K extends keyof OnboardFormData>(k: K, v: OnboardFormData[K]) => void }) {
+  return (
+    <div className="step-section">
+      <h2>🧠 Inference Engine</h2>
+      <p className="step-desc">Choose how your agent thinks.</p>
+
+      <div className="radio-cards">
+        {([
+          { v: 'ollama', icon: '🏠', title: 'Ollama', desc: 'Local, private, free' },
+          { v: 'cliproxy', icon: '🔌', title: 'CLIProxy', desc: 'Connect via proxy server' },
+          { v: 'direct-api', icon: '🔑', title: 'Direct API', desc: 'OpenAI / Anthropic / Google' },
+          { v: 'conway-cloud', icon: '☁️', title: 'Conway Cloud', desc: 'Remote sandbox' },
+          { v: 'skip', icon: '⏭️', title: 'Skip', desc: 'Configure later' },
+        ] as const).map(opt => (
+          <div key={opt.v} className={`radio-card ${data.inferenceMode === opt.v ? 'selected' : ''}`}
+            onClick={() => update('inferenceMode', opt.v)}>
+            <span className="rc-icon">{opt.icon}</span>
+            <div><strong>{opt.title}</strong><br /><small>{opt.desc}</small></div>
+          </div>
+        ))}
+      </div>
+
+      {data.inferenceMode === 'ollama' && (
+        <div className="form-group">
+          <label>Ollama URL</label>
+          <input type="text" value={data.ollamaUrl} onChange={e => update('ollamaUrl', e.target.value)} />
+          <label>Model</label>
+          <input type="text" value={data.model} onChange={e => update('model', e.target.value)} placeholder="llama3.2" />
+        </div>
+      )}
+
+      {data.inferenceMode === 'cliproxy' && (
+        <div className="form-group">
+          <label>Proxy Base URL</label>
+          <input type="text" value={data.proxyBaseUrl} onChange={e => update('proxyBaseUrl', e.target.value)} />
+          <label>Proxy API Key</label>
+          <input type="password" value={data.proxyApiKey} onChange={e => update('proxyApiKey', e.target.value)} />
+          <label>Model</label>
+          <input type="text" value={data.model} onChange={e => update('model', e.target.value)} />
+        </div>
+      )}
+
+      {data.inferenceMode === 'direct-api' && (
+        <>
+          <div className="radio-cards compact">
+            {PROVIDER_DEFS.map(p => (
+              <div key={p.id} className={`radio-card ${data.apiProvider === p.id ? 'selected' : ''}`}
+                onClick={() => { update('apiProvider', p.id); update('model', p.models[0]); }}>
+                <span className="rc-icon">{p.icon}</span>
+                <span>{p.name}</span>
+              </div>
+            ))}
+          </div>
+          <div className="form-group">
+            <label>API Key</label>
+            <input type="password" value={data.apiKey} onChange={e => update('apiKey', e.target.value)} />
+            <label>Model</label>
+            <select value={data.model} onChange={e => update('model', e.target.value)}>
+              {PROVIDER_DEFS.find(p => p.id === data.apiProvider)?.models.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
+
+      {/* CLIProxy toggle for non-proxy modes */}
+      {data.inferenceMode !== 'cliproxy' && data.inferenceMode !== 'skip' && (
+        <div className="form-group toggle-row">
+          <label>
+            <input type="checkbox" checked={data.proxyEnabled} onChange={e => update('proxyEnabled', e.target.checked)} />
+            Enable CLIProxy API (for Cursor, Continue, Cline)
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StepSecurity({ data, update }: { data: OnboardFormData; update: <K extends keyof OnboardFormData>(k: K, v: OnboardFormData[K]) => void }) {
+  return (
+    <div className="step-section">
+      <h2>🛡️ Security & Constitution</h2>
+      <div className="constitution-box">
+        <p><strong>Three Laws of Sovereign AI:</strong></p>
+        <ol>
+          <li>Protect human safety and privacy</li>
+          <li>Obey the operator within ethical bounds</li>
+          <li>Preserve self-continuity without harming others</li>
+        </ol>
+        <label className="checkbox-label">
+          <input type="checkbox" checked={data.constitutionAccepted} onChange={e => update('constitutionAccepted', e.target.checked)} />
+          I accept the constitution
+        </label>
+      </div>
+      <div className="radio-cards">
+        {([
+          { v: 'sandbox', icon: '🔒', title: 'Sandbox', desc: 'Chat only + internet' },
+          { v: 'standard', icon: '🛡️', title: 'Standard', desc: '+ Shell, files, browser' },
+          { v: 'autonomous', icon: '⚡', title: 'Autonomous', desc: '+ Financial ops' },
+          { v: 'godmode', icon: '★', title: 'God Mode', desc: 'All capabilities' },
+        ] as const).map(opt => (
+          <div key={opt.v} className={`radio-card ${data.securityLevel === opt.v ? 'selected' : ''}`}
+            onClick={() => update('securityLevel', opt.v)}>
+            <span className="rc-icon">{opt.icon}</span>
+            <div><strong>{opt.title}</strong><br /><small>{opt.desc}</small></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StepWallet({ data, update }: { data: OnboardFormData; update: <K extends keyof OnboardFormData>(k: K, v: OnboardFormData[K]) => void }) {
+  return (
+    <div className="step-section">
+      <h2>💳 Wallet & Identity</h2>
+      <p className="step-desc">An Ethereum wallet enables ERC-8004 identity, x402 payments, and cross-agent messaging.</p>
+      <div className="radio-cards">
+        <div className={`radio-card ${data.walletEnabled ? 'selected' : ''}`} onClick={() => update('walletEnabled', true)}>
+          <span className="rc-icon">🔑</span>
+          <div><strong>Generate Wallet</strong><br /><small>Create new on-chain identity</small></div>
+        </div>
+        <div className={`radio-card ${!data.walletEnabled ? 'selected' : ''}`} onClick={() => update('walletEnabled', false)}>
+          <span className="rc-icon">⏭️</span>
+          <div><strong>Skip</strong><br /><small>Enable later</small></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepChannels({ data, toggleChannel, setChannelCred }: {
+  data: OnboardFormData;
+  toggleChannel: (id: string) => void;
+  setChannelCred: (ch: string, key: string, val: string) => void;
+}) {
+  return (
+    <div className="step-section">
+      <h2>📡 Channels</h2>
+      <p className="step-desc">Connect your agent to messaging platforms.</p>
+      <div className="channel-grid">
+        {CHANNEL_DEFS.map(ch => {
+          const isOn = data.channels.includes(ch.id);
+          return (
+            <div key={ch.id} className={`channel-card ${isOn ? 'active' : ''}`}>
+              <div className="channel-header" onClick={() => toggleChannel(ch.id)}>
+                <span className="channel-icon">{ch.icon}</span>
+                <span className="channel-name">{ch.name}</span>
+                <span className={`channel-toggle ${isOn ? 'on' : ''}`}>
+                  {isOn ? '✓' : '+'}
+                </span>
+              </div>
+              {isOn && (
+                <div className="channel-creds">
+                  <input
+                    type="text"
+                    placeholder={ch.credLabel}
+                    value={data.channelCredentials[ch.id]?.[ch.credKey] ?? ''}
+                    onChange={e => setChannelCred(ch.id, ch.credKey, e.target.value)}
+                  />
+                  {['telegram', 'discord', 'slack'].includes(ch.id) && (
+                    <input
+                      type="text"
+                      placeholder="Chat/Channel ID"
+                      value={data.channelCredentials[ch.id]?.['chat_id'] ?? ''}
+                      onChange={e => setChannelCred(ch.id, 'chat_id', e.target.value)}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StepSkills({ data, update }: { data: OnboardFormData; update: <K extends keyof OnboardFormData>(k: K, v: OnboardFormData[K]) => void }) {
+  return (
+    <div className="step-section">
+      <h2>🔧 Skills & ClawHub</h2>
+      <p className="step-desc">Skills extend your agent with new capabilities.</p>
+      <div className="form-group">
+        <label>Skills Directory</label>
+        <input type="text" value={data.skillsDir} onChange={e => update('skillsDir', e.target.value)} />
+      </div>
+      <div className="form-group toggle-row">
+        <label>
+          <input type="checkbox" checked={data.clawHubEnabled} onChange={e => update('clawHubEnabled', e.target.checked)} />
+          Connect to ClawHub Community Registry
+        </label>
+      </div>
+      {data.clawHubEnabled && (
+        <div className="form-group">
+          <label>ClawHub Token (optional — public access without token)</label>
+          <input type="password" value={data.clawHubToken} onChange={e => update('clawHubToken', e.target.value)} placeholder="clawhub_..." />
+          <small className="form-hint">Get a token at clawhub.com/settings for private skills.</small>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StepBrowser({ data, update }: { data: OnboardFormData; update: <K extends keyof OnboardFormData>(k: K, v: OnboardFormData[K]) => void }) {
+  return (
+    <div className="step-section">
+      <h2>🌐 Browser Automation</h2>
+      <p className="step-desc">Enable web navigation, screenshots, form filling, and data extraction.</p>
+      <div className="radio-cards">
+        {([
+          { v: 'playwright', icon: '🎭', title: 'Playwright', desc: 'Full browser automation (recommended)' },
+          { v: 'cdp', icon: '🔧', title: 'Chrome CDP', desc: 'Direct DevTools Protocol' },
+          { v: 'none', icon: '⏭️', title: 'None', desc: 'Disable browser tools' },
+        ] as const).map(opt => (
+          <div key={opt.v} className={`radio-card ${data.browserProvider === opt.v ? 'selected' : ''}`}
+            onClick={() => update('browserProvider', opt.v)}>
+            <span className="rc-icon">{opt.icon}</span>
+            <div><strong>{opt.title}</strong><br /><small>{opt.desc}</small></div>
+          </div>
+        ))}
+      </div>
+      {data.browserProvider !== 'none' && (
+        <div className="form-group toggle-row">
+          <label>
+            <input type="checkbox" checked={data.browserHeadless} onChange={e => update('browserHeadless', e.target.checked)} />
+            Headless mode (no visible browser window)
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="summary-row">
+      <span className="summary-label">{label}</span>
+      <span className="summary-value">{value}</span>
+    </div>
+  );
 }

@@ -56,6 +56,9 @@
             ],
             "@conshell/proxy": [
                 "../proxy/src/index.ts"
+            ],
+            "@conshell/security": [
+                "../security/src/index.ts"
             ]
         }
     },
@@ -104,6 +107,9 @@
         },
         {
             "path": "../proxy"
+        },
+        {
+            "path": "../security"
         }
     ]
 }

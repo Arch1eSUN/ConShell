@@ -33,15 +33,15 @@ describe('AgentStateMachine', () => {
         expect(sm.state).toBe('sleeping');
     });
 
-    it('rejects invalid transition: setup → running', () => {
+    it('rejects invalid transition: setup → running', async () => {
         const sm = new AgentStateMachine();
-        expect(() => sm.transition('running')).toThrow('Invalid state transition');
+        await expect(sm.transition('running')).rejects.toThrow('Invalid state transition');
     });
 
-    it('dead is terminal (no transitions out)', () => {
+    it('dead is terminal (no transitions out)', async () => {
         const sm = new AgentStateMachine('dead');
-        expect(() => sm.transition('waking')).toThrow('Invalid state transition');
-        expect(() => sm.transition('setup')).toThrow('Invalid state transition');
+        await expect(sm.transition('waking')).rejects.toThrow('Invalid state transition');
+        await expect(sm.transition('setup')).rejects.toThrow('Invalid state transition');
     });
 
     it('sleeping → waking (wake cycle)', () => {
@@ -58,12 +58,12 @@ describe('AgentStateMachine', () => {
         }
     });
 
-    it('fires transition listeners', () => {
+    it('fires transition listeners', async () => {
         const sm = new AgentStateMachine();
         const transitions: string[] = [];
-        sm.onTransition((from, to) => transitions.push(`${from}→${to}`));
-        sm.transition('waking');
-        sm.transition('running');
+        sm.onTransition((t) => transitions.push(`${t.from}→${t.to}`));
+        await sm.transition('waking');
+        await sm.transition('running');
         expect(transitions).toEqual(['setup→waking', 'waking→running']);
     });
 

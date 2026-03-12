@@ -7,7 +7,7 @@
  * Default limits:
  *   /api/chat     → 20 req/min  (LLM inference cost)
  *   /api/paid/*   → 10 req/min  (payment verification)
- *   /api/*        → 60 req/min  (general)
+ *   /api/*        → 200 req/min  (general)
  *   /health       → unlimited
  */
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -15,7 +15,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 // ── Types ───────────────────────────────────────────────────────────────
 
 export interface RateLimitConfig {
-    /** Max requests per window. Default: 60 */
+    /** Max requests per window. Default: 200 */
     readonly maxRequests: number;
     /** Window size in milliseconds. Default: 60_000 (1 minute) */
     readonly windowMs: number;
@@ -40,7 +40,7 @@ export class RateLimiter {
     private cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
     constructor(
-        private readonly maxRequests: number = 60,
+        private readonly maxRequests: number = 200,
         private readonly windowMs: number = 60_000,
     ) {
         // Periodically clean up expired entries to prevent memory leaks
@@ -103,8 +103,8 @@ export const RATE_LIMITS = {
     chat: { maxRequests: 20, windowMs: 60_000 } satisfies RateLimitConfig,
     /** Paid endpoints — very conservative */
     paid: { maxRequests: 10, windowMs: 60_000 } satisfies RateLimitConfig,
-    /** General API */
-    general: { maxRequests: 60, windowMs: 60_000 } satisfies RateLimitConfig,
+    /** General API — generous for local dashboard usage */
+    general: { maxRequests: 200, windowMs: 60_000 } satisfies RateLimitConfig,
 } as const;
 
 // ── Middleware ───────────────────────────────────────────────────────────

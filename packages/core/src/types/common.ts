@@ -39,7 +39,8 @@ export type ToolCategory =
     | 'browser'
     | 'shell'
     | 'filesystem'
-    | 'http';
+    | 'http'
+    | 'communication';
 
 export type ToolSource = 'agent' | 'mcp' | 'heartbeat';
 
@@ -50,11 +51,13 @@ export type CapabilityId =
     | 'browser_control'
     | 'shell_exec'
     | 'file_system'
+    | 'file_write'
     | 'financial_ops'
     | 'account_creation'
     | 'self_deploy'
     | 'self_modify'
-    | 'payment_enabled';
+    | 'payment_enabled'
+    | 'network';
 
 /** Progressive security tiers: each tier enables more capabilities. */
 export type SecurityTier = 'sandbox' | 'standard' | 'autonomous' | 'godmode';

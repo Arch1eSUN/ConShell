@@ -109,7 +109,7 @@ describe('SoulSystem', () => {
         const repo = new SoulHistoryRepository(db);
         const soul = new SoulSystem(repo, noopLogger);
         const doc = soul.view();
-        expect(doc.name).toBe('Unnamed Agent');
+        expect(doc.name).toBe('{NAME}');
         expect(doc.version).toBe('soul/v1');
     });
 
@@ -142,7 +142,7 @@ describe('SoulSystem', () => {
 
         const result = soul.update({ name: '' });
         expect(result.valid).toBe(false);
-        expect(soul.view().name).toBe('Unnamed Agent'); // Unchanged
+        expect(soul.view().name).toBe('{NAME}'); // Unchanged
     });
 
     it('update accepts valid changes', () => {

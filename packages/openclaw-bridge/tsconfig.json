@@ -1,0 +1,31 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "composite": true,
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "paths": {
+            "@conshell/core": [
+                "../core/src/index.ts"
+            ],
+            "@conshell/skills": [
+                "../skills/src/index.ts"
+            ]
+        }
+    },
+    "references": [
+        {
+            "path": "../core"
+        },
+        {
+            "path": "../skills"
+        }
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
+    ]
+}

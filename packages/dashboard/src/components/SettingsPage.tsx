@@ -121,11 +121,19 @@ function ProvidersSection() {
     });
     const [saving, setSaving] = useState(false);
 
+    const [loading, setLoading] = useState(true);
+
     const loadProviders = useCallback(async () => {
+        setLoading(true);
         try {
             const data = await api('/providers');
             setProviders(data.providers ?? []);
-        } catch { setStatus({ type: 'error', msg: 'Failed to load providers' }); }
+            setStatus(null);
+        } catch (err) {
+            setStatus({ type: 'error', msg: `Failed to load providers: ${err instanceof Error ? err.message : 'Connection error'}` });
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     useEffect(() => { loadProviders(); }, [loadProviders]);
@@ -248,7 +256,16 @@ function ProvidersSection() {
                     </div>
                 )}
 
-                {providers.length === 0 ? (
+                {loading ? (
+                    <div className="settings-empty" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                        ⏳ Loading providers...
+                    </div>
+                ) : status?.type === 'error' && providers.length === 0 ? (
+                    <div className="settings-empty" style={{ textAlign: 'center' }}>
+                        <p style={{ color: '#ef4444', marginBottom: '0.75rem' }}>{status.msg}</p>
+                        <button className="settings-btn settings-btn-secondary" onClick={loadProviders}>⟳ Retry</button>
+                    </div>
+                ) : providers.length === 0 ? (
                     <div className="settings-empty">
                         No providers configured yet. Click "+ Add Provider" to get started.
                     </div>

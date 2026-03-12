@@ -35,6 +35,12 @@ import {
     registerCronRoutes,
     registerSkillsMarketplaceRoutes,
     registerOAuthRoutes,
+    registerSocialRoutes,
+    registerIdentityRoutes,
+    registerBackupRoutes,
+    registerPluginRoutes,
+    registerSecurityRoutes,
+    registerTaskRoutes,
 } from './routes/index.js';
 import { registerMediaRoutes } from './media.js';
 import { registerFederationRoutes } from './federation.js';
@@ -117,6 +123,20 @@ export function createAppServer(agent: RunningAgent): ServerHandle {
     registerVoiceRoutes(r, ctx);
     registerCanvasRoutes(r, ctx);
     registerOAuthRoutes(r, ctx);
+    registerSocialRoutes(r, ctx);
+    registerIdentityRoutes(r, ctx);
+    registerBackupRoutes(r, ctx);
+    registerPluginRoutes(r, ctx);
+    registerSecurityRoutes(r, ctx);
+    registerTaskRoutes(r, ctx);
+
+    // ── Start Task Runner (async background goals) ───────────────────────
+    if (agent.taskRunner) {
+        // Inject WebSocket broadcast so task events push to connected clients
+        (agent.taskRunner as unknown as { deps: { broadcast: (type: string, data: unknown) => void } }).deps.broadcast =
+            (type: string, data: unknown) => wsManager.broadcast(type, data);
+        agent.taskRunner.start();
+    }
 
     // ── WebSocket Real-Time Broadcasts ──────────────────────────────────
     let lastBroadcastState = agent.getState();
@@ -142,7 +162,10 @@ export function createAppServer(agent: RunningAgent): ServerHandle {
         }
     }, 3000);
 
-    httpServer.on('close', () => clearInterval(statusInterval));
+    httpServer.on('close', () => {
+        clearInterval(statusInterval);
+        agent.taskRunner?.stop();
+    });
 
     // ── Static Files (Dashboard) ────────────────────────────────────────
     const dashboardPath = resolve(__dirname, '../../dashboard/dist');

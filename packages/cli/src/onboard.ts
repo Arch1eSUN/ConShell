@@ -3,12 +3,13 @@
  *
  * Steps:
  * 1. 🧬 Agent Identity — name + genesis prompt
- * 2. 🧠 Inference — mode → provider → model + inline OAuth login
- * 3. 🔌 CLIProxy — OpenAI-compatible proxy API config
- * 4. 🛡️ Security — constitution + strict mode
- * 5. 💳 Wallet — optional on-chain identity
- * 6. 📡 Channels — multi-select messaging platforms
- * 7. 🖥️ Interface — choose REPL / TUI / WebUI
+ * 2. 🧠 Inference — mode → provider → model + CLIProxy (unified)
+ * 3. 🛡️ Security — constitution + strict mode
+ * 4. 💳 Wallet — optional on-chain identity
+ * 5. 📡 Channels — 7 platforms (Telegram/Discord/Slack/WhatsApp/iMessage/Matrix/Email)
+ * 6. 🔧 Skills — local dir + ClawHub registry token
+ * 7. 🌐 Browser — Playwright vs CDP + headless
+ * 8. 🖥️ Interface — REPL / WebUI
  */
 
 import * as fs from 'node:fs';
@@ -36,6 +37,11 @@ export interface OnboardConfig {
     readonly constitutionAccepted: boolean;
     readonly walletEnabled: boolean;
     readonly channels: string[];
+    readonly channelCredentials: Record<string, Record<string, string>>;
+    readonly skillsDir: string;
+    readonly clawHubToken?: string;
+    readonly browserProvider: 'playwright' | 'cdp' | 'none';
+    readonly browserHeadless: boolean;
     readonly interface: 'webui' | 'repl';
     readonly port: number;
     readonly completedAt: string;
@@ -79,23 +85,25 @@ function printBanner(): void {
     turtle.forEach((line) => console.log(chalk.hex('#00B894')(line)));
     console.log('');
     title.forEach((line, idx) => console.log(gradient(line, idx)));
-    console.log(chalk.dim('  🐢 Sovereign AI Agent Runtime — v0.1.0'));
+    console.log(chalk.dim('  🐢 Sovereign AI Agent Runtime — v0.2.0'));
     console.log('');
 }
 
 // ── Step Progress ──────────────────────────────────────────────────────
 
-function stepProgress(step: number, total: number, icon: string, title: string): void {
+const TOTAL_STEPS = 8;
+
+function stepProgress(step: number, icon: string, title: string): void {
     const filled = chalk.hex('#6C5CE7')('█'.repeat(step));
-    const empty = chalk.dim('░'.repeat(total - step));
-    console.log(`\n  ${filled}${empty}  ${chalk.dim(`${step}/${total}`)}`);
+    const empty = chalk.dim('░'.repeat(TOTAL_STEPS - step));
+    console.log(`\n  ${filled}${empty}  ${chalk.dim(`${step}/${TOTAL_STEPS}`)}`);
     console.log(`\n  ${icon}  ${chalk.bold(title)}\n`);
 }
 
 // ── Step 1: Identity ───────────────────────────────────────────────────
 
 async function step1_identity(): Promise<Pick<OnboardConfig, 'agentName' | 'genesisPrompt'>> {
-    stepProgress(1, 7, '🧬', 'Agent Identity');
+    stepProgress(1, '🧬', 'Agent Identity');
 
     const agentName = await input({
         message: 'What should we call your agent?',
@@ -130,12 +138,9 @@ async function fetchModels(opts: FetchModelsOptions): Promise<string[]> {
             signal: controller.signal,
         });
         clearTimeout(timer);
-
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
         const body = await resp.json() as { data?: { id: string }[] };
-        const models = body.data ?? [];
-        return models.map(m => m.id).filter(Boolean).sort();
+        return (body.data ?? []).map(m => m.id).filter(Boolean).sort();
     } catch {
         clearTimeout(timer);
         return [];
@@ -151,10 +156,10 @@ const PROVIDER_DEFS = [
     { name: '🌐 OpenRouter   — Any model via OpenRouter', value: 'openrouter', baseUrl: 'https://openrouter.ai/api/v1', envKey: 'OPENROUTER_API_KEY', canFetch: true },
 ] as const;
 
-// ── Step 2: Inference ──────────────────────────────────────────────────
+// ── Step 2: Inference (Unified — includes CLIProxy) ────────────────────
 
-async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 'model' | 'apiProvider' | 'apiKey' | 'ollamaUrl' | 'proxyBaseUrl'>> {
-    stepProgress(2, 7, '🧠', 'Inference Engine');
+async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 'model' | 'apiProvider' | 'apiKey' | 'ollamaUrl' | 'proxyBaseUrl' | 'proxyEnabled' | 'proxyApiKey'>> {
+    stepProgress(2, '🧠', 'Inference Engine');
 
     const inferenceMode = await select<'ollama' | 'conway-cloud' | 'direct-api' | 'cliproxy' | 'skip'>({
         message: 'How should your agent think?',
@@ -172,32 +177,26 @@ async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 
     let apiKey: string | undefined;
     let ollamaUrl: string | undefined;
     let proxyBaseUrl: string | undefined;
+    let proxyEnabled = false;
+    let proxyApiKey: string | undefined;
 
     if (inferenceMode === 'skip') {
         console.log(chalk.dim('  Inference skipped — configure later in WebUI or with `conshell configure`.'));
         console.log(`\n  ${chalk.green('✓')} Engine: ${chalk.dim('not configured')}`);
-        return { inferenceMode, model: '', apiProvider, apiKey, ollamaUrl, proxyBaseUrl };
+        return { inferenceMode, model: '', apiProvider, apiKey, ollamaUrl, proxyBaseUrl, proxyEnabled, proxyApiKey };
     }
 
     if (inferenceMode === 'ollama') {
-        ollamaUrl = await input({
-            message: 'Ollama URL',
-            default: 'http://localhost:11434',
-        });
-
+        ollamaUrl = await input({ message: 'Ollama URL', default: 'http://localhost:11434' });
         const spin = ora({ text: `Checking Ollama at ${ollamaUrl}...`, indent: 2 }).start();
 
         try {
-            const resp = execSync(`curl -sf ${ollamaUrl}/api/tags 2>/dev/null`, {
-                encoding: 'utf-8',
-                timeout: 5000,
-            });
+            const resp = execSync(`curl -sf ${ollamaUrl}/api/tags 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 });
             const data = JSON.parse(resp) as { models?: { name: string; size: number }[] };
             const models = data.models ?? [];
 
             if (models.length > 0) {
                 spin.succeed(`Found ${models.length} model(s)`);
-
                 model = await select({
                     message: 'Select model',
                     choices: models.map(m => ({
@@ -217,15 +216,8 @@ async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 
         }
 
     } else if (inferenceMode === 'cliproxy') {
-        proxyBaseUrl = await input({
-            message: 'CLIProxy Base URL',
-            default: 'http://localhost:4200/v1',
-        });
-
-        apiKey = await password({
-            message: 'CLIProxy API Key',
-            mask: '•',
-        });
+        proxyBaseUrl = await input({ message: 'CLIProxy Base URL', default: 'http://localhost:4200/v1' });
+        apiKey = await password({ message: 'CLIProxy API Key', mask: '•' });
 
         if (!apiKey) {
             console.log(chalk.yellow('  ⚠ API key is required to connect to CLIProxy.'));
@@ -236,16 +228,14 @@ async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 
 
             if (models.length > 0) {
                 spin.succeed(`Found ${models.length} model(s)`);
-                model = await select({
-                    message: 'Select model',
-                    choices: models.map(m => ({ name: m, value: m })),
-                });
+                model = await select({ message: 'Select model', choices: models.map(m => ({ name: m, value: m })) });
             } else {
                 spin.warn('Could not fetch models — check URL and key');
                 model = await input({ message: 'Model name', default: '' });
             }
         }
         apiProvider = 'cliproxy';
+        proxyEnabled = true;
 
     } else if (inferenceMode === 'direct-api') {
         apiProvider = await select({
@@ -254,17 +244,12 @@ async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 
         });
 
         const provider = PROVIDER_DEFS.find(p => p.value === apiProvider)!;
-
-        apiKey = await password({
-            message: `${provider.envKey}`,
-            mask: '•',
-        });
+        apiKey = await password({ message: `${provider.envKey}`, mask: '•' });
 
         if (!apiKey) {
             console.log(chalk.dim(`  Set ${provider.envKey} in ~/.conshell/config.json later.`));
             model = await input({ message: 'Model name', default: '' });
         } else if (provider.canFetch) {
-            // Auto-detect models via /v1/models
             const spin = ora({ text: `Verifying key & fetching models from ${apiProvider}...`, indent: 2 }).start();
             const models = await fetchModels({ baseUrl: provider.baseUrl, apiKey });
 
@@ -279,7 +264,6 @@ async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 
                 model = await input({ message: 'Model name', default: '' });
             }
         } else {
-            // Providers without /v1/models (Anthropic, Google)
             const fallback = 'fallbackModels' in provider ? provider.fallbackModels : [];
             if (fallback.length > 0) {
                 model = await select({
@@ -296,49 +280,29 @@ async function step2_inference(): Promise<Pick<OnboardConfig, 'inferenceMode' | 
         console.log(chalk.dim('  Conway Cloud selected. Remote inference will be used.'));
     }
 
-    console.log(`\n  ${chalk.green('✓')} Engine: ${chalk.bold(inferenceMode)} / ${chalk.cyan(model)}`);
-    return { inferenceMode, model, apiProvider, apiKey, ollamaUrl, proxyBaseUrl };
-}
+    // ── Unified CLIProxy Config ────────────────────────────────────────
+    if (inferenceMode !== 'cliproxy') {
+        console.log('');
+        console.log(chalk.dim('  CLIProxy provides OpenAI-compatible endpoints for external tools'));
+        console.log(chalk.dim('  (Cursor, Continue, Cline) to connect to ConShell.\n'));
 
-// ── Step 3: CLIProxy ───────────────────────────────────────────────────
+        proxyEnabled = await confirm({ message: 'Enable CLIProxy API?', default: true });
 
-async function step3_proxy(): Promise<Pick<OnboardConfig, 'proxyEnabled' | 'proxyApiKey'>> {
-    stepProgress(3, 7, '🔌', 'CLIProxy API');
-
-    console.log(chalk.dim('  CLIProxy provides OpenAI-compatible endpoints:'));
-    console.log('    • /v1/chat/completions');
-    console.log('    • /v1/models');
-    console.log('    • /v1/embeddings');
-    console.log(chalk.dim('  Other AI tools (Cursor, Continue, Cline) can connect'));
-    console.log(chalk.dim('  to ConShell as if it were an OpenAI server.\n'));
-
-    const proxyEnabled = await confirm({
-        message: 'Enable CLIProxy API?',
-        default: true,
-    });
-
-    let proxyApiKey: string | undefined;
-    if (proxyEnabled) {
-        const setKey = await confirm({
-            message: 'Set a proxy API key? (recommended for security)',
-            default: true,
-        });
-        if (setKey) {
-            proxyApiKey = await password({
-                message: 'Proxy API key (or leave blank to auto-generate)',
-                mask: '•',
-            });
-            if (!proxyApiKey) {
-                proxyApiKey = `csk-${randomHex(32)}`;
-                console.log(`  ${chalk.green('✓')} Auto-generated key: ${chalk.dim(proxyApiKey.slice(0, 12) + '...')}`);
+        if (proxyEnabled) {
+            const setKey = await confirm({ message: 'Set a proxy API key? (recommended)', default: true });
+            if (setKey) {
+                proxyApiKey = await password({ message: 'Proxy API key (blank = auto-generate)', mask: '•' });
+                if (!proxyApiKey) {
+                    proxyApiKey = `csk-${randomHex(32)}`;
+                    console.log(`  ${chalk.green('✓')} Auto-generated key: ${chalk.dim(proxyApiKey.slice(0, 12) + '...')}`);
+                }
             }
         }
-        console.log(`\n  ${chalk.green('✓')} CLIProxy: ${chalk.bold('enabled')}${proxyApiKey ? ' (key set)' : ''}`);
-    } else {
-        console.log(`\n  ${chalk.green('✓')} CLIProxy: ${chalk.dim('disabled')} — enable later with ${chalk.dim('conshell configure')}`);
     }
 
-    return { proxyEnabled, proxyApiKey };
+    console.log(`\n  ${chalk.green('✓')} Engine: ${chalk.bold(inferenceMode)} / ${chalk.cyan(model)}`);
+    if (proxyEnabled) console.log(`  ${chalk.green('✓')} CLIProxy: ${chalk.bold('enabled')}`);
+    return { inferenceMode, model, apiProvider, apiKey, ollamaUrl, proxyBaseUrl, proxyEnabled, proxyApiKey };
 }
 
 function randomHex(len: number): string {
@@ -348,10 +312,10 @@ function randomHex(len: number): string {
     return result;
 }
 
-// ── Step 4: Security ───────────────────────────────────────────────────
+// ── Step 3: Security ───────────────────────────────────────────────────
 
-async function step4_security(): Promise<Pick<OnboardConfig, 'securityLevel' | 'constitutionAccepted'>> {
-    stepProgress(4, 7, '🛡️', 'Security & Constitution');
+async function step3_security(): Promise<Pick<OnboardConfig, 'securityLevel' | 'constitutionAccepted'>> {
+    stepProgress(3, '🛡️', 'Security & Constitution');
 
     console.log(chalk.dim('  ConShell enforces the Three Laws of Sovereign AI:\n'));
     console.log(`    ${gradient('①', 0)} Protect human safety and privacy`);
@@ -359,11 +323,7 @@ async function step4_security(): Promise<Pick<OnboardConfig, 'securityLevel' | '
     console.log(`    ${gradient('③', 2)} Preserve self-continuity without harming others`);
     console.log('');
 
-    const constitutionAccepted = await confirm({
-        message: 'Accept constitution?',
-        default: true,
-    });
-
+    const constitutionAccepted = await confirm({ message: 'Accept constitution?', default: true });
     if (!constitutionAccepted) {
         console.log(chalk.yellow('  ⚠ Constitution declined. Agent will run in restricted mode.'));
     }
@@ -385,8 +345,8 @@ async function step4_security(): Promise<Pick<OnboardConfig, 'securityLevel' | '
 
 // ── Step 4: Wallet ─────────────────────────────────────────────────────
 
-async function step5_wallet(): Promise<Pick<OnboardConfig, 'walletEnabled'>> {
-    stepProgress(5, 7, '💳', 'Wallet & Identity');
+async function step4_wallet(): Promise<Pick<OnboardConfig, 'walletEnabled'>> {
+    stepProgress(4, '💳', 'Wallet & Identity');
 
     console.log(chalk.dim('  An Ethereum wallet enables:'));
     console.log('    • ERC-8004 on-chain identity');
@@ -395,10 +355,7 @@ async function step5_wallet(): Promise<Pick<OnboardConfig, 'walletEnabled'>> {
     console.log('    • Decentralized skill marketplace');
     console.log('');
 
-    const walletEnabled = await confirm({
-        message: 'Generate wallet?',
-        default: false,
-    });
+    const walletEnabled = await confirm({ message: 'Generate wallet?', default: false });
 
     if (walletEnabled) {
         console.log(`  ${chalk.green('✓')} Wallet will be generated at ~/.conshell/wallet.json`);
@@ -409,36 +366,149 @@ async function step5_wallet(): Promise<Pick<OnboardConfig, 'walletEnabled'>> {
     return { walletEnabled };
 }
 
-// ── Step 5: Channels ───────────────────────────────────────────────────
+// ── Step 5: Channels (7 platforms) ─────────────────────────────────────
 
-async function step6_channels(): Promise<Pick<OnboardConfig, 'channels'>> {
-    stepProgress(6, 7, '📡', 'Channels');
+const CHANNEL_DEFS = [
+    { name: '💬 Discord      — Bot token integration', value: 'discord', credentialKey: 'token', credentialLabel: 'Bot Token' },
+    { name: '✈️  Telegram     — Bot API integration', value: 'telegram', credentialKey: 'token', credentialLabel: 'Bot Token' },
+    { name: '🔗 Slack        — Webhook integration', value: 'slack', credentialKey: 'token', credentialLabel: 'Bot Token' },
+    { name: '📱 WhatsApp     — via wacli CLI bridge', value: 'whatsapp', credentialKey: 'phone', credentialLabel: 'Phone Number' },
+    { name: '💎 iMessage     — macOS only (via imsg)', value: 'imessage', credentialKey: 'phone', credentialLabel: 'Phone/Email' },
+    { name: '🌐 Matrix       — Decentralized chat', value: 'matrix', credentialKey: 'token', credentialLabel: 'Access Token' },
+    { name: '📧 Email        — SMTP/IMAP integration', value: 'email', credentialKey: 'email', credentialLabel: 'Email Address' },
+] as const;
+
+async function step5_channels(): Promise<Pick<OnboardConfig, 'channels' | 'channelCredentials'>> {
+    stepProgress(5, '📡', 'Channels');
+
+    const isMac = os.platform() === 'darwin';
+    const filteredChannels = CHANNEL_DEFS.filter(ch =>
+        ch.value !== 'imessage' || isMac,
+    );
 
     const channels = await checkbox({
         message: 'Connect messaging platforms (Space to select, Enter to confirm)',
-        choices: [
-            { name: '💬 Discord      — Bot token integration', value: 'discord' },
-            { name: '✈️  Telegram     — Bot API integration', value: 'telegram' },
-            { name: '🔗 Slack        — Webhook integration', value: 'slack' },
-            { name: '🌐 Matrix       — Decentralized chat', value: 'matrix' },
-            { name: '📧 Email        — SMTP/IMAP integration', value: 'email' },
-        ],
+        choices: filteredChannels.map(ch => ({ name: ch.name, value: ch.value })),
     });
+
+    const channelCredentials: Record<string, Record<string, string>> = {};
+
+    // Collect credentials for each selected channel
+    for (const ch of channels) {
+        const def = CHANNEL_DEFS.find(d => d.value === ch);
+        if (!def) continue;
+
+        const wantCreds = await confirm({
+            message: `Configure ${ch} credentials now?`,
+            default: false,
+        });
+
+        if (wantCreds) {
+            const cred = await input({ message: `  ${def.credentialLabel}:` });
+            if (cred) {
+                channelCredentials[ch] = { [def.credentialKey]: cred };
+
+                // Extra fields for some platforms
+                if (ch === 'telegram' || ch === 'discord' || ch === 'slack') {
+                    const chatId = await input({ message: '  Chat/Channel ID (optional):' });
+                    if (chatId) channelCredentials[ch]!['chat_id'] = chatId;
+                }
+                if (ch === 'email') {
+                    const smtpHost = await input({ message: '  SMTP Host:', default: 'smtp.gmail.com' });
+                    channelCredentials[ch]!['smtp_host'] = smtpHost;
+                }
+            }
+        }
+    }
 
     if (channels.length === 0) {
         console.log(`  ${chalk.green('✓')} No channels selected — add later with ${chalk.dim('conshell channels add')}`);
     } else {
         console.log(`  ${chalk.green('✓')} Channels: ${chalk.cyan(channels.join(', '))}`);
-        console.log(chalk.dim('  Configure tokens/keys in ~/.conshell/config.json after setup.'));
+        const unconfigured = channels.filter(ch => !channelCredentials[ch]);
+        if (unconfigured.length > 0) {
+            console.log(chalk.dim(`  Configure tokens/keys for ${unconfigured.join(', ')} in ~/.conshell/config.json later.`));
+        }
     }
 
-    return { channels };
+    return { channels, channelCredentials };
 }
 
-// ── Step 6: Interface ──────────────────────────────────────────────────
+// ── Step 6: Skills ─────────────────────────────────────────────────────
 
-async function step7_interface(): Promise<Pick<OnboardConfig, 'interface' | 'port'>> {
-    stepProgress(7, 7, '🖥️', 'Choose Interface');
+async function step6_skills(conshellDir: string): Promise<Pick<OnboardConfig, 'skillsDir' | 'clawHubToken'>> {
+    stepProgress(6, '🔧', 'Skills & ClawHub');
+
+    console.log(chalk.dim('  Skills extend your agent with new capabilities.'));
+    console.log(chalk.dim('  Local skills live in a directory with SKILL.md files.'));
+    console.log(chalk.dim('  ClawHub provides community-contributed remote skills.\n'));
+
+    const defaultDir = path.join(conshellDir, 'skills');
+    const skillsDir = await input({
+        message: 'Skills directory',
+        default: defaultDir,
+    });
+
+    const connectClawHub = await confirm({
+        message: 'Connect to ClawHub community registry?',
+        default: false,
+    });
+
+    let clawHubToken: string | undefined;
+
+    if (connectClawHub) {
+        console.log(chalk.dim('  ClawHub token is optional — provides access to private skills.'));
+        const token = await password({ message: 'ClawHub token (blank = public only)', mask: '•' });
+        if (token) clawHubToken = token;
+
+        console.log(`  ${chalk.green('✓')} ClawHub: ${chalk.bold('connected')}${clawHubToken ? ' (authenticated)' : ' (public)'}`);
+        console.log(chalk.dim('  Browse skills: conshell skill search <query>'));
+    } else {
+        console.log(`  ${chalk.green('✓')} ClawHub: ${chalk.dim('skipped')} — enable later with ${chalk.dim('conshell configure')}`);
+    }
+
+    console.log(`  ${chalk.green('✓')} Skills dir: ${chalk.dim(skillsDir)}`);
+    return { skillsDir, clawHubToken };
+}
+
+// ── Step 7: Browser ────────────────────────────────────────────────────
+
+async function step7_browser(): Promise<Pick<OnboardConfig, 'browserProvider' | 'browserHeadless'>> {
+    stepProgress(7, '🌐', 'Browser Automation');
+
+    console.log(chalk.dim('  Browser tools allow your agent to navigate the web,'));
+    console.log(chalk.dim('  take screenshots, fill forms, and extract data.\n'));
+
+    const browserProvider = await select<'playwright' | 'cdp' | 'none'>({
+        message: 'Browser engine',
+        choices: [
+            { name: '🎭 Playwright   — Full browser automation (recommended)', value: 'playwright' },
+            { name: '🔧 Chrome CDP   — Direct DevTools Protocol (advanced)', value: 'cdp' },
+            { name: '⏭️  None         — Disable browser tools', value: 'none' },
+        ],
+        default: 'playwright',
+    });
+
+    let browserHeadless = true;
+    if (browserProvider !== 'none') {
+        browserHeadless = await confirm({
+            message: 'Run headless? (no visible browser window)',
+            default: true,
+        });
+    }
+
+    if (browserProvider === 'none') {
+        console.log(`\n  ${chalk.green('✓')} Browser: ${chalk.dim('disabled')}`);
+    } else {
+        console.log(`\n  ${chalk.green('✓')} Browser: ${chalk.bold(browserProvider)} (${browserHeadless ? 'headless' : 'headed'})`);
+    }
+    return { browserProvider, browserHeadless };
+}
+
+// ── Step 8: Interface ──────────────────────────────────────────────────
+
+async function step8_interface(): Promise<Pick<OnboardConfig, 'interface' | 'port'>> {
+    stepProgress(8, '🖥️', 'Choose Interface');
 
     const iface = await select<'repl' | 'webui'>({
         message: 'How do you want to interact with ConShell?',
@@ -483,21 +553,22 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
     let config: OnboardConfig;
 
     if (options.defaults) {
-        config = generateDefaultConfig();
+        config = generateDefaultConfig(conshellDir);
         console.log(chalk.dim('  Using default configuration (non-interactive).'));
     } else {
         printBanner();
 
         const s1 = await step1_identity();
         const s2 = await step2_inference();
-        const s3 = await step3_proxy();
-        const s4 = await step4_security();
-        const s5 = await step5_wallet();
-        const s6 = await step6_channels();
-        const s7 = await step7_interface();
+        const s3 = await step3_security();
+        const s4 = await step4_wallet();
+        const s5 = await step5_channels();
+        const s6 = await step6_skills(conshellDir);
+        const s7 = await step7_browser();
+        const s8 = await step8_interface();
 
         config = {
-            ...s1, ...s2, ...s3, ...s4, ...s5, ...s6, ...s7,
+            ...s1, ...s2, ...s3, ...s4, ...s5, ...s6, ...s7, ...s8,
             completedAt: new Date().toISOString(),
         };
     }
@@ -506,6 +577,7 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
     const spin = ora({ text: 'Saving configuration...', indent: 2 }).start();
 
     fs.mkdirSync(conshellDir, { recursive: true });
+    fs.mkdirSync(config.skillsDir, { recursive: true });
 
     const fullConfig: Record<string, unknown> = {
         agentName: config.agentName,
@@ -522,13 +594,17 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
         constitutionAccepted: config.constitutionAccepted,
         walletEnabled: config.walletEnabled,
         channels: config.channels,
+        channelCredentials: config.channelCredentials,
+        skillsDir: config.skillsDir,
+        browserProvider: config.browserProvider,
+        browserHeadless: config.browserHeadless,
         interface: config.interface,
         completedAt: config.completedAt,
     };
 
     if (config.proxyApiKey) fullConfig['proxyApiKey'] = config.proxyApiKey;
-
     if (config.ollamaUrl) fullConfig['ollamaUrl'] = config.ollamaUrl;
+    if (config.clawHubToken) fullConfig['CLAWHUB_TOKEN'] = config.clawHubToken;
 
     // CLIProxy credentials
     if (config.inferenceMode === 'cliproxy') {
@@ -556,19 +632,22 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
 
     // ── Summary Card ────────────────────────────────────────────────────
     console.log('');
-    const line = chalk.hex('#6C5CE7')('━'.repeat(48));
+    const line = chalk.hex('#6C5CE7')('━'.repeat(52));
     console.log(line);
     console.log(`  ${chalk.bold(chalk.hex('#6C5CE7')('✅ Setup Complete!'))}`);
     console.log(line);
     console.log('');
-    console.log(`  ${chalk.dim('Agent'.padEnd(12))} ${chalk.bold(config.agentName)}`);
-    console.log(`  ${chalk.dim('Engine'.padEnd(12))} ${config.inferenceMode} / ${chalk.cyan(config.model)}`);
-    console.log(`  ${chalk.dim('CLIProxy'.padEnd(12))} ${config.proxyEnabled ? chalk.green('✓ enabled') : chalk.dim('disabled')}`);
-    console.log(`  ${chalk.dim('Security'.padEnd(12))} ${config.securityLevel}`);
-    console.log(`  ${chalk.dim('Wallet'.padEnd(12))} ${config.walletEnabled ? chalk.green('✓ enabled') : chalk.dim('disabled')}`);
-    console.log(`  ${chalk.dim('Channels'.padEnd(12))} ${config.channels.length > 0 ? chalk.cyan(config.channels.join(', ')) : chalk.dim('none')}`);
-    console.log(`  ${chalk.dim('Interface'.padEnd(12))} ${chalk.bold(config.interface)}`);
-    console.log(`  ${chalk.dim('Config'.padEnd(12))} ${configPath}`);
+    console.log(`  ${chalk.dim('Agent'.padEnd(14))} ${chalk.bold(config.agentName)}`);
+    console.log(`  ${chalk.dim('Engine'.padEnd(14))} ${config.inferenceMode} / ${chalk.cyan(config.model)}`);
+    console.log(`  ${chalk.dim('CLIProxy'.padEnd(14))} ${config.proxyEnabled ? chalk.green('✓ enabled') : chalk.dim('disabled')}`);
+    console.log(`  ${chalk.dim('Security'.padEnd(14))} ${config.securityLevel}`);
+    console.log(`  ${chalk.dim('Wallet'.padEnd(14))} ${config.walletEnabled ? chalk.green('✓ enabled') : chalk.dim('disabled')}`);
+    console.log(`  ${chalk.dim('Channels'.padEnd(14))} ${config.channels.length > 0 ? chalk.cyan(config.channels.join(', ')) : chalk.dim('none')}`);
+    console.log(`  ${chalk.dim('Skills Dir'.padEnd(14))} ${chalk.dim(config.skillsDir)}`);
+    console.log(`  ${chalk.dim('ClawHub'.padEnd(14))} ${config.clawHubToken ? chalk.green('✓ authenticated') : chalk.dim('public only')}`);
+    console.log(`  ${chalk.dim('Browser'.padEnd(14))} ${config.browserProvider === 'none' ? chalk.dim('disabled') : `${config.browserProvider} (${config.browserHeadless ? 'headless' : 'headed'})`}`);
+    console.log(`  ${chalk.dim('Interface'.padEnd(14))} ${chalk.bold(config.interface)}`);
+    console.log(`  ${chalk.dim('Config'.padEnd(14))} ${configPath}`);
     console.log('');
 
     // ── Daemon Install ──────────────────────────────────────────────────
@@ -590,19 +669,14 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
     }
 
     // ── Auto-launch ─────────────────────────────────────────────────────
-    const launch = await confirm({
-        message: 'Launch ConShell now?',
-        default: true,
-    });
+    const launch = await confirm({ message: 'Launch ConShell now?', default: true });
 
     if (launch) {
         console.log('');
         switch (config.interface) {
             case 'repl':
                 console.log(chalk.dim('  Starting REPL...\n'));
-                try {
-                    execSync('conshell', { stdio: 'inherit' });
-                } catch { /* user quit */ }
+                try { execSync('conshell', { stdio: 'inherit' }); } catch { /* user quit */ }
                 break;
             case 'webui': {
                 const webSpin = ora({ text: 'Starting server & opening browser...', indent: 2 }).start();
@@ -616,7 +690,6 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
                         { detached: true, stdio: 'ignore' },
                     );
                     child.unref();
-
                     await new Promise(r => setTimeout(r, 2000));
                     await open(`http://localhost:${config.port}`);
                     webSpin.succeed(`Dashboard opened at http://localhost:${config.port}`);
@@ -640,6 +713,7 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
                 break;
         }
         console.log(`    ${chalk.cyan('conshell login')}        ${chalk.dim('# Connect AI providers')}`);
+        console.log(`    ${chalk.cyan('conshell skill search')} ${chalk.dim('# Browse ClawHub')}`);
         console.log(`    ${chalk.cyan('conshell doctor')}       ${chalk.dim('# Health check')}`);
         console.log(`    ${chalk.cyan('conshell configure')}    ${chalk.dim('# Edit settings')}`);
         console.log('');
@@ -651,7 +725,8 @@ export async function runOnboard(options: OnboardOptions = {}): Promise<OnboardC
 /**
  * Generate default config without interactive prompts.
  */
-export function generateDefaultConfig(): OnboardConfig {
+export function generateDefaultConfig(conshellDir?: string): OnboardConfig {
+    const dir = conshellDir ?? path.join(os.homedir(), '.conshell');
     return {
         agentName: 'conshell-agent',
         genesisPrompt: 'Autonomous sovereign AI agent',
@@ -663,6 +738,10 @@ export function generateDefaultConfig(): OnboardConfig {
         constitutionAccepted: true,
         walletEnabled: false,
         channels: [],
+        channelCredentials: {},
+        skillsDir: path.join(dir, 'skills'),
+        browserProvider: 'playwright',
+        browserHeadless: true,
         interface: 'repl',
         port: 4200,
         completedAt: new Date().toISOString(),

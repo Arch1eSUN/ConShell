@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { api } from '../lib/api';
+import { useWebSocket } from '../lib/useWebSocket';
 import './ChatInterface.css';
 
 interface Message {
@@ -34,6 +35,42 @@ export function ChatInterface() {
     const [historyLoaded, setHistoryLoaded] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
     const abortRef = useRef<AbortController | null>(null);
+
+    const { on } = useWebSocket();
+
+    // Listen for proactive agent messages via WebSocket
+    useEffect(() => {
+        const unsubs = [
+            on('agent_message', (data) => {
+                const content = String(data.message ?? data.content ?? '');
+                if (!content) return;
+                setMessages(prev => [...prev, {
+                    role: 'agent' as const,
+                    content,
+                    timestamp: new Date(),
+                }]);
+            }),
+            on('task_complete', (data) => {
+                const result = String(data.result ?? data.message ?? 'Task completed');
+                const goal = data.goal ? `[Task: ${data.goal}] ` : '';
+                setMessages(prev => [...prev, {
+                    role: 'agent' as const,
+                    content: `${goal}${result}`,
+                    timestamp: new Date(),
+                }]);
+            }),
+            on('task_failed', (data) => {
+                const error = String(data.error ?? 'Unknown error');
+                const goal = data.goal ? `[Task: ${data.goal}] ` : '';
+                setMessages(prev => [...prev, {
+                    role: 'agent' as const,
+                    content: `${goal}⚠ Task failed: ${error}`,
+                    timestamp: new Date(),
+                }]);
+            }),
+        ];
+        return () => unsubs.forEach(u => u());
+    }, [on]);
 
     const scrollToBottom = useCallback(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -6,9 +6,9 @@ interface Props {
     children: ReactNode;
 }
 
-type Tab = 'overview' | 'chat' | 'logs' | 'heartbeat' | 'children' | 'soul'
+type Tab = 'overview' | 'chat' | 'logs' | 'heartbeat' | 'tasks' | 'children' | 'soul'
     | 'identity' | 'social' | 'plugins' | 'channels' | 'backup' | 'health' | 'metrics'
-    | 'onboard' | 'settings';
+    | 'onboard' | 'canvas' | 'voice' | 'media' | 'settings';
 
 interface LayoutProps extends Props {
     activeTab: Tab;
@@ -33,6 +33,7 @@ const NAV_GROUPS: NavGroup[] = [
         label: 'Agent',
         items: [
             { id: 'heartbeat', label: 'Heartbeat' },
+            { id: 'tasks', label: 'Tasks' },
             { id: 'children', label: 'Children' },
             { id: 'soul', label: 'Soul' },
             { id: 'identity', label: 'Identity' },
@@ -44,6 +45,9 @@ const NAV_GROUPS: NavGroup[] = [
         items: [
             { id: 'plugins', label: 'Plugins' },
             { id: 'channels', label: 'Channels' },
+            { id: 'canvas', label: 'Canvas' },
+            { id: 'voice', label: 'Voice' },
+            { id: 'media', label: 'Media' },
             { id: 'backup', label: 'Backup' },
             { id: 'health', label: 'Health' },
             { id: 'metrics', label: 'Metrics' },

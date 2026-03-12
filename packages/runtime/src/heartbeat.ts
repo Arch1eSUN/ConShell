@@ -107,7 +107,7 @@ export class HeartbeatDaemon {
         for (const [name, task] of this.tasks) {
             try {
                 // Check tier gate
-                if (TIER_ORDER[currentTier] < TIER_ORDER[task.minTier]) {
+                if ((TIER_ORDER[currentTier] ?? 0) < (TIER_ORDER[task.minTier] ?? 0)) {
                     continue;
                 }
 

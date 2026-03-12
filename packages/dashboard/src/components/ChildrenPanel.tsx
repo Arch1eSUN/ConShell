@@ -32,18 +32,42 @@ function formatTimeAgo(isoString: string): string {
 }
 
 export function ChildrenPanel() {
-    const { data, loading } = usePolling<ChildrenResponse>(
+    const { data, loading, error } = usePolling<ChildrenResponse>(
         () => api.children() as Promise<ChildrenResponse>,
         15000,
     );
 
-    if (loading || !data) {
+    if (loading && !data) {
         return (
             <div className="children-panel">
                 <h3>Child Agents</h3>
                 <div className="children-empty">
                     <div className="children-empty-icon">*</div>
                     <p>Loading child agents…</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error && !data) {
+        return (
+            <div className="children-panel">
+                <h3>Child Agents</h3>
+                <div className="children-empty">
+                    <div className="children-empty-icon">—</div>
+                    <p style={{ color: 'var(--ink-muted)' }}>No child agents spawned yet</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div className="children-panel">
+                <h3>Child Agents</h3>
+                <div className="children-empty">
+                    <div className="children-empty-icon">—</div>
+                    <p>No child agents spawned yet</p>
                 </div>
             </div>
         );

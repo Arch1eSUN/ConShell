@@ -171,6 +171,8 @@ export interface RunningAgent {
     readonly capabilityConfig: { get: () => CapabilityConfig; set: (c: CapabilityConfig) => void };
     readonly getState: () => AgentState;
     readonly getTier: () => SurvivalTier;
+    readonly taskQueue?: import('@conshell/runtime').TaskQueue;
+    readonly taskRunner?: import('@conshell/runtime').TaskRunner;
     shutdown: () => void;
 }
 
@@ -675,6 +677,19 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
 
     logger.info('OnchainWalletProvider initialized (Base Sepolia USDC)');
 
+    // ── Task Queue + Runner (async user-delegated goals) ─────────────────
+    const { TaskQueue, TaskRunner } = await import('@conshell/runtime');
+    const taskDb = {
+        run: (sql: string, params?: unknown[]) => { db.prepare(sql).run(...(params ?? [])); },
+        all: (sql: string, params?: unknown[]) => db.prepare(sql).all(...(params ?? [])),
+    };
+    const taskQueue = new TaskQueue(logger, taskDb);
+    const taskRunner = new TaskRunner({
+        logger,
+        taskQueue,
+        agentLoop,
+    });
+
     const agent: RunningAgent = {
         config,
         db,
@@ -695,8 +710,11 @@ export async function bootKernel(config: AppConfig): Promise<RunningAgent> {
         capabilityConfig: capabilityConfigHolder,
         getState: () => stateMachine.state as AgentState,
         getTier: () => tierManager.getTier(),
+        taskQueue,
+        taskRunner,
         shutdown() {
             logger.info('Shutting down agent kernel gracefully');
+            taskRunner.stop();
             heartbeat.stop();
             if (stateMachine.canTransition('sleeping')) {
                 stateMachine.transition('sleeping');

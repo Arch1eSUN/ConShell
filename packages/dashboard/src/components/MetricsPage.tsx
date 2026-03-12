@@ -7,14 +7,24 @@ interface MetricEntry {
     trend?: 'up' | 'down' | 'flat';
 }
 
+interface ModelCost {
+    model: string;
+    turns: number;
+    tokens: number;
+    costMicros: number;
+}
+
 const TREND_ICON: Record<string, string> = { up: '↑', down: '↓', flat: '→' };
 
 export function MetricsPage() {
     const [metrics, setMetrics] = useState<MetricEntry[]>([]);
+    const [modelCosts, setModelCosts] = useState<ModelCost[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     const fetchMetrics = useCallback(async () => {
         setLoading(true);
+        setError('');
         try {
             const res = await fetch('/api/status');
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -31,7 +41,27 @@ export function MetricsPage() {
                 { label: 'Survival Tier', value: data.currentTier ?? '—', trend: 'flat' },
             ];
             setMetrics(built);
-        } catch {
+
+            // Fetch cost breakdown from turns
+            try {
+                const turnsRes = await fetch('/api/turns?limit=200');
+                if (turnsRes.ok) {
+                    const turnsData = await turnsRes.json();
+                    const turns = turnsData.turns ?? [];
+                    const byModel = new Map<string, ModelCost>();
+                    for (const turn of turns) {
+                        const model = String(turn.model ?? 'unknown');
+                        const entry = byModel.get(model) ?? { model, turns: 0, tokens: 0, costMicros: 0 };
+                        entry.turns += 1;
+                        entry.tokens += Number(turn.totalTokens ?? turn.tokens ?? 0);
+                        entry.costMicros += Number(turn.costMicros ?? 0);
+                        byModel.set(model, entry);
+                    }
+                    setModelCosts(Array.from(byModel.values()).sort((a, b) => b.costMicros - a.costMicros));
+                }
+            } catch { /* ignore cost breakdown error — metrics still show */ }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load metrics');
             setMetrics([
                 { label: 'Server', value: 'Offline', trend: 'down' },
             ]);
@@ -47,6 +77,13 @@ export function MetricsPage() {
                 <h2 className="page-title">Metrics</h2>
                 <p className="page-subtitle">Runtime performance and cost tracking</p>
             </header>
+
+            {error && (
+                <div style={{ padding: '0.75rem 1rem', marginBottom: '1rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: '#ef4444', fontSize: '0.85rem' }}>⚠ {error}</span>
+                    <button className="settings-btn settings-btn-secondary" onClick={fetchMetrics} style={{ fontSize: '0.8rem' }}>⟳ Retry</button>
+                </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
                 {metrics.map(m => (
@@ -70,13 +107,37 @@ export function MetricsPage() {
                 <div className="settings-card-header">
                     <div>
                         <div className="settings-card-title">Cost Breakdown</div>
-                        <div className="settings-card-subtitle">Inference spend by provider and model</div>
+                        <div className="settings-card-subtitle">Inference spend by model</div>
                     </div>
                     <button className="settings-btn settings-btn-secondary" onClick={fetchMetrics}>Refresh</button>
                 </div>
-                <div className="settings-empty" style={{ marginTop: '0.75rem' }}>
-                    Detailed per-model cost tracking coming soon.
-                </div>
+
+                {modelCosts.length > 0 ? (
+                    <table style={{ width: '100%', marginTop: '0.75rem', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                        <thead>
+                            <tr style={{ borderBottom: '1px solid var(--border-subtle, #333)', textAlign: 'left' }}>
+                                <th style={{ padding: '0.5rem 0', color: 'var(--ink-muted)' }}>Model</th>
+                                <th style={{ padding: '0.5rem 0', color: 'var(--ink-muted)', textAlign: 'right' }}>Turns</th>
+                                <th style={{ padding: '0.5rem 0', color: 'var(--ink-muted)', textAlign: 'right' }}>Tokens</th>
+                                <th style={{ padding: '0.5rem 0', color: 'var(--ink-muted)', textAlign: 'right' }}>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {modelCosts.map(mc => (
+                                <tr key={mc.model} style={{ borderBottom: '1px solid var(--border-subtle, #222)' }}>
+                                    <td style={{ padding: '0.5rem 0', fontFamily: 'monospace', fontSize: '0.85rem' }}>{mc.model}</td>
+                                    <td style={{ padding: '0.5rem 0', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{mc.turns}</td>
+                                    <td style={{ padding: '0.5rem 0', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{mc.tokens.toLocaleString()}</td>
+                                    <td style={{ padding: '0.5rem 0', textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--accent, #6366f1)' }}>${(mc.costMicros / 1_000_000).toFixed(4)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className="settings-empty" style={{ marginTop: '0.75rem' }}>
+                        No cost data available yet. Start chatting to generate usage metrics.
+                    </div>
+                )}
             </div>
         </div>
     );
