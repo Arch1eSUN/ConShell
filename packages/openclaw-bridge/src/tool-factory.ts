@@ -8,7 +8,7 @@
  *
  * Each tool is policy-gated via the existing ToolExecutor/PolicyEngine pipeline.
  */
-import type { ToolDefinition } from '@conshell/core';
+import type { ToolDefinition, CapabilityId, ToolCategory } from '@conshell/core';
 import type {
     BrowserProvider,
     BrowserSession,
@@ -182,7 +182,7 @@ export function createClawHubAgentTools(adapter: ClawHubAdapter): readonly Bridg
                 requiredAuthority: 'self',
                 mcpExposed: true,
                 auditFields: ['query'],
-                requiredCapabilities: ['network'],
+                requiredCapabilities: ['network' as CapabilityId],
             },
             handler: async (args) => {
                 const results = await adapter.search(
@@ -212,7 +212,7 @@ export function createClawHubAgentTools(adapter: ClawHubAdapter): readonly Bridg
                 requiredAuthority: 'self',
                 mcpExposed: false,
                 auditFields: ['name'],
-                requiredCapabilities: ['file_write', 'network'],
+                requiredCapabilities: ['file_write' as CapabilityId, 'network' as CapabilityId],
             },
             handler: async (args) => {
                 const info = await adapter.install(
@@ -238,7 +238,7 @@ export function createClawHubAgentTools(adapter: ClawHubAdapter): readonly Bridg
                 requiredAuthority: 'self',
                 mcpExposed: true,
                 auditFields: ['name'],
-                requiredCapabilities: ['network'],
+                requiredCapabilities: ['network' as CapabilityId],
             },
             handler: async (args) => {
                 const manifest = await adapter.getManifest(args['name'] as string);
@@ -256,7 +256,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
         {
             definition: {
                 name: 'channel_list',
-                category: 'communication',
+                category: 'communication' as ToolCategory,
                 description: 'List all active messaging channels and their status.',
                 inputSchema: { type: 'object', properties: {} },
                 riskLevel: 'safe',
@@ -273,7 +273,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
         {
             definition: {
                 name: 'channel_broadcast',
-                category: 'communication',
+                category: 'communication' as ToolCategory,
                 description: 'Send a message through a specific channel by its ID.',
                 inputSchema: {
                     type: 'object',
@@ -287,7 +287,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
                 requiredAuthority: 'self',
                 mcpExposed: true,
                 auditFields: ['channelId'],
-                requiredCapabilities: ['network'],
+                requiredCapabilities: ['network' as CapabilityId],
             },
             handler: async (args) => {
                 await router.send(
@@ -300,7 +300,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
         {
             definition: {
                 name: 'channel_create',
-                category: 'communication',
+                category: 'communication' as ToolCategory,
                 description: 'Register a new messaging channel (Telegram, Discord, Slack, Webhook).',
                 inputSchema: {
                     type: 'object',
@@ -317,7 +317,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
                 requiredAuthority: 'self',
                 mcpExposed: false,
                 auditFields: ['type', 'label'],
-                requiredCapabilities: ['network'],
+                requiredCapabilities: ['network' as CapabilityId],
             },
             handler: async (args) => {
                 const channelType = args['type'] as 'telegram' | 'discord' | 'slack' | 'whatsapp' | 'webhook';
@@ -336,7 +336,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
         {
             definition: {
                 name: 'channel_isolate',
-                category: 'communication',
+                category: 'communication' as ToolCategory,
                 description: 'Create an isolated agent workspace for a specific channel.',
                 inputSchema: {
                     type: 'object',
@@ -349,7 +349,7 @@ export function createChannelAgentTools(router: ChannelRouter): readonly BridgeT
                 requiredAuthority: 'self',
                 mcpExposed: false,
                 auditFields: ['channelId'],
-                requiredCapabilities: ['file_write'],
+                requiredCapabilities: ['file_write' as CapabilityId],
             },
             handler: async (args) => {
                 const instance = await router.isolate(args['channelId'] as string);
